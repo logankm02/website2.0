@@ -14,8 +14,7 @@ export default {
         '500': '0.5s', // Define a transition duration of 0.5 seconds
       },
       backgroundImage: {
-        'banner': "url('/src/assets/images/cover.jpeg')", // Update this path to your image
-        'sunset': "url('/src/assets/images/sunset.jpg')",
+        'banner': "url('/cover.jpeg')",
       },
       fontFamily: {
         'sans': ['Lexend', 'sans-serif'],

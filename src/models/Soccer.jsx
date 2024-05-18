@@ -6,7 +6,7 @@ Source: https://sketchfab.com/3d-models/soccer-football-stadium-game-asset-lowpo
 Title: ⚽Soccer football stadium game asset lowpoly city
 */
 
-import scene from '/src/assets/3d/soccer.glb'
+import scene from '/src/assets/soccer.glb'
 
 import React, { useRef, useState, useEffect } from 'react'
 import { useGLTF, Html } from '@react-three/drei'
