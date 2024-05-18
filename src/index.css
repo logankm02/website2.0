@@ -1,0 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+    .skill {
+        @apply flex flex-col justify-end mr-5 items-center my-5 h-20
+    }
+
+    .skill img {
+        @apply w-20 h-auto mb-2
+    }
+
+    .skill p {
+        @apply text-center
+    }
+}
