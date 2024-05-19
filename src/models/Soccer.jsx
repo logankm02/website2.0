@@ -46,7 +46,7 @@ const targetPositions = {
     x: 0.5,
     y: -0.5,
     z: 6.7,
-    rotationX: -1.2
+    rotationX: -1.5
 };
 
 // Calculate distances to be covered in each dimension
@@ -62,10 +62,10 @@ const maxDistance = Math.max(distances.x, distances.y, distances.z, distances.ro
 
 // Calculate rates of change in each dimension
 const rates = {
-    x: distances.x / maxDistance * 0.04,
+    x: distances.x / maxDistance * 0.035,
     y: distances.y / maxDistance * 0.0,
-    z: distances.z / maxDistance * 0.04,
-    rotationX: distances.rotationX / maxDistance * 0.04,
+    z: distances.z / maxDistance * 0.035,
+    rotationX: distances.rotationX / maxDistance * 0.03,
 };
 
   useFrame(() => {
@@ -79,7 +79,7 @@ const rates = {
         if (soccerRef.current.position.y < -0.5) {
             soccerRef.current.position.y += rates.y
         }
-         if (soccerRef.current.rotation.x > -1.2) {
+         if (soccerRef.current.rotation.x > -1.5) {
           soccerRef.current.rotation.x -= rates.rotationX;
         }
 
