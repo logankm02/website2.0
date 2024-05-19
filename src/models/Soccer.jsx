@@ -45,24 +45,27 @@ export function Soccer(props) {
 const targetPositions = {
     x: 0.5,
     y: -0.5,
-    z: 6.7
+    z: 6.7,
+    rotationX: -1.2
 };
 
 // Calculate distances to be covered in each dimension
 const distances = {
     x: Math.abs(targetPositions.x - 1.2),
     y: Math.abs(targetPositions.y - (-0.9)),
-    z: Math.abs(targetPositions.z - 2)
+    z: Math.abs(targetPositions.z - 2),
+    rotationX: Math.abs(targetPositions.rotationX - 0.2)
 };
 
 // Find the maximum distance
-const maxDistance = Math.max(distances.x, distances.y, distances.z);
+const maxDistance = Math.max(distances.x, distances.y, distances.z, distances.rotationX);
 
 // Calculate rates of change in each dimension
 const rates = {
     x: distances.x / maxDistance * 0.04,
-    y: distances.y / maxDistance * 0.04,
-    z: distances.z / maxDistance * 0.04
+    y: distances.y / maxDistance * 0.0,
+    z: distances.z / maxDistance * 0.04,
+    rotationX: distances.rotationX / maxDistance * 0.04,
 };
 
   useFrame(() => {
@@ -76,16 +79,14 @@ const rates = {
         if (soccerRef.current.position.y < -0.5) {
             soccerRef.current.position.y += rates.y
         }
-
-         if (soccerRef.current.rotation.x > -2) {
-          soccerRef.current.rotation.x -= 0.01
+         if (soccerRef.current.rotation.x > -1.2) {
+          soccerRef.current.rotation.x -= rates.rotationX;
         }
 
         // Check if all conditions are satisfied
         const allConditionsMet =
             soccerRef.current.position.z >= 6.7 &&
             soccerRef.current.position.x <= 0.5 &&
-            soccerRef.current.position.y >= -0.5 &&
             soccerRef.current.rotation.x >= -2;
 
         if (allConditionsMet) {

@@ -4,7 +4,7 @@
 
 @layer components {
     .skill {
-        @apply flex flex-col justify-end mr-5 items-center my-5 h-20
+        @apply flex flex-col justify-end mr-5 items-center my-5 h-20 hover:scale-110 transition-transform
     }
 
     .skill img {
@@ -13,5 +13,9 @@
 
     .skill p {
         @apply text-center
+    }
+
+    .project {
+       @apply w-auto h-6 ml-2
     }
 }

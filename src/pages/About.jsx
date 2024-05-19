@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import emailjs from "@emailjs/browser"
 import profile from '/images/profile.jpeg';
 import github from '/images/github.png';
 import linkedin from '/images/linkedin.png';
@@ -18,30 +19,31 @@ import threejs from '/images/threejs.png';
 import tailwind from '/images/tailwind.png';
 import mysql from '/images/mysql.png';
 import mongodb from '/images/mongodb.svg';
+import firebase from '/images/firebase.png';
+import webScreenshot from '/images/webss.png';
+import messageScreenshot from '/images/messagess.png';
+import weatherScreenshot from '/images/weatherss.png';
+import findUrPartyScreenshot from '/images/findurpartyss.jpg';
 
 export default function About() {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    message: ''
-  });
+    const form = useRef()
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value
-    });
-  };
-
-  const handleSubmit = (e) => {
+  const sendEmail = (e) => {
     e.preventDefault();
-    console.log(formData);
-    setFormData({
-      name: '',
-      email: '',
-      message: ''
-    });
+    console.log(import.meta.env.VITE_PUBLIC_KEY);
+    emailjs.sendForm(
+        import.meta.env.VITE_SERVICE_ID, 
+        import.meta.env.VITE_TEMPLATE_ID, 
+        form.current, {
+            publicKey: import.meta.env.VITE_PUBLIC_KEY,
+        }).then(
+        () => {
+          console.log('SUCCESS!');
+        },
+        (error) => {
+          console.log('FAILED...', error);
+        },
+      );
   };
 
   const [fadeIn, setFadeIn] = useState(false);
@@ -110,56 +112,46 @@ export default function About() {
             </div>
           </div>
         </div>
-        <div className='flex flex-col justify-center '>
+        <div className='flex flex-col justify-center w-3/5'>
           <h1 className='text-center mb-5 text-3xl font-bold'>Projects</h1>
-          <div className='flex flex-row items-center justify-between space-x-4 border p-4 rounded-md bg-slate-50 mb-10'>
-            <div>
-              AI Text Chatbot
+          <div className='flex flex-row items-center justify-between space-x-4 border rounded-md bg-slate-50 mb-10 h-40 hover:scale-105 transition-transform'>
+            <div className='left-0 text-left p-4'>
+                <h1>Personal Website</h1>
+                <p className='flex flex-row'>Made with: <img className='project' src={reactLogo} alt="react" /><img className='project' src={threejs} alt="threejs" /><img className='project' src={tailwind} alt="tailwind" /></p>
             </div>
-            <div>
-              Finetuning LLMs
-            </div>
-          </div>
-          <div className='flex flex-row items-center justify-between space-x-4 border p-4 rounded-md bg-slate-50 mb-10'>
-            <div>
-              Personal Messaging App
-            </div>
-            <div>
-              Messaging App
+            <div className='w-1/2 h-40 pt-5 overflow-hidden flex justify-end'>
+              <img className='right-0 top-5' src={webScreenshot} alt="website" />
             </div>
           </div>
-          <div className='flex flex-row items-center justify-between space-x-4 border p-4 rounded-md bg-slate-50 mb-10'>
-            <div>
-              Sliding Block Puzzle Solver
+          <div className='flex flex-row items-center justify-between space-x-4 border rounded-md bg-slate-50 mb-10 hover:scale-105 transition-transform'>
+            <div className='left-0 text-left p-4'>
+              <h1>Personal Messaging Site</h1>
+              <p className='flex flex-row'>Made with: <img className='project' src={reactLogo} alt="react" /><img className='project' src={firebase} alt="firebase" /></p>
             </div>
-            <div>
-              Depth First Search
-            </div>
-          </div>
-          <div className='flex flex-row items-center justify-between space-x-4 border p-4 rounded-md bg-slate-50 mb-10'>
-            <div>
-              Path Finder
-            </div>
-            <div>
-              Dijsktra's Algorithm
+            <div className='w-1/2 h-40 pt-5 overflow-hidden flex justify-end'>
+              <img className='right-0 top-5' src={messageScreenshot} alt="message" />
             </div>
           </div>
-          <div className='flex flex-row items-center justify-between space-x-4 border p-4 rounded-md bg-slate-50 mb-10'>
-            <div>
-              Time Zone Converter and Weather
+          <div className='flex flex-row items-center justify-between space-x-4 border rounded-md bg-slate-50 mb-10 hover:scale-105 transition-transform'>
+            <div className='left-0 text-left p-4'>
+                <h1>Travel/Remote Work Helper</h1>
+                <p>(Time Zone and Weather)</p>
+                <p className='flex flex-row'>Made with: <img className='project' src={html} alt="html" /><img className='project' src={css} alt="css" /><img className='project' src={jsLogo} alt="js" /></p>
             </div>
-            <div>
-              Had trouble with the time?
-            </div>
-          </div>
-          <div className='flex flex-row items-center justify-between space-x-4 border p-4 rounded-md bg-slate-50 mb-10'>
-            <div>
-              Personal Website
-            </div>
-            <div>
-              This Website
+            <div className='w-1/2 h-40 pt-5 overflow-hidden flex justify-end'>
+              <img className='right-0 top-5' src={weatherScreenshot} alt="weather" />
             </div>
           </div>
+          <div className='flex flex-row items-center justify-between space-x-4 border rounded-md bg-slate-50 mb-10 hover:scale-105 transition-transform'>
+            <div className='left-0 text-left p-4'>
+                <h1>findURpary iOS App</h1>
+                <p className='flex flex-row'>Made with: <img className='project' src={swift} alt="swift" /></p>
+            </div>
+            <div className='w-1/2 h-40 pt-5 overflow-hidden flex justify-end'>
+              <img className='right-0 top-5' src={findUrPartyScreenshot} alt="findurparty" />
+            </div>
+          </div>
+          
         </div>
         <div className='flex flex-col justify-center mb-10'>
           <h1 className='text-center mb-10 text-3xl font-bold'>Skills</h1>
@@ -224,16 +216,14 @@ export default function About() {
         </div>
         <div id="getInTouch" className="max-w-md m-auto bg-white rounded-md mb-10">
           <h2 className="text-xl font-bold mb-4">Get in Touch</h2>
-          <p className='mb-4'>Email logankm2014@gmail.com or use this form to send me an email. I'd love to hear from you!</p>
-          <form onSubmit={handleSubmit}>
+          <p className='mb-4'>Email <a href="mailto:logankm2014@gmail.com">logankm2014@gmail.com</a> or use this form to send me an email. I'd love to hear from you!</p>
+          <form ref={form} onSubmit={sendEmail}>
             <div className="mb-4">
               <label htmlFor="name" className="block text-sm font-semibold mb-1">Name:</label>
               <input
                 type="text"
                 id="name"
                 name="name"
-                value={formData.name}
-                onChange={handleChange}
                 required
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
               />
@@ -244,8 +234,6 @@ export default function About() {
                 type="email"
                 id="email"
                 name="email"
-                value={formData.email}
-                onChange={handleChange}
                 required
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
               />
@@ -255,8 +243,6 @@ export default function About() {
               <textarea
                 id="message"
                 name="message"
-                value={formData.message}
-                onChange={handleChange}
                 rows="4"
                 required
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
