@@ -15,6 +15,7 @@ export default {
       },
       backgroundImage: {
         'banner': "url('/cover.jpeg')",
+        'sky' : "url('/sky4.png')",
       },
       fontFamily: {
         'sans': ['Lexend', 'sans-serif'],

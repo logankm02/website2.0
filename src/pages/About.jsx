@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useMediaQuery } from 'react-responsive';
 import emailjs from "@emailjs/browser"
 import profile from '/images/profile.jpeg';
 import github from '/images/github.png';
@@ -26,7 +27,10 @@ import weatherScreenshot from '/images/weatherss.png';
 import findUrPartyScreenshot from '/images/findurpartyss.jpg';
 
 export default function About() {
-    const form = useRef()
+  const isDesktop = useMediaQuery({ query: '(min-width: 768px)'})
+  const isMobile = useMediaQuery({ query: '(max-width: 768px)' })
+
+  const form = useRef()
 
   const sendEmail = (e) => {
     e.preventDefault();
@@ -92,12 +96,12 @@ export default function About() {
   return (
     <main className="h-auto top-0 left-0">
       <div className={`flex flex-col items-center mx-10 transition-opacity duration-1000 ${fadeIn ? 'opacity-100' : 'opacity-0'}`}>
-        <div id='home' className='w-screen h-screen flex flex-col justify-center items-center mb-20 bg-banner bg-cover bg-center'>
-          <div className='grid grid-cols-2 m-10'>
-            <div className='flex flex-col items-center justify-center'>
-              <img className='rounded-full border-8 h-80' src={profile} alt="profile" />
+        <div id='home' className='w-screen md:h-screen flex flex-col justify-center items-center mb-20 bg-banner bg-cover bg-center'>
+          <div className='grid grid-cols-1 md:grid-cols-2 m-10'>
+            <div className='flex flex-col items-center justify-center p-4'>
+              <img className='rounded-full border-8 w-4/5 md:h-80 md:w-auto' src={profile} alt="profile" />
             </div>
-            <div className='w-auto grid grid-cols-1 items-center justify-center text-right p-6 text-white border rounded-lg bg-slate-800 bg-opacity-20 hover:scale-105 transition-transform'>
+            <div className='w-auto grid grid-cols-1 items-center justify-center text-right p-4 text-white border rounded-lg bg-slate-800 bg-opacity-20 hover:scale-105 transition-transform'>
               <h1 className='mb-5 text-3xl font-bold'>Logan Kinajil-Moran</h1>
               <div className='flex flex-row justify-end mb-2'>
                 <a href="https://github.com/logankm02"><img className='h-10 m-2' src={github} alt="git" /></a>
@@ -115,20 +119,23 @@ export default function About() {
               </div>
             </div>
           </div>
-          <a href="#about" className='flex items-center justify-center' onClick={handleScrollAbout}><img className='w-14' src={arrow} alt="arrow" /></a>
+          <div>
+            <a href="#about" className='flex justify-center items-start' onClick={handleScrollAbout}><img className='w-14' src={arrow} alt="arrow" /></a>
+          </div>
+          
         </div>
         <div id='about' className='flex flex-col justify-center h-max'>
           <h1 className='text-center mb-5 text-3xl font-bold'>Education</h1>
-          <div className='flex flex-row items-center space-x-4 border p-8 rounded-md bg-slate-50 mb-10 hover:scale-105 transition-transform'>
-            <img className='h-20' src={r} alt="R" />
-            <div>
+          <div className='grid grid-cols-1 place-items-center md:flex md:flex-row md:items-center space-x-4 border p-8 rounded-md bg-slate-50 mb-10 hover:scale-105 transition-transform'>
+            <img className='h-20 mb-2' src={r} alt="R" />
+            <div className='mb-4 text-center md:text-left'>
               <h1>University of Rochester</h1>
               <p>Rochester, New York</p>
               <p>Major in Computer Science</p>
               <p>Major in Economics</p>
               <p>Class of 2025</p>
             </div>
-            <div>
+            <div className='mb-4 text-center md:text-left'>
               <p>GPA 3.93</p>
               <p>Dean's Scholar, Provost's Circle Scholar</p>
               <p>Varsity Athlete (Men's Soccer)</p>
@@ -137,54 +144,53 @@ export default function About() {
             </div>
           </div>
         </div>
-        <div className='flex flex-col justify-center w-3/5'>
+        <div className='flex flex-col justify-center w-4/5 md:w-3/5'>
           <h1 className='text-center mb-5 text-3xl font-bold'>Projects</h1>
-          <div className='flex flex-row items-center justify-between space-x-4 border rounded-md bg-slate-50 mb-10 h-40 hover:scale-105 transition-transform'>
+          <div className='grid grid-cols-1 md:flex md:flex-row justify-between space-x-4 border rounded-md bg-slate-50 mb-10 hover:scale-105 transition-transform'>
             <div className='left-0 text-left p-4 flex flex-col justifty-between h-full'>
-                <h1>Personal Website</h1>
-                <p className='flex flex-row mb-5'>Made with: <img className='project' src={reactLogo} alt="react" /><img className='project' src={threejs} alt="threejs" /><img className='project' src={tailwind} alt="tailwind" /></p>
-                <button type="button" className="w-3/4 text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2" onClick={navWeb}>View Website</button>
+              <h1>Personal Website</h1>
+              <p className='flex flex-row mb-5'>Made with: <img className='project' src={reactLogo} alt="react" /><img className='project' src={threejs} alt="threejs" /><img className='project' src={tailwind} alt="tailwind" /></p>
+              <button type="button" className="w-3/4 text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2" onClick={navWeb}>View Website</button>
             </div>
-            <div className='w-1/2 h-40 pt-5 overflow-hidden flex justify-end'>
-              <img className='right-0 top-5' src={webScreenshot} alt="website" />
+            <div className='w-4/5 md:w-1/2 h-auto md:flex md:items-center md:justify-center justify-items-center p-4'>
+              <img className='w-full h-auto md:h-40 md:w-auto' src={webScreenshot} alt="message" />
             </div>
           </div>
-          <div className='flex flex-row items-center justify-between space-x-4 border rounded-md bg-slate-50 mb-10 hover:scale-105 transition-transform'>
+          <div className='grid grid-cols-1 md:flex md:flex-row justify-between space-x-4 border rounded-md bg-slate-50 mb-10 hover:scale-105 transition-transform'>
             <div className='left-0 text-left p-4 flex flex-col justifty-between h-full'>
               <h1>Personal Messaging Site</h1>
               <p className='flex flex-row mb-5'>Made with: <img className='project' src={reactLogo} alt="react" /><img className='project' src={firebase} alt="firebase" /></p>
               <button type="button" className="w-3/4 text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2" onClick={msgWeb}>View Website</button>
             </div>
-            <div className='w-1/2 h-40 pt-5 overflow-hidden flex justify-end'>
-              <img className='right-0 top-5' src={messageScreenshot} alt="message" />
+            <div className='w-4/5 md:w-1/2 h-auto md:flex md:items-center md:justify-center justify-items-center p-4'>
+              <img className='w-full h-auto md:h-40 md:w-auto' src={messageScreenshot} alt="message" />
             </div>
           </div>
-          <div className='flex flex-row items-center justify-between space-x-4 border rounded-md bg-slate-50 mb-10 hover:scale-105 transition-transform'>
+          <div className='grid grid-cols-1 md:flex md:flex-row justify-between space-x-4 border rounded-md bg-slate-50 mb-10 hover:scale-105 transition-transform'>
             <div className='left-0 text-left p-4 flex flex-col justifty-between h-full'>
-                <h1>Travel/Remote Work Helper</h1>
-                <p>(Time Zone and Weather)</p>
-                <p className='flex flex-row mb-5'>Made with: <img className='project' src={html} alt="html" /><img className='project' src={css} alt="css" /><img className='project' src={jsLogo} alt="js" /></p>
-                <button type="button" className="w-3/4 text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2" onClick={trvlWeb}>View Website</button>
+              <h1>Travel/Remote Work Helper</h1>
+              <p className='flex flex-row mb-5'>Made with: <img className='project' src={html} alt="html" /><img className='project' src={css} alt="css" /><img className='project' src={jsLogo} alt="js" /></p>
+              <button type="button" className="w-3/4 text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2" onClick={trvlWeb}>View Website</button>
             </div>
-            <div className='w-1/2 h-40 pt-5 overflow-hidden flex justify-end'>
-              <img className='right-0 top-5' src={weatherScreenshot} alt="weather" />
+            <div className='w-4/5 md:w-1/2 h-auto md:flex md:items-center md:justify-center justify-items-center p-4'>
+              <img className='w-full h-auto md:h-40 md:w-auto' src={weatherScreenshot} alt="message" />
             </div>
           </div>
-          <div className='flex flex-row items-center justify-between space-x-4 border rounded-md bg-slate-50 mb-10 hover:scale-105 transition-transform'>
+          <div className='grid grid-cols-1 md:flex md:flex-row justify-between space-x-4 border rounded-md bg-slate-50 mb-10 hover:scale-105 transition-transform'>
             <div className='left-0 text-left p-4 flex flex-col justifty-between h-full'>
-                <h1>findURpary iOS App</h1>
-                <p className='flex flex-row mb-5'>Made with: <img className='project' src={swift} alt="swift" /></p>
-                <button type="button" className="w-3/4 text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2" onClick={findUrPartyAppStore}>View on App Store</button>
+              <h1>findUrParty iOS App</h1>
+              <p className='flex flex-row mb-5'>Made with: <img className='project' src={swift} alt="swift" /></p>
+              <button type="button" className="w-3/4 text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2" onClick={findUrPartyAppStore}>View in App Store</button>
             </div>
-            <div className='w-1/2 h-40 pt-5 overflow-hidden flex justify-end'>
-              <img className='right-0 top-5' src={findUrPartyScreenshot} alt="findurparty" />
+            <div className='w-4/5 md:w-1/2 h-auto md:flex md:items-center md:justify-center justify-items-center p-4'>
+              <img className='w-full h-auto md:h-40 md:w-auto' src={findUrPartyScreenshot} alt="message" />
             </div>
           </div>
           
         </div>
         <div className='flex flex-col justify-center mb-10'>
           <h1 className='text-center mb-10 text-3xl font-bold'>Skills</h1>
-          <div className='grid grid-cols-7'>
+          <div className='grid grid-cols-4 md:grid-cols-7'>
             <div className='skill'>
               <img src={python} alt="python" />
               <p>Python</p>
