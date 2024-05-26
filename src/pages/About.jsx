@@ -99,7 +99,7 @@ export default function About() {
         <div id='home' className='w-screen md:h-screen flex flex-col justify-center items-center mb-20 bg-banner bg-cover bg-center'>
           <div className='grid grid-cols-1 md:grid-cols-2 m-10'>
             <div className='flex flex-col items-center justify-center p-4'>
-              <img className='rounded-full border-8 w-4/5 md:h-80 md:w-auto' src={profile} alt="profile" />
+              <img className='rounded-full border-8 w-4/5 mb-5 md:h-80 md:w-auto' src={profile} alt="profile" />
             </div>
             <div className='w-auto grid grid-cols-1 items-center justify-center text-right p-4 text-white border rounded-lg bg-slate-800 bg-opacity-20 hover:scale-105 transition-transform'>
               <h1 className='mb-5 text-3xl font-bold'>Logan Kinajil-Moran</h1>
@@ -146,17 +146,17 @@ export default function About() {
         </div>
         <div className='flex flex-col justify-center w-4/5 md:w-3/5'>
           <h1 className='text-center mb-5 text-3xl font-bold'>Projects</h1>
-          <div className='grid grid-cols-1 md:flex md:flex-row justify-between space-x-4 border rounded-md bg-slate-50 mb-10 hover:scale-105 transition-transform'>
+          <div className='grid grid-cols-1 h-auto md:flex md:flex-row justify-between space-x-4 border rounded-md bg-slate-50 mb-10 hover:scale-105 transition-transform'>
             <div className='left-0 text-left p-4 flex flex-col justifty-between h-full'>
               <h1>Personal Website</h1>
               <p className='flex flex-row mb-5'>Made with: <img className='project' src={reactLogo} alt="react" /><img className='project' src={threejs} alt="threejs" /><img className='project' src={tailwind} alt="tailwind" /></p>
               <button type="button" className="w-3/4 text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2" onClick={navWeb}>View Website</button>
             </div>
             <div className='w-4/5 md:w-1/2 h-auto md:flex md:items-center md:justify-center justify-items-center p-4'>
-              <img className='w-full h-auto md:h-40 md:w-auto' src={webScreenshot} alt="message" />
+              <img className='w-4/5 h-auto md:h-40 md:w-auto' src={webScreenshot} alt="message" />
             </div>
           </div>
-          <div className='grid grid-cols-1 md:flex md:flex-row justify-between space-x-4 border rounded-md bg-slate-50 mb-10 hover:scale-105 transition-transform'>
+          <div className='grid grid-cols-1 h-auto md:flex md:flex-row justify-between space-x-4 border rounded-md bg-slate-50 mb-10 hover:scale-105 transition-transform'>
             <div className='left-0 text-left p-4 flex flex-col justifty-between h-full'>
               <h1>Personal Messaging Site</h1>
               <p className='flex flex-row mb-5'>Made with: <img className='project' src={reactLogo} alt="react" /><img className='project' src={firebase} alt="firebase" /></p>
@@ -166,7 +166,7 @@ export default function About() {
               <img className='w-full h-auto md:h-40 md:w-auto' src={messageScreenshot} alt="message" />
             </div>
           </div>
-          <div className='grid grid-cols-1 md:flex md:flex-row justify-between space-x-4 border rounded-md bg-slate-50 mb-10 hover:scale-105 transition-transform'>
+          <div className='grid grid-cols-1 h-auto md:flex md:flex-row justify-between space-x-4 border rounded-md bg-slate-50 mb-10 hover:scale-105 transition-transform'>
             <div className='left-0 text-left p-4 flex flex-col justifty-between h-full'>
               <h1>Travel/Remote Work Helper</h1>
               <p className='flex flex-row mb-5'>Made with: <img className='project' src={html} alt="html" /><img className='project' src={css} alt="css" /><img className='project' src={jsLogo} alt="js" /></p>
@@ -176,7 +176,7 @@ export default function About() {
               <img className='w-full h-auto md:h-40 md:w-auto' src={weatherScreenshot} alt="message" />
             </div>
           </div>
-          <div className='grid grid-cols-1 md:flex md:flex-row justify-between space-x-4 border rounded-md bg-slate-50 mb-10 hover:scale-105 transition-transform'>
+          <div className='grid grid-cols-1 h-auto md:flex md:flex-row justify-between space-x-4 border rounded-md bg-slate-50 mb-10 hover:scale-105 transition-transform'>
             <div className='left-0 text-left p-4 flex flex-col justifty-between h-full'>
               <h1>findUrParty iOS App</h1>
               <p className='flex flex-row mb-5'>Made with: <img className='project' src={swift} alt="swift" /></p>
