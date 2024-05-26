@@ -4,7 +4,7 @@ import About from "./pages/About";
 
 export default function App() {
   return (
-    <main className='bg-sky bg-cover h-screen'>
+    <main className='bg-gradient-to-b from-sunset to-transparent bg-cover h-screen'>
       <Router>
         <Routes>
           <Route path="/website2.0" element={<Home />} end />

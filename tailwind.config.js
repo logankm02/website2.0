@@ -8,14 +8,19 @@ export default {
     extend: {
       colors: {
         cream: "#FFFDD0",
-        malibu: "#84A4FC"
+        malibu: "#84A4FC",
+        sunsetSky: "#FFA07A",
+        sunsetSun: "#FFD700", 
+      },
+      gradientColorStops: {
+        'sunset': '#87CEEB, #FFA07A', // Light blue to sunset color
       },
       transitionDuration: {
         '500': '0.5s', // Define a transition duration of 0.5 seconds
       },
       backgroundImage: {
         'banner': "url('/cover.jpeg')",
-        'sky' : "url('/sky4.png')",
+        'sky' : "url('/nightsky.jpg')",
       },
       fontFamily: {
         'sans': ['Lexend', 'sans-serif'],
