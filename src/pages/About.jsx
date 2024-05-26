@@ -152,9 +152,11 @@ export default function About() {
               <p className='flex flex-row mb-5'>Made with: <img className='project' src={reactLogo} alt="react" /><img className='project' src={threejs} alt="threejs" /><img className='project' src={tailwind} alt="tailwind" /></p>
               <button type="button" className="w-3/4 text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2" onClick={navWeb}>View Website</button>
             </div>
-            <div className='w-4/5 md:w-1/2 h-auto md:flex md:items-center md:justify-center justify-items-center p-4'>
-              <img className='w-4/5 h-auto md:h-40 md:w-auto' src={webScreenshot} alt="message" />
-            </div>
+            {isDesktop && (
+              <div className='w-4/5 md:w-1/2 h-auto md:flex md:items-center md:justify-center justify-items-center p-4'>
+                <img className='w-4/5 h-auto md:h-40 md:w-auto' src={webScreenshot} alt="message" />
+              </div>
+            )}
           </div>
           <div className='grid grid-cols-1 h-auto md:flex md:flex-row justify-between space-x-4 border rounded-md bg-slate-50 mb-10 hover:scale-105 transition-transform'>
             <div className='left-0 text-left p-4 flex flex-col justifty-between h-full'>
@@ -162,9 +164,11 @@ export default function About() {
               <p className='flex flex-row mb-5'>Made with: <img className='project' src={reactLogo} alt="react" /><img className='project' src={firebase} alt="firebase" /></p>
               <button type="button" className="w-3/4 text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2" onClick={msgWeb}>View Website</button>
             </div>
-            <div className='w-4/5 md:w-1/2 h-auto md:flex md:items-center md:justify-center justify-items-center p-4'>
-              <img className='w-full h-auto md:h-40 md:w-auto' src={messageScreenshot} alt="message" />
-            </div>
+            {isDesktop && (
+              <div className='w-4/5 md:w-1/2 h-auto md:flex md:items-center md:justify-center justify-items-center p-4'>
+                <img className='w-full h-auto md:h-40 md:w-auto' src={messageScreenshot} alt="message" />
+              </div>
+            )}
           </div>
           <div className='grid grid-cols-1 h-auto md:flex md:flex-row justify-between space-x-4 border rounded-md bg-slate-50 mb-10 hover:scale-105 transition-transform'>
             <div className='left-0 text-left p-4 flex flex-col justifty-between h-full'>
@@ -172,9 +176,11 @@ export default function About() {
               <p className='flex flex-row mb-5'>Made with: <img className='project' src={html} alt="html" /><img className='project' src={css} alt="css" /><img className='project' src={jsLogo} alt="js" /></p>
               <button type="button" className="w-3/4 text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2" onClick={trvlWeb}>View Website</button>
             </div>
-            <div className='w-4/5 md:w-1/2 h-auto md:flex md:items-center md:justify-center justify-items-center p-4'>
-              <img className='w-full h-auto md:h-40 md:w-auto' src={weatherScreenshot} alt="message" />
-            </div>
+            {isDesktop && (
+              <div className='w-4/5 md:w-1/2 h-auto md:flex md:items-center md:justify-center justify-items-center p-4'>
+                <img className='w-full h-auto md:h-40 md:w-auto' src={weatherScreenshot} alt="message" />
+              </div>
+            )}
           </div>
           <div className='grid grid-cols-1 h-auto md:flex md:flex-row justify-between space-x-4 border rounded-md bg-slate-50 mb-10 hover:scale-105 transition-transform'>
             <div className='left-0 text-left p-4 flex flex-col justifty-between h-full'>
@@ -182,11 +188,12 @@ export default function About() {
               <p className='flex flex-row mb-5'>Made with: <img className='project' src={swift} alt="swift" /></p>
               <button type="button" className="w-3/4 text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2" onClick={findUrPartyAppStore}>View in App Store</button>
             </div>
-            <div className='w-4/5 md:w-1/2 h-auto md:flex md:items-center md:justify-center justify-items-center p-4'>
-              <img className='w-full h-auto md:h-40 md:w-auto' src={findUrPartyScreenshot} alt="message" />
-            </div>
+            {isDesktop && (
+              <div className='w-4/5 md:w-1/2 h-auto md:flex md:items-center md:justify-center justify-items-center p-4'>
+                <img className='w-full h-auto md:h-40 md:w-auto' src={findUrPartyScreenshot} alt="message" />
+              </div>
+            )} 
           </div>
-          
         </div>
         <div className='flex flex-col justify-center mb-10'>
           <h1 className='text-center mb-10 text-3xl font-bold'>Skills</h1>
