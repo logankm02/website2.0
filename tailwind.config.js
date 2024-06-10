@@ -13,10 +13,10 @@ export default {
         sunsetSun: "#FFD700", 
       },
       gradientColorStops: {
-        'sunset': '#87CEEB, #FFA07A', // Light blue to sunset color
+        'sunset': '#551764, #FFA07A',
       },
       transitionDuration: {
-        '500': '0.5s', // Define a transition duration of 0.5 seconds
+        '500': '0.5s',
       },
       backgroundImage: {
         'banner': "url('/cover.jpeg')",

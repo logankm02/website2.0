@@ -1,10 +1,26 @@
-import { Html } from "@react-three/drei";
+import { Html, useProgress } from "@react-three/drei";
+import { metronome } from 'ldrs';
+import { useEffect } from 'react';
 
-export const Loader = () => {
+metronome.register()
+
+export const Loader = ({ setIsLoaded }) => {
+  const { progress } = useProgress();
+
+    useEffect(() => {
+        if (progress === 100) {
+            setIsLoaded(true);
+        }
+    }, [progress, setIsLoaded]);
+
   return (
-    <Html>
-      <div className='flex justify-center items-center'>
-          <div className='w-6 h-6 bg-white rounded-full animate-pulse'></div>
+    <Html center>
+      <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center z-50">
+        <l-metronome
+          size="50"
+          speed="1.6" 
+          color="black" 
+        ></l-metronome>
       </div>
     </Html>
   );

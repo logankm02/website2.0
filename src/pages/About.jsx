@@ -25,6 +25,8 @@ import webScreenshot from '/images/webss.png';
 import messageScreenshot from '/images/messagess.png';
 import weatherScreenshot from '/images/weatherss.png';
 import findUrPartyScreenshot from '/images/findurpartyss.jpg';
+import scrabbleScreenshot from '/images/scrabbless.png';
+import blackjackScreenshot from '/images/blackjackss.png';
 
 export default function About() {
   const isDesktop = useMediaQuery({ query: '(min-width: 768px)'})
@@ -51,10 +53,17 @@ export default function About() {
   };
 
   const [fadeIn, setFadeIn] = useState(false);
+  const [profileLoaded, setProfileLoaded] = useState(false);
 
   useEffect(() => {
-    setFadeIn(true);
-  }, []);
+    if (profileLoaded) {
+      setFadeIn(true);
+    }
+  }, [profileLoaded]);
+
+  const handleProfileLoad = () => {
+    setProfileLoaded(true);
+  };
 
   const handleScrollAbout = (e) => {
     e.preventDefault();
@@ -86,6 +95,17 @@ export default function About() {
     window.open(url, '_blank');
   }
 
+  const scrabbleWeb = (e) => {
+    e.preventDefault();
+    const url = 'https://logankm02.github.io/scrabble-bot/';
+    window.open(url, '_blank');
+  }
+  const BlackjackWeb = (e) => {
+    e.preventDefault();
+    const url = 'https://logankm02.github.io/blackjack/';
+    window.open(url, '_blank');
+  }
+
   const findUrPartyAppStore = (e) => {
     e.preventDefault();
     const url = 'https://apps.apple.com/app/id6465749219';
@@ -99,7 +119,7 @@ export default function About() {
         <div id='home' className='w-screen md:h-screen flex flex-col justify-center items-center mb-20 bg-banner bg-cover bg-center'>
           <div className='grid grid-cols-1 md:grid-cols-2 m-10'>
             <div className='flex flex-col items-center justify-center p-4'>
-              <img className='rounded-full border-8 w-4/5 mb-5 md:h-80 md:w-auto' src={profile} alt="profile" />
+              <img className='rounded-full border-8 w-4/5 mb-5 md:h-80 md:w-auto' src={profile} alt="profile" onLoad={handleProfileLoad}/>
             </div>
             <div className='w-auto grid grid-cols-1 items-center justify-center text-right p-4 text-white border rounded-lg bg-slate-800 bg-opacity-20 hover:scale-105 transition-transform'>
               <h1 className='mb-5 text-3xl font-bold'>Logan Kinajil-Moran</h1>
@@ -160,6 +180,18 @@ export default function About() {
           </div>
           <div className='grid grid-cols-1 h-auto md:flex md:flex-row justify-between space-x-4 border rounded-md bg-slate-50 mb-10 hover:scale-105 transition-transform'>
             <div className='left-0 text-left p-4 flex flex-col justifty-between h-full'>
+              <h1>AI Scrabble Bot</h1>
+              <p className='flex flex-row mb-5'>Made with: <img className='project' src={html} alt="html" /><img className='project' src={css} alt="css" /><img className='project' src={jsLogo} alt="js" /><img className='project' src={python} alt="python" /></p>
+              <button type="button" className="w-3/4 text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2" onClick={scrabbleWeb}>View Website</button>
+            </div>
+            {isDesktop && (
+              <div className='w-4/5 md:w-1/2 h-auto md:flex md:items-center md:justify-center justify-items-center p-4'>
+                <img className='w-4/5 h-auto md:h-40 md:w-auto' src={scrabbleScreenshot} alt="scrabble" />
+              </div>
+            )}
+          </div>
+          <div className='grid grid-cols-1 h-auto md:flex md:flex-row justify-between space-x-4 border rounded-md bg-slate-50 mb-10 hover:scale-105 transition-transform'>
+            <div className='left-0 text-left p-4 flex flex-col justifty-between h-full'>
               <h1>Personal Messaging Site</h1>
               <p className='flex flex-row mb-5'>Made with: <img className='project' src={reactLogo} alt="react" /><img className='project' src={firebase} alt="firebase" /></p>
               <button type="button" className="w-3/4 text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2" onClick={msgWeb}>View Website</button>
@@ -193,6 +225,18 @@ export default function About() {
                 <img className='w-full h-auto md:h-40 md:w-auto' src={findUrPartyScreenshot} alt="message" />
               </div>
             )} 
+          </div>
+          <div className='grid grid-cols-1 h-auto md:flex md:flex-row justify-between space-x-4 border rounded-md bg-slate-50 mb-10 hover:scale-105 transition-transform'>
+            <div className='left-0 text-left p-4 flex flex-col justifty-between h-full'>
+              <h1>Blackjack Game</h1>
+              <p className='flex flex-row mb-5'>Made with: <img className='project' src={html} alt="html" /><img className='project' src={css} alt="css" /><img className='project' src={jsLogo} alt="js" /><img className='project' src={python} alt="python" /></p>
+              <button type="button" className="w-3/4 text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2" onClick={BlackjackWeb}>View Website</button>
+            </div>
+            {isDesktop && (
+              <div className='w-4/5 md:w-1/2 h-auto md:flex md:items-center md:justify-center justify-items-center p-4'>
+                <img className='w-4/5 h-auto md:h-40 md:w-auto' src={blackjackScreenshot} alt="scrabble" />
+              </div>
+            )}
           </div>
         </div>
         <div className='flex flex-col justify-center mb-10'>
