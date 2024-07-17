@@ -32,6 +32,9 @@ import blackjackScreenshot from "/images/blackjackss.png";
 export default function About() {
   const isDesktop = useMediaQuery({ query: "(min-width: 768px)" });
   const isMobile = useMediaQuery({ query: "(max-width: 768px)" });
+  VITE_PUBLIC_KEY = "dMEvhwxawdetQkE0U";
+  VITE_TEMPLATE_ID = "template_9rosqi6";
+  VITE_SERVICE_ID = "service_43su9pt";
 
   const form = useRef();
 
