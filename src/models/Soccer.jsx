@@ -38,7 +38,7 @@ export function Soccer(props) {
 
   useEffect(() => {
     if (zoomComplete) {
-      navigate('/website2.0/about', { replace: true })    
+      navigate('/about', { replace: true })    
     }
   }, [zoomComplete]);
 

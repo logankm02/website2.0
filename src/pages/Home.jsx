@@ -1,5 +1,5 @@
+import React, { Suspense, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { Suspense, useState } from 'react';
 import { Environment, Html } from '@react-three/drei';
 import { Soccer } from '../models/Soccer';
 import { Loader } from '../components/Loader';

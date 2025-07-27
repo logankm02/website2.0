@@ -19,8 +19,8 @@ export default {
         '500': '0.5s',
       },
       backgroundImage: {
-        'banner': "url('/cover.jpeg')",
-        'sky' : "url('/nightsky.jpg')",
+        'banner': "url('../public/cover.jpeg')",
+        'sky' : "url('../public/nightsky.jpg')",
       },
       fontFamily: {
         'sans': ['Lexend', 'sans-serif'],

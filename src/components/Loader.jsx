@@ -1,6 +1,6 @@
+import React, { useEffect } from 'react';
 import { Html, useProgress } from "@react-three/drei";
 import { metronome } from 'ldrs';
-import { useEffect } from 'react';
 
 metronome.register()
 
