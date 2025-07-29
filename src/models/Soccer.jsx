@@ -101,7 +101,7 @@ const rates = {
     <>
     {!zoomIn && (
       <Html>
-      <div className="absolute transform -translate-x-1/2 -translate-y-80 z-10 w-80">
+      <div className="absolute transform -translate-x-1/2 -translate-y-80 z-10 w-[500px]">
         <HomeText />
       </div>
     </Html>

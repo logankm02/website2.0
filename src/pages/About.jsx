@@ -1,6 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useMediaQuery } from "react-responsive";
 import emailjs from "@emailjs/browser";
+import TableOfContents from "../components/TableOfContents";
+import WorldClock from "../components/WorldClock";
+import SpotifyPlaylists from "../components/SpotifyPlaylists";
+import RecentReads from "../components/RecentReads";
 import profile from "../../public/images/profile.jpeg";
 import github from "../../public/images/github.png";
 import linkedin from "../../public/images/linkedin.png";
@@ -130,6 +134,7 @@ export default function About() {
 
   return (
     <main className="h-auto top-0 left-0">
+      <TableOfContents />
       <div
         className={`flex flex-col items-center mx-10 transition-opacity duration-1000 ${
           fadeIn ? "opacity-100" : "opacity-0"
@@ -137,68 +142,99 @@ export default function About() {
       >
         <div
           id="home"
-          className="w-screen md:h-screen flex flex-col justify-between items-center mb-20 bg-banner bg-cover bg-center"
+          className="w-screen h-screen flex flex-col bg-banner bg-cover bg-center relative overflow-hidden"
         >
-          <div className="absolute bottom-4 right-4 flex items-center">
-            <svg className="w-4 h-4 mr-1 text-white drop-shadow-lg" fill="currentColor" viewBox="0 0 20 20">
+          {/* Location Badge */}
+          <div className="absolute top-4 right-4 flex items-center bg-black/20 backdrop-blur-sm rounded-full px-3 py-1 z-10">
+            <svg className="w-3 h-3 mr-1 text-white" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
             </svg>
-            <p className="text-white text-sm drop-shadow-lg">Wellington, New Zealand</p>
+            <p className="text-white text-xs font-medium">Wellington, NZ</p>
           </div>
-          <div className="flex-1 flex items-center justify-center">
-            <div className="max-w-5xl mx-auto px-4 py-4">
-            <div className="flex flex-col items-center text-center mb-4">
-              <img
-                className="rounded-full border-2 border-white shadow-xl w-40 h-40 object-cover mb-4"
-                src={profile}
-                alt="profile"
-                onLoad={handleProfileLoad}
-              />
-              <h1 className="mb-3 text-4xl font-bold text-white drop-shadow-lg">Logan Kinajil-Moran</h1>
-              <div className="flex flex-row justify-center mb-4">
-                <a href="https://github.com/logankm02" className="mx-2 hover:scale-110 transition-transform">
-                  <img className="h-10 w-10 drop-shadow-lg" src={github} alt="git" />
-                </a>
-                <a href="https://www.linkedin.com/in/logan-kinajil-moran/" className="mx-2 hover:scale-110 transition-transform">
-                  <img className="h-10 w-10 drop-shadow-lg" src={linkedin} alt="linkedin" />
-                </a>
-              </div>
-            </div>
-            
-            <div className="max-w-3xl mx-auto text-center text-white bg-slate-800 bg-opacity-30 backdrop-blur-sm border rounded-xl p-6 hover:scale-105 transition-transform shadow-xl">
-              <div className="space-y-3 mb-6">
-                <p className="text-lg leading-relaxed">
-                  Originally from New Zealand, I'm about to begin
-                  my MEng in Electrical Engineering and Computer Science at UC Berkeley, after graduating from the 
-                  University of Rochester.
-                </p>
-              </div>
+
+          {/* Dashboard Grid */}
+          <div className="flex-1 flex items-center justify-center w-full max-w-7xl mx-auto p-6">
+            <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 w-full h-full max-h-[85vh]">
               
-              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                <button
-                  type="button"
-                  className="group text-gray-900 bg-white/90 backdrop-blur-sm border-2 border-white/20 focus:outline-none hover:bg-white hover:scale-105 focus:ring-4 focus:ring-white/30 font-semibold rounded-xl text-base px-8 py-3 transition-all duration-300 hover:shadow-xl shadow-lg"
-                >
-                  Download Resume
-                </button>
-                <button
-                  type="button"
-                  className="group text-white bg-slate-700/90 backdrop-blur-sm border-2 border-slate-500/30 hover:bg-slate-700 hover:scale-105 focus:ring-4 focus:ring-slate-400/50 font-semibold rounded-xl text-base px-8 py-3 transition-all duration-300 hover:shadow-xl shadow-lg"
-                  onClick={handleScrollGetInTouch}
-                >
-                  Get in touch
-                </button>
+              {/* Profile Card - Main focal point */}
+              <div className="lg:col-span-2 bg-white/10 backdrop-blur-md rounded-2xl p-4 shadow-2xl border border-white/20 h-full">
+                <div className="flex flex-col items-center text-center h-full justify-center space-y-3">
+                  <img
+                    className="rounded-full border-3 border-white/30 shadow-xl w-20 h-20 object-cover"
+                    src={profile}
+                    alt="profile"
+                    onLoad={handleProfileLoad}
+                  />
+                  <div className="space-y-1">
+                    <h1 className="text-xl font-bold text-white">Logan Kinajil-Moran</h1>
+                    <p className="text-white/80 text-sm">Electrical Engineering & CS</p>
+                    <p className="text-white/70 leading-relaxed text-sm">
+                      MEng student at UC Berkeley, originally from New Zealand 🇳🇿
+                    </p>
+                  </div>
+                  
+                  {/* Social Links */}
+                  <div className="flex gap-2 w-full">
+                    <a href="https://github.com/logankm02" className="flex-1 flex items-center justify-center gap-2 p-2 bg-white/10 rounded-lg hover:bg-white/20 transition-all hover:scale-105">
+                      <img className="h-4 w-4" src={github} alt="github" />
+                      <span className="text-white text-xs font-medium">GitHub</span>
+                    </a>
+                    <a href="https://www.linkedin.com/in/logan-kinajil-moran/" className="flex-1 flex items-center justify-center gap-2 p-2 bg-white/10 rounded-lg hover:bg-white/20 transition-all hover:scale-105">
+                      <img className="h-4 w-4" src={linkedin} alt="linkedin" />
+                      <span className="text-white text-xs font-medium">LinkedIn</span>
+                    </a>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex flex-col gap-2 w-full max-w-xs">
+                    <button className="text-black bg-white hover:bg-gray-100 font-semibold rounded-lg px-4 py-2 transition-all hover:scale-105 shadow-lg text-sm">
+                      Download Resume
+                    </button>
+                    <button 
+                      onClick={handleScrollGetInTouch}
+                      className="text-white bg-white/20 hover:bg-white/30 font-semibold rounded-lg px-4 py-2 transition-all hover:scale-105 backdrop-blur-sm border border-white/30 text-sm"
+                    >
+                      Get in Touch
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Side Widgets */}
+              <div className="lg:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-3 auto-rows-fr h-full">
+                
+                {/* Recent Reads Widget */}
+                <div className="h-full">
+                  <RecentReads />
+                </div>
+
+                {/* Spotify Playlists Widget */}
+                <div className="h-full">
+                  <SpotifyPlaylists />
+                </div>
+
+                {/* World Clock & Weather Widget */}
+                <div className="h-full">
+                  <WorldClock />
+                </div>
+
+                {/* Table of Contents Widget */}
+                <div className="h-full">
+                  <TableOfContents isWidget={true} />
+                </div>
+
               </div>
             </div>
-            </div>
           </div>
-          <div className="pb-8">
+
+          {/* Scroll Arrow */}
+          <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2">
             <a
               href="#about"
               className="flex justify-center items-center"
               onClick={handleScrollAbout}
             >
-              <img className="w-10 slow-bounce" src={arrow} alt="arrow" />
+              <img className="w-6 slow-bounce opacity-70" src={arrow} alt="arrow" />
             </a>
           </div>
         </div>
@@ -291,7 +327,7 @@ export default function About() {
             </div>
           </div>
         </div>
-        <div className="flex flex-col justify-center w-4/5 md:w-3/5">
+        <div id="projects" className="flex flex-col justify-center w-4/5 md:w-3/5">
           <h1 className="text-center mb-5 text-3xl font-bold">Projects</h1>
           <div className="grid grid-cols-1 h-auto md:flex md:flex-row justify-between space-x-4 border rounded-md bg-slate-50 mb-10 hover:scale-105 transition-transform">
             <div className="left-0 text-left p-4 flex flex-col justifty-between h-full">
@@ -483,7 +519,7 @@ export default function About() {
             )}
           </div>
         </div>
-        <div className="flex flex-col justify-center mb-10">
+        <div id="skills" className="flex flex-col justify-center mb-10">
           <h1 className="text-center mb-10 text-3xl font-bold">Skills</h1>
           <div className="grid grid-cols-4 md:grid-cols-6">
             <div className="skill">

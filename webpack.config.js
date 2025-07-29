@@ -1,8 +1,41 @@
 const path = require('path');
+const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 
-module.exports = (env, argv) => ({
+// Load environment variables
+require('dotenv').config();
+
+// Debug: log environment variables (if needed)
+if (process.env.REACT_APP_WEATHER_API_KEY) {
+  console.log('Weather API key found in environment');
+}
+
+// Get environment variables that start with REACT_APP_
+function getClientEnvironment() {
+  const raw = Object.keys(process.env)
+    .filter(key => key.startsWith('REACT_APP_'))
+    .reduce((env, key) => {
+      env[key] = process.env[key];
+      return env;
+    }, {
+      NODE_ENV: process.env.NODE_ENV || 'development',
+    });
+
+  // Stringify all values so we can feed them into webpack DefinePlugin
+  const stringified = {
+    'process.env': Object.keys(raw).reduce((env, key) => {
+      env[key] = JSON.stringify(raw[key]);
+      return env;
+    }, {}),
+  };
+
+  return { raw, stringified };
+}
+
+const env = getClientEnvironment();
+
+module.exports = (envArgs, argv) => ({
   mode: argv.mode || 'development',
   entry: './src/main.jsx',
   output: {
@@ -51,6 +84,10 @@ module.exports = (env, argv) => ({
         },
       ],
     }),
+    new webpack.DefinePlugin({
+      'process.env.NODE_ENV': JSON.stringify(argv.mode || 'development'),
+      'process.env.REACT_APP_WEATHER_API_KEY': JSON.stringify(process.env.REACT_APP_WEATHER_API_KEY),
+    }),
   ],
   devServer: {
     static: {
@@ -59,5 +96,6 @@ module.exports = (env, argv) => ({
     port: 3000,
     open: true,
     historyApiFallback: true,
+    host: '127.0.0.1',
   },
 });
