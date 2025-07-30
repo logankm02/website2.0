@@ -8,7 +8,7 @@ export default function App() {
 
   return (
     <main className={`w-full h-screen relative ${isLoaded ? 'bg-gradient-to-b from-sunset to-transparent bg-cover' : 'bg-transparent'}`}>
-      <Router basename={process.env.NODE_ENV === 'production' ? '/website2.0' : ''}>
+      <Router>
         <Routes>
           <Route path="/" element={<Home setIsLoaded={setIsLoaded}/>} />
           <Route path="/about" element={<About />} />

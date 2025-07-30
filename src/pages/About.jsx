@@ -3,36 +3,37 @@ import { useMediaQuery } from "react-responsive";
 import emailjs from "@emailjs/browser";
 import TableOfContents from "../components/TableOfContents";
 import WorldClock from "../components/WorldClock";
-import SpotifyPlaylists from "../components/SpotifyPlaylists";
+import SpotifyPlaylistsAPI from "../components/SpotifyPlaylistsAPI";
 import RecentReads from "../components/RecentReads";
-import profile from "../../public/images/profile.jpeg";
-import github from "../../public/images/github.png";
-import linkedin from "../../public/images/linkedin.png";
-import arrow from "../../public/images/arrow.png";
-import r from "../../public/images/r.png";
-import python from "../../public/images/python.png";
-import java from "../../public/images/java.png";
-import cLogo from "../../public/images/clogo.png";
-import jsLogo from "../../public/images/jslogo.png";
-import swift from "../../public/images/swift.png";
-import php from "../../public/images/php.png";
-import sql from "../../public/images/sqllogo.png";
-import html from "../../public/images/html.png";
-import css from "../../public/images/css.png";
-import flask from "../../public/images/flask.png";
-import reactLogo from "../../public/images/react.png";
-import threejs from "../../public/images/threejs.png";
-import tailwind from "../../public/images/tailwind.png";
-import mysql from "../../public/images/mysql.png";
-import mongodb from "../../public/images/mongodb.svg";
-import firebase from "../../public/images/firebase.png";
-import webScreenshot from "../../public/images/webss.png";
-import messageScreenshot from "../../public/images/messagess.png";
-import weatherScreenshot from "../../public/images/weatherss.png";
-import findUrPartyScreenshot from "../../public/images/findurpartyss.jpg";
-import scrabbleScreenshot from "../../public/images/scrabbless.png";
-import blackjackScreenshot from "../../public/images/blackjackss.png";
-import berkeley from "../../public/images/berkeley.png";
+// Using public directory paths directly for Vite
+const profile = "/images/profile.jpeg";
+const github = "/images/github.png";
+const linkedin = "/images/linkedin.png";
+const arrow = "/images/arrow.png";
+const r = "/images/r.png";
+const python = "/images/python.png";
+const java = "/images/java.png";
+const cLogo = "/images/clogo.png";
+const jsLogo = "/images/jslogo.png";
+const swift = "/images/swift.png";
+const php = "/images/php.png";
+const sql = "/images/sqllogo.png";
+const html = "/images/html.png";
+const css = "/images/css.png";
+const flask = "/images/flask.png";
+const reactLogo = "/images/react.png";
+const threejs = "/images/threejs.png";
+const tailwind = "/images/tailwind.png";
+const mysql = "/images/mysql.png";
+const mongodb = "/images/mongodb.svg";
+const firebase = "/images/firebase.png";
+const webScreenshot = "/images/webss.png";
+const messageScreenshot = "/images/messagess.png";
+const weatherScreenshot = "/images/weatherss.png";
+const findUrPartyScreenshot = "/images/findurpartyss.jpg";
+const scrabbleScreenshot = "/images/scrabbless.png";
+const blackjackScreenshot = "/images/blackjackss.png";
+const berkeley = "/images/berkeley.png";
 
 export default function About() {
   const isDesktop = useMediaQuery({ query: "(min-width: 768px)" });
@@ -152,78 +153,70 @@ export default function About() {
             <p className="text-white text-xs font-medium">Wellington, NZ</p>
           </div>
 
-          {/* Dashboard Grid */}
-          <div className="flex-1 flex items-center justify-center w-full max-w-7xl mx-auto p-6">
-            <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 w-full h-full max-h-[85vh]">
+          {/* Hero Dashboard - Redesigned */}
+          <div className="w-full h-full flex items-center justify-center px-8 py-6">
+            <div className="w-full max-w-7xl h-[75vh] grid grid-cols-12 grid-rows-6 gap-3">
               
-              {/* Profile Card - Main focal point */}
-              <div className="lg:col-span-2 bg-white/10 backdrop-blur-md rounded-2xl p-4 shadow-2xl border border-white/20 h-full">
-                <div className="flex flex-col items-center text-center h-full justify-center space-y-3">
-                  <img
-                    className="rounded-full border-3 border-white/30 shadow-xl w-20 h-20 object-cover"
-                    src={profile}
-                    alt="profile"
-                    onLoad={handleProfileLoad}
-                  />
-                  <div className="space-y-1">
-                    <h1 className="text-xl font-bold text-white">Logan Kinajil-Moran</h1>
-                    <p className="text-white/80 text-sm">Electrical Engineering & CS</p>
-                    <p className="text-white/70 leading-relaxed text-sm">
-                      MEng student at UC Berkeley, originally from New Zealand 🇳🇿
-                    </p>
-                  </div>
-                  
-                  {/* Social Links */}
-                  <div className="flex gap-2 w-full">
-                    <a href="https://github.com/logankm02" className="flex-1 flex items-center justify-center gap-2 p-2 bg-white/10 rounded-lg hover:bg-white/20 transition-all hover:scale-105">
-                      <img className="h-4 w-4" src={github} alt="github" />
-                      <span className="text-white text-xs font-medium">GitHub</span>
-                    </a>
-                    <a href="https://www.linkedin.com/in/logan-kinajil-moran/" className="flex-1 flex items-center justify-center gap-2 p-2 bg-white/10 rounded-lg hover:bg-white/20 transition-all hover:scale-105">
-                      <img className="h-4 w-4" src={linkedin} alt="linkedin" />
-                      <span className="text-white text-xs font-medium">LinkedIn</span>
-                    </a>
-                  </div>
-
-                  {/* Action Buttons */}
-                  <div className="flex flex-col gap-2 w-full max-w-xs">
-                    <button className="text-black bg-white hover:bg-gray-100 font-semibold rounded-lg px-4 py-2 transition-all hover:scale-105 shadow-lg text-sm">
-                      Download Resume
-                    </button>
-                    <button 
-                      onClick={handleScrollGetInTouch}
-                      className="text-white bg-white/20 hover:bg-white/30 font-semibold rounded-lg px-4 py-2 transition-all hover:scale-105 backdrop-blur-sm border border-white/30 text-sm"
-                    >
-                      Get in Touch
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* Right Side Widgets */}
-              <div className="lg:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-3 auto-rows-fr h-full">
+              {/* Profile Card - Left side spanning 4 columns, 6 rows */}
+              <div className="col-span-4 row-span-6 bg-white/10 backdrop-blur-md rounded-2xl p-4 shadow-2xl border border-white/20 flex flex-col items-center justify-center text-center">
+                <img
+                  className="rounded-full border-3 border-white/30 shadow-xl w-20 h-20 object-cover mb-4"
+                  src={profile}
+                  alt="profile"
+                  onLoad={handleProfileLoad}
+                />
+                <h1 className="text-xl font-bold text-white mb-1">Logan Kinajil-Moran</h1>
+                <p className="text-white/80 text-sm mb-1">Electrical Engineering & CS</p>
+                <p className="text-white/70 text-sm mb-4 leading-relaxed">
+                  MEng student at UC Berkeley, from New Zealand 🇳🇿
+                </p>
                 
-                {/* Recent Reads Widget */}
-                <div className="h-full">
-                  <RecentReads />
+                {/* Social Links */}
+                <div className="flex gap-2 w-full mb-4">
+                  <a href="https://github.com/logankm02" className="flex-1 flex items-center justify-center gap-2 p-2 bg-white/10 rounded-lg hover:bg-white/20 transition-all hover:scale-105">
+                    <img className="h-4 w-4" src={github} alt="github" />
+                    <span className="text-white text-xs font-medium">GitHub</span>
+                  </a>
+                  <a href="https://www.linkedin.com/in/logan-kinajil-moran/" className="flex-1 flex items-center justify-center gap-2 p-2 bg-white/10 rounded-lg hover:bg-white/20 transition-all hover:scale-105">
+                    <img className="h-4 w-4" src={linkedin} alt="linkedin" />
+                    <span className="text-white text-xs font-medium">LinkedIn</span>
+                  </a>
                 </div>
 
-                {/* Spotify Playlists Widget */}
-                <div className="h-full">
-                  <SpotifyPlaylists />
+                {/* Action Buttons */}
+                <div className="flex flex-col gap-2 w-full">
+                  <button className="text-black bg-white hover:bg-gray-100 font-semibold rounded-lg px-4 py-2 transition-all hover:scale-105 shadow-lg text-sm">
+                    Download Resume
+                  </button>
+                  <button 
+                    onClick={handleScrollGetInTouch}
+                    className="text-white bg-white/20 hover:bg-white/30 font-semibold rounded-lg px-4 py-2 transition-all hover:scale-105 backdrop-blur-sm border border-white/30 text-sm"
+                  >
+                    Get in Touch
+                  </button>
                 </div>
-
-                {/* World Clock & Weather Widget */}
-                <div className="h-full">
-                  <WorldClock />
-                </div>
-
-                {/* Table of Contents Widget */}
-                <div className="h-full">
-                  <TableOfContents isWidget={true} />
-                </div>
-
               </div>
+
+              {/* Recent Reads - Top left widget */}
+              <div className="col-span-4 row-span-3">
+                <RecentReads />
+              </div>
+
+              {/* Spotify Playlists - Top right widget */}
+              <div className="col-span-4 row-span-3">
+                <SpotifyPlaylistsAPI />
+              </div>
+
+              {/* World Clock - Bottom left widget */}
+              <div className="col-span-4 row-span-3">
+                <WorldClock />
+              </div>
+
+              {/* Table of Contents - Bottom right widget */}
+              <div className="col-span-4 row-span-3">
+                <TableOfContents isWidget={true} />
+              </div>
+
             </div>
           </div>
 
@@ -239,7 +232,7 @@ export default function About() {
           </div>
         </div>
         <div id="about" className="flex flex-col justify-center h-max w-4/5 md:w-3/5 mx-auto">
-          <h1 className="text-center mb-5 text-3xl font-bold">Education</h1>
+          <h1 className="text-center m-5 text-3xl font-bold">Education</h1>
           
           {/* UC Berkeley */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 place-items-center md:place-items-start md:items-center border p-8 rounded-md bg-slate-50 mb-10 hover:scale-105 transition-transform">
