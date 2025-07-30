@@ -7,16 +7,21 @@ Title: ⚽Soccer football stadium game asset lowpoly city
 */
 
 import scene from '/src/assets/soccer.glb'
+import juggleScene from '/src/assets/passing2.glb'
 
 import React, { useRef, useState, useEffect } from 'react'
-import { useGLTF, Html } from '@react-three/drei'
+import { useGLTF, Html, useAnimations } from '@react-three/drei'
 import { useFrame, useThree } from '@react-three/fiber'
+import { LoopRepeat, Euler, Quaternion } from 'three'
 import { useNavigate } from 'react-router-dom'
 import { HomeText } from '../components/HomeText'
 
 export function Soccer(props) {
     const { nodes, materials } = useGLTF(scene)
+    const { nodes: juggleNodes, materials: juggleMaterials, animations, scene: passingScene } = useGLTF(juggleScene)
     const soccerRef = useRef()
+    const juggleRef = useRef()
+    const { actions } = useAnimations(animations, juggleRef)
     const navigate = useNavigate()
 
   const [zoomIn, setZoomIn] = useState(false)
@@ -41,6 +46,38 @@ export function Soccer(props) {
       navigate('/about', { replace: true })    
     }
   }, [zoomComplete]);
+
+  useEffect(() => {
+    if (actions && Object.keys(actions).length > 0) {
+      Object.values(actions).forEach(action => {
+        if (action) {
+          action.reset()
+          action.setLoop(LoopRepeat, Infinity)
+          action.play()
+        }
+      })
+    }
+  }, [actions])
+
+  useEffect(() => {
+    if (juggleRef.current) {
+      juggleRef.current.traverse((child) => {
+        if (child.isMesh) {
+          // Apply materials based on specific mesh names
+          if (child.name === 'Object_651') {
+            child.material = materials.Soccer_Ball
+            console.log('Applied Soccer_Ball material to ball:', child.name)
+          } else if (child.name === 'Object_677') {
+            child.material = materials['Material.009']
+            console.log('Applied Material.009 to character:', child.name)
+          }
+          
+          child.castShadow = true
+          child.receiveShadow = true
+        }
+      })
+    }
+  }, [materials])
 
 const targetPositions = {
     x: 0.5,
@@ -1338,7 +1375,7 @@ const rates = {
         rotation={[0, -Math.PI / 2, 0]}
         scale={[0.785, 0.798, 0.785]}
       />
-      <mesh
+      {/* <mesh
         castShadow
         receiveShadow
         geometry={nodes.Object_651.geometry}
@@ -1346,6 +1383,17 @@ const rates = {
         position={[0.213, 0.151, -0.196]}
         rotation={[0, 0.326, 0]}
         scale={0.228}
+      /> */}
+      
+      {/* Passing Character */}
+      <primitive
+        ref={juggleRef}
+        object={passingScene}
+        position={[0, 0.3, 0.9]}
+        scale={[0.01, 0.01, 0.01]}
+        rotation={[-0.5, 9, 1.2]}
+        castShadow
+        receiveShadow
       />
       <mesh
         castShadow
@@ -1446,7 +1494,7 @@ const rates = {
         rotation={[0, -Math.PI / 2, 0]}
         scale={0.002}
       />
-      <mesh
+      {/* <mesh
         castShadow
         receiveShadow
         geometry={nodes.Object_677.geometry}
@@ -1454,7 +1502,7 @@ const rates = {
         position={[0.277, 0.14, -0.034]}
         rotation={[1.709, -0.096, 2.537]}
         scale={0.003}
-      />
+      /> */}
     </group>
     </>
   )
