@@ -24,8 +24,8 @@ export const HomeText = () => {
   }, [])
   return (
       <div className="text-center w-full text-white p-8 drop-shadow-lg">
-            <h1 className="text-3xl font-bold mb-4">I'm Logan Kinajil-Moran</h1>
-            <p className="text-lg mb-3">I'm an electrical engineering and computer science student from New Zealand 🇳🇿</p>
+            <h1 className="text-6xl font-bold mb-4">Hi, I'm Logan Kinajil-Moran</h1>
+            <p className="text-lg mb-3">An electrical engineering and computer science student from New Zealand 🇳🇿</p>
             <p className="text-lg mb-4">Incoming MEng EECS student at UC Berkeley</p>
             {isMobile && <p className="text-base">Tap anywhere to learn more!</p>}
             {isDesktop && createPortal(
@@ -33,11 +33,13 @@ export const HomeText = () => {
                 className="fixed pointer-events-none z-50" 
                 style={{
                   left: mousePosition.x,
-                  top: mousePosition.y-20,
+                  top: mousePosition.y-30,
                   fontSize: '14px',
                   color: 'white',
                   padding: '4px 8px',
                   borderRadius: '4px',
+                  border: '1px solid white',
+                  backgroundColor: 'rgba(0, 0, 0, 0.5)',
                   whiteSpace: 'nowrap'
                 }}
               >

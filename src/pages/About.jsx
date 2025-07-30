@@ -12,6 +12,9 @@ const linkedin = "/images/linkedin.png";
 const arrow = "/images/arrow.png";
 const r = "/images/r.png";
 const python = "/images/python.png";
+const cpp = "/images/c++.png";
+const rp = "/images/rp.png";
+const owlLogo = "/images/owl-logo.png";
 const java = "/images/java.png";
 const cLogo = "/images/clogo.png";
 const jsLogo = "/images/jslogo.png";
@@ -33,6 +36,8 @@ const weatherScreenshot = "/images/weatherss.png";
 const findUrPartyScreenshot = "/images/findurpartyss.jpg";
 const scrabbleScreenshot = "/images/scrabbless.png";
 const blackjackScreenshot = "/images/blackjackss.png";
+const tuinetScreenshot = "/images/tuinet.jpg";
+const kiteScreenshot = "/images/askkite.png";
 const berkeley = "/images/berkeley.png";
 
 export default function About() {
@@ -127,6 +132,12 @@ export default function About() {
     window.open(url, "_blank");
   };
 
+  const kiteWeb = (e) => {
+    e.preventDefault();
+    const url = "https://usekite.app";
+    window.open(url, "_blank");
+  };
+
   const findUrPartyAppStore = (e) => {
     e.preventDefault();
     const url = "https://apps.apple.com/app/id6465749219";
@@ -160,15 +171,17 @@ export default function About() {
               {/* Profile Card - Left side spanning 4 columns, 6 rows */}
               <div className="col-span-4 row-span-6 bg-white/10 backdrop-blur-md rounded-2xl p-4 shadow-2xl border border-white/20 flex flex-col items-center justify-center text-center">
                 <img
-                  className="rounded-full border-3 border-white/30 shadow-xl w-20 h-20 object-cover mb-4"
+                  className="rounded-full border-3 border-white/30 shadow-xl w-40 h-40 object-cover mb-4"
                   src={profile}
                   alt="profile"
                   onLoad={handleProfileLoad}
                 />
-                <h1 className="text-xl font-bold text-white mb-1">Logan Kinajil-Moran</h1>
-                <p className="text-white/80 text-sm mb-1">Electrical Engineering & CS</p>
+                <h1 className="text-3xl font-bold text-white mb-1">Logan Kinajil-Moran</h1>
+                <p className="text-white/80 text-l mb-1">Electrical Engineering & Computer Science</p>
+                <p className="text-white/80 text-sm mb-1">University of Rochester '25 | UC Berekely '26</p>
+                <p className="text-white/80 text-sm mb-1"></p>
                 <p className="text-white/70 text-sm mb-4 leading-relaxed">
-                  MEng student at UC Berkeley, from New Zealand 🇳🇿
+                  MEng student currently based in Berkeley, California. From New Zealand 🇳🇿 
                 </p>
                 
                 {/* Social Links */}
@@ -185,8 +198,13 @@ export default function About() {
 
                 {/* Action Buttons */}
                 <div className="flex flex-col gap-2 w-full">
-                  <button className="text-black bg-white hover:bg-gray-100 font-semibold rounded-lg px-4 py-2 transition-all hover:scale-105 shadow-lg text-sm">
+                  {/* <button className="text-black bg-white hover:bg-gray-100 font-semibold rounded-lg px-4 py-2 transition-all hover:scale-105 shadow-lg text-sm">
                     Download Resume
+                  </button> */}
+                  <button className="text-black bg-white hover:bg-gray-100 font-semibold rounded-lg px-4 py-2 transition-all hover:scale-105 shadow-lg text-sm"
+                    onClick={handleScrollAbout}
+                  >
+                    Learn More
                   </button>
                   <button 
                     onClick={handleScrollGetInTouch}
@@ -231,142 +249,157 @@ export default function About() {
             </a>
           </div>
         </div>
-        <div id="about" className="flex flex-col justify-center h-max w-4/5 md:w-3/5 mx-auto">
-          <h1 className="text-center m-5 text-3xl font-bold">Education</h1>
+        <div id="about" className="flex flex-col justify-center h-max w-4/5 md:w-3/5">
+          <h1 className="text-center m-6 text-3xl font-bold">Education</h1>
           
           {/* UC Berkeley */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 place-items-center md:place-items-start md:items-center border p-8 rounded-md bg-slate-50 mb-10 hover:scale-105 transition-transform">
-            <img className="h-28 justify-self-center" src={berkeley} alt="Berkeley" />
-            <div className="mb-4 text-center md:text-left">
-              <h1>University of California, Berkeley</h1>
-              <p>Berkeley, California</p>
-              <p>Master of Engineering</p>
-              <p>Electrical Engineering and Computer Science</p>
-              <p>Class of 2026</p>
+          <div className="border p-6 rounded-md bg-slate-50 mb-6 hover:scale-105 transition-transform">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <img className="w-12 h-12 object-contain" src={berkeley} alt="UC Berkeley" />
+                <div>
+                  <h2 className="font-bold text-lg">University of California, Berkeley</h2>
+                  <p className="text-sm text-gray-600">MEng, Electrical Engineering and Computer Science</p>
+                </div>
+              </div>
+              <div className="text-right">
+                <p className="text-sm text-gray-600">Class of 2026</p>
+                <p className="text-sm text-gray-500">Berkeley, California</p>
+              </div>
             </div>
-            <div className="mb-4 text-center md:text-left">
-              <p>Fung Excellence Scholarship</p>
-              <p>Concentration: Visual Computing and Computer Graphics</p>
+            <div className="pl-15">
+              <p className="text-sm mb-2">• Fung Excellence Scholarship</p>
+              <p className="text-sm mb-2">• Concentration in Visual Computing and Computer Graphics</p>
             </div>
           </div>
 
           {/* University of Rochester */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 place-items-center md:place-items-start md:items-center border p-8 rounded-md bg-slate-50 mb-10 hover:scale-105 transition-transform">
-            <img className="h-28 justify-self-center" src={r} alt="Rochester" />
-            <div className="mb-4 text-center md:text-left">
-              <h1>University of Rochester</h1>
-              <p>Rochester, New York</p>
-              <p>Major in Computer Science</p>
-              <p>Major in Economics</p>
-              <p>Class of 2025</p>
+          <div className="border p-6 rounded-md bg-slate-50 hover:scale-105 transition-transform">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <img className="w-12 h-12 object-contain" src={r} alt="University of Rochester" />
+                <div>
+                  <h2 className="font-bold text-lg">University of Rochester</h2>
+                  <p className="font-sm text-gray-600">BA, Computer Science and Economics, Magna Cum Laude</p>
+                </div>
+              </div>
+              <div className="text-right">
+                <p className="text-sm text-gray-600">Class of 2025</p>
+                <p className="text-sm text-gray-500">Rochester, New York</p>
+              </div>
             </div>
-            <div className="mb-4 text-center md:text-left">
-              <p>GPA 3.93</p>
-              <p>Dean's Scholar, Provost's Circle Scholar</p>
-              <p>Varsity Athlete (Men's Soccer)</p>
-              <p>UAA All-Academic Recognition</p>
-              <p>Dean's List in every semester</p>
+            <div className="pl-15">
+              <p className="text-sm mb-2">• GPA 3.94</p>
+               <p className="text-sm mb-2">• Phi Kappa Beta</p>
+              <p className="text-sm mb-2">• Dean's Scholar, Provost's Circle Scholar</p>
+              <p className="text-sm mb-2">• NCAA Varsity Athlete (Men's Soccer)</p>
+              <p className="text-sm mb-2">• UAA All-Academic Recognition</p>
+              <p className="text-sm mb-2">• Dean's List in every semester</p>
             </div>
           </div>
         </div>
-        <div id="experience" className="flex flex-col justify-center h-max w-4/5 md:w-3/5 mx-auto">
-          <h1 className="text-center mb-5 text-3xl font-bold">Experience</h1>
+        <div id="experience" className="flex flex-col justify-center h-max w-4/5 md:w-3/5">
+          <h1 className="text-center text-3xl font-bold m-6">Experience</h1>
           
           {/* Electronics Engineer Intern */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 place-items-center md:place-items-start md:items-start border p-8 rounded-md bg-slate-50 mb-10 hover:scale-105 transition-transform">
-            <div className="mb-4 text-center md:text-left">
-              <h2 className="font-bold">Electronics Engineer Intern</h2>
-              <p className="text-sm text-gray-600">June 2025 – Present</p>
+          <div className="border p-6 rounded-md bg-slate-50 mb-6 hover:scale-105 transition-transform">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <img className="w-12 h-12 object-contain" src={owlLogo} alt="OWL Integrations" />
+                <div>
+                  <h2 className="font-bold text-lg">Electronics Engineer Intern</h2>
+                  <h3 className="font-semibold text-gray-700">OWL Integrations</h3>
+                </div>
+              </div>
+              <div className="text-right">
+                <p className="text-sm text-gray-600">June 2025 – Present</p>
+                <p className="text-sm text-gray-500">Rochester, New York</p>
+              </div>
             </div>
-            <div className="mb-4 text-center md:text-left">
-              <h3 className="font-semibold">OWL Integrations</h3>
-              <p className="text-sm">Rochester, New York</p>
-            </div>
-            <div className="mb-4 text-center md:text-left">
-              <p className="text-sm">• Beginning in June developing new electronics firmware for DuckLinks, and contribute to the ClusterDuck Protocol open source firmware</p>
+            <div className="pl-15">
+              <p className="text-sm mb-2">• Beginning in June developing new electronics firmware for DuckLinks, and contribute to the ClusterDuck Protocol open source firmware</p>
             </div>
           </div>
 
           {/* Release Software Engineer */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 place-items-center md:place-items-start md:items-start border p-8 rounded-md bg-slate-50 mb-10 hover:scale-105 transition-transform">
-            <div className="mb-4 text-center md:text-left">
-              <h2 className="font-bold">Release Software Engineer/Head of Testing</h2>
-              <p className="text-sm text-gray-600">July 2024 – Present</p>
+          <div className="border p-6 rounded-md bg-slate-50 mb-6 hover:scale-105 transition-transform">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h2 className="font-bold text-lg">Release Software Engineer/Head of Testing</h2>
+                <h3 className="font-semibold text-gray-700">CyberDyne Ventures/Independent Research</h3>
+              </div>
+              <div className="text-right">
+                <p className="text-sm text-gray-600">July 2024 – Present</p>
+                <p className="text-sm text-gray-500">US/Remote</p>
+              </div>
             </div>
-            <div className="mb-4 text-center md:text-left">
-              <h3 className="font-semibold">CyberDyne Ventures/Independent Research</h3>
-              <p className="text-sm">US/Remote</p>
-            </div>
-            <div className="mb-4 text-center md:text-left">
-              <p className="text-sm">• Collaborated with security researcher Craig Chamberlain (previously Principal Security Researcher at Elastic) to release the Skynet project at DEF CON 2024</p>
-              <p className="text-sm">• Contributed to the backend using Go and Neo4j, and a React frontend integrated with Docker for demonstration</p>
+            <div>
+              <p className="text-sm mb-2">• Collaborated with security researcher Craig Chamberlain (previously Principal Security Researcher at Elastic) to release the Skynet project at DEF CON 2024</p>
+              <p className="text-sm mb-2">• Contributed to the backend using Go and Neo4j, and a React frontend integrated with Docker for demonstration</p>
             </div>
           </div>
 
           {/* Research Assistant */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 place-items-center md:place-items-start md:items-start border p-8 rounded-md bg-slate-50 mb-10 hover:scale-105 transition-transform">
-            <div className="mb-4 text-center md:text-left">
-              <h2 className="font-bold">Research Assistant</h2>
-              <p className="text-sm text-gray-600">March 2024 – October 2024</p>
+          <div className="border p-6 rounded-md bg-slate-50 mb-6 hover:scale-105 transition-transform">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <img className="w-12 h-12 object-contain" src={r} alt="University of Rochester" />
+                <div>
+                  <h2 className="font-bold text-lg">Research Assistant</h2>
+                  <h3 className="font-semibold text-gray-700">University of Rochester Medical Centre</h3>
+                  <p className="text-sm text-gray-600">Department of Neurosurgery</p>
+                </div>
+              </div>
+              <div className="text-right">
+                <p className="text-sm text-gray-600">March 2024 – October 2024</p>
+                <p className="text-sm text-gray-500">Rochester, New York</p>
+              </div>
             </div>
-            <div className="mb-4 text-center md:text-left">
-              <h3 className="font-semibold">University of Rochester Medical Centre</h3>
-              <p className="text-sm">Department of Neurosurgery</p>
-              <p className="text-sm">Rochester, New York</p>
-            </div>
-            <div className="mb-4 text-center md:text-left">
-              <p className="text-sm">• Collaborated with residents and PhD candidates in Dr. Jonathan J. Stone's lab to support neurosurgery research, enhancing team efficiency and contributing to successful project outcomes</p>
-              <p className="text-sm">• Utilized computer science skills in data analysis, machine learning, and visualization using tools like PyTorch and scikit-learn to support scientific research, leading to improved data insights and successful funding applications</p>
+            <div className="pl-15">
+              <p className="text-sm mb-2">• Collaborated with residents and PhD candidates in Dr. Jonathan J. Stone's lab to support neurosurgery research, enhancing team efficiency and contributing to successful project outcomes</p>
+              <p className="text-sm mb-2">• Utilized computer science skills in data analysis, machine learning, and visualization using tools like PyTorch and scikit-learn to support scientific research, leading to improved data insights and successful funding applications</p>
             </div>
           </div>
         </div>
         <div id="projects" className="flex flex-col justify-center w-4/5 md:w-3/5">
-          <h1 className="text-center mb-5 text-3xl font-bold">Projects</h1>
+          <h1 className="text-center m-3 text-3xl font-bold">Projects</h1>
           <div className="grid grid-cols-1 h-auto md:flex md:flex-row justify-between space-x-4 border rounded-md bg-slate-50 mb-10 hover:scale-105 transition-transform">
             <div className="left-0 text-left p-4 flex flex-col justifty-between h-full">
-              <h1>TuiNet</h1>
+              <h1>Project TūīNet</h1>
               <p className="flex flex-row mb-5">
-                Made with: <img className="project" src={python} alt="python" />
-                <img className="project" src={cLogo} alt="c" />
-                <img className="project" src={jsLogo} alt="js" />
-              </p>
-              <button
-                type="button"
-                className="w-3/4 text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2"
-              >
-                View Project
-              </button>
-            </div>
-          </div>
-          <div className="grid grid-cols-1 h-auto md:flex md:flex-row justify-between space-x-4 border rounded-md bg-slate-50 mb-10 hover:scale-105 transition-transform">
-            <div className="left-0 text-left p-4 flex flex-col justifty-between h-full">
-              <h1>Kite</h1>
-              <p className="flex flex-row mb-5">
-                Made with: <img className="project" src={python} alt="python" />
-                <img className="project" src={reactLogo} alt="react" />
-                <img className="project" src={tailwind} alt="tailwind" />
-              </p>
-              <button
-                type="button"
-                className="w-3/4 text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2"
-              >
-                View Project
-              </button>
-            </div>
-          </div>
-          <div className="grid grid-cols-1 h-auto md:flex md:flex-row justify-between space-x-4 border rounded-md bg-slate-50 mb-10 hover:scale-105 transition-transform">
-            <div className="left-0 text-left p-4 flex flex-col justifty-between h-full">
-              <h1>Blackjack Game</h1>
-              <p className="flex flex-row mb-5">
-                Made with: <img className="project" src={html} alt="html" />
-                <img className="project" src={css} alt="css" />
-                <img className="project" src={jsLogo} alt="js" />
+                Made with: <img className="project" src={cpp} alt="c++" />
                 <img className="project" src={python} alt="python" />
+                <img className="project" src={rp} alt="rp" />
               </p>
               <button
                 type="button"
                 className="w-3/4 text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2"
-                onClick={BlackjackWeb}
+              >
+                View Project
+              </button>
+            </div>
+            {isDesktop && (
+              <div className="w-4/5 md:w-1/2 h-auto md:flex md:items-center md:justify-center justify-items-center p-4">
+                <img
+                  className="w-4/5 h-auto md:h-40 md:w-auto"
+                  src={tuinetScreenshot}
+                  alt="tuinet"
+                />
+              </div>
+            )}
+          </div>
+          <div className="grid grid-cols-1 h-auto md:flex md:flex-row justify-between space-x-4 border rounded-md bg-slate-50 mb-10 hover:scale-105 transition-transform">
+            <div className="left-0 text-left p-4 flex flex-col justifty-between h-full">
+              <h1>Kite - AI Email Assistant</h1>
+              <p className="flex flex-row mb-5">
+                Made with: <img className="project" src={python} alt="python" />
+                <img className="project" src={jsLogo} alt="javascript" />
+                <img className="project" src={firebase} alt="firebase" />
+              </p>
+              <button
+                type="button"
+                className="w-3/4 text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2"
+                onClick={kiteWeb}
               >
                 View Website
               </button>
@@ -375,84 +408,8 @@ export default function About() {
               <div className="w-4/5 md:w-1/2 h-auto md:flex md:items-center md:justify-center justify-items-center p-4">
                 <img
                   className="w-4/5 h-auto md:h-40 md:w-auto"
-                  src={blackjackScreenshot}
-                  alt="scrabble"
-                />
-              </div>
-            )}
-          </div>
-          <div className="grid grid-cols-1 h-auto md:flex md:flex-row justify-between space-x-4 border rounded-md bg-slate-50 mb-10 hover:scale-105 transition-transform">
-            <div className="left-0 text-left p-4 flex flex-col justifty-between h-full">
-              <h1>findUrParty iOS App</h1>
-              <p className="flex flex-row mb-5">
-                Made with: <img className="project" src={swift} alt="swift" />
-              </p>
-              <button
-                type="button"
-                className="w-3/4 text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2"
-                onClick={findUrPartyAppStore}
-              >
-                View in App Store
-              </button>
-            </div>
-            {isDesktop && (
-              <div className="w-4/5 md:w-1/2 h-auto md:flex md:items-center md:justify-center justify-items-center p-4">
-                <img
-                  className="w-full h-auto md:h-40 md:w-auto"
-                  src={findUrPartyScreenshot}
-                  alt="message"
-                />
-              </div>
-            )}
-          </div>
-          <div className="grid grid-cols-1 h-auto md:flex md:flex-row justify-between space-x-4 border rounded-md bg-slate-50 mb-10 hover:scale-105 transition-transform">
-            <div className="left-0 text-left p-4 flex flex-col justifty-between h-full">
-              <h1>Travel/Remote Work Helper</h1>
-              <p className="flex flex-row mb-5">
-                Made with: <img className="project" src={html} alt="html" />
-                <img className="project" src={css} alt="css" />
-                <img className="project" src={jsLogo} alt="js" />
-              </p>
-              <button
-                type="button"
-                className="w-3/4 text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2"
-                onClick={trvlWeb}
-              >
-                View Website
-              </button>
-            </div>
-            {isDesktop && (
-              <div className="w-4/5 md:w-1/2 h-auto md:flex md:items-center md:justify-center justify-items-center p-4">
-                <img
-                  className="w-full h-auto md:h-40 md:w-auto"
-                  src={weatherScreenshot}
-                  alt="message"
-                />
-              </div>
-            )}
-          </div>
-          <div className="grid grid-cols-1 h-auto md:flex md:flex-row justify-between space-x-4 border rounded-md bg-slate-50 mb-10 hover:scale-105 transition-transform">
-            <div className="left-0 text-left p-4 flex flex-col justifty-between h-full">
-              <h1>Personal Messaging Site</h1>
-              <p className="flex flex-row mb-5">
-                Made with:{" "}
-                <img className="project" src={reactLogo} alt="react" />
-                <img className="project" src={firebase} alt="firebase" />
-              </p>
-              <button
-                type="button"
-                className="w-3/4 text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2"
-                onClick={msgWeb}
-              >
-                View Website
-              </button>
-            </div>
-            {isDesktop && (
-              <div className="w-4/5 md:w-1/2 h-auto md:flex md:items-center md:justify-center justify-items-center p-4">
-                <img
-                  className="w-full h-auto md:h-40 md:w-auto"
-                  src={messageScreenshot}
-                  alt="message"
+                  src={kiteScreenshot}
+                  alt="kite"
                 />
               </div>
             )}
@@ -506,6 +463,109 @@ export default function About() {
                 <img
                   className="w-4/5 h-auto md:h-40 md:w-auto"
                   src={webScreenshot}
+                  alt="message"
+                />
+              </div>
+            )}
+          </div>
+          <div className="grid grid-cols-1 h-auto md:flex md:flex-row justify-between space-x-4 border rounded-md bg-slate-50 mb-10 hover:scale-105 transition-transform">
+            <div className="left-0 text-left p-4 flex flex-col justifty-between h-full">
+              <h1>findUrParty iOS App</h1>
+              <p className="flex flex-row mb-5">
+                Made with: <img className="project" src={swift} alt="swift" />
+              </p>
+              <button
+                type="button"
+                className="w-3/4 text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2"
+                onClick={findUrPartyAppStore}
+              >
+                View in App Store
+              </button>
+            </div>
+            {isDesktop && (
+              <div className="w-4/5 md:w-1/2 h-auto md:flex md:items-center md:justify-center justify-items-center p-4">
+                <img
+                  className="w-full h-auto md:h-40 md:w-auto"
+                  src={findUrPartyScreenshot}
+                  alt="message"
+                />
+              </div>
+            )}
+          </div>
+          <div className="grid grid-cols-1 h-auto md:flex md:flex-row justify-between space-x-4 border rounded-md bg-slate-50 mb-10 hover:scale-105 transition-transform">
+            <div className="left-0 text-left p-4 flex flex-col justifty-between h-full">
+              <h1>Blackjack Game</h1>
+              <p className="flex flex-row mb-5">
+                Made with: <img className="project" src={html} alt="html" />
+                <img className="project" src={css} alt="css" />
+                <img className="project" src={jsLogo} alt="js" />
+                <img className="project" src={python} alt="python" />
+              </p>
+              <button
+                type="button"
+                className="w-3/4 text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2"
+                onClick={BlackjackWeb}
+              >
+                View Website
+              </button>
+            </div>
+            {isDesktop && (
+              <div className="w-4/5 md:w-1/2 h-auto md:flex md:items-center md:justify-center justify-items-center p-4">
+                <img
+                  className="w-4/5 h-auto md:h-40 md:w-auto"
+                  src={blackjackScreenshot}
+                  alt="message"
+                />
+              </div>
+            )}
+          </div>
+          <div className="grid grid-cols-1 h-auto md:flex md:flex-row justify-between space-x-4 border rounded-md bg-slate-50 mb-10 hover:scale-105 transition-transform">
+            <div className="left-0 text-left p-4 flex flex-col justifty-between h-full">
+              <h1>Travel/Remote Work Helper</h1>
+              <p className="flex flex-row mb-5">
+                Made with: <img className="project" src={html} alt="html" />
+                <img className="project" src={css} alt="css" />
+                <img className="project" src={jsLogo} alt="js" />
+              </p>
+              <button
+                type="button"
+                className="w-3/4 text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2"
+                onClick={trvlWeb}
+              >
+                View Website
+              </button>
+            </div>
+            {isDesktop && (
+              <div className="w-4/5 md:w-1/2 h-auto md:flex md:items-center md:justify-center justify-items-center p-4">
+                <img
+                  className="w-full h-auto md:h-40 md:w-auto"
+                  src={weatherScreenshot}
+                  alt="message"
+                />
+              </div>
+            )}
+          </div>
+          <div className="grid grid-cols-1 h-auto md:flex md:flex-row justify-between space-x-4 border rounded-md bg-slate-50 mb-10 hover:scale-105 transition-transform">
+            <div className="left-0 text-left p-4 flex flex-col justifty-between h-full">
+              <h1>Personal Messaging Site</h1>
+              <p className="flex flex-row mb-5">
+                Made with:{" "}
+                <img className="project" src={reactLogo} alt="react" />
+                <img className="project" src={firebase} alt="firebase" />
+              </p>
+              <button
+                type="button"
+                className="w-3/4 text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2"
+                onClick={msgWeb}
+              >
+                View Website
+              </button>
+            </div>
+            {isDesktop && (
+              <div className="w-4/5 md:w-1/2 h-auto md:flex md:items-center md:justify-center justify-items-center p-4">
+                <img
+                  className="w-full h-auto md:h-40 md:w-auto"
+                  src={messageScreenshot}
                   alt="message"
                 />
               </div>
@@ -582,8 +642,8 @@ export default function About() {
           <div className="max-w-2xl mx-auto bg-slate-50 border rounded-xl p-8">
             <p className="mb-6 text-center text-gray-700">
               Email{" "}
-              <a href="mailto:logankm2014@gmail.com" className="text-blue-600 hover:underline font-medium">
-                logankm2014@gmail.com
+              <a href="mailto:logan8@gmail.com" className="text-blue-600 hover:underline font-medium">
+                logankm8@gmail.com
               </a>{" "}
               or use this form to send me a message. I'd love to hear from you!
             </p>

@@ -31,7 +31,7 @@ const TableOfContents = ({ isWidget = false }) => {
       }
 
       // Determine background color based on what's behind the TOC position
-      const tocPosition = window.innerHeight / 2; // TOC is centered vertically
+      const tocPosition = window.innerHeight / 3; // TOC is positioned at 1/3 from top
       const tocScrollPosition = window.scrollY + tocPosition;
       
       const homeSection = document.getElementById('home');
@@ -106,7 +106,7 @@ const TableOfContents = ({ isWidget = false }) => {
       initial={{ opacity: 0, x: 50 }}
       animate={{ opacity: isVisible ? 1 : 0, x: isVisible ? 0 : 50 }}
       transition={{ duration: 0.3 }}
-      className="fixed right-8 top-1/2 transform -translate-y-1/2 z-40"
+      className="fixed right-8 top-1/3 transform -translate-y-1/3 z-40"
     >
       <motion.div 
         animate={{

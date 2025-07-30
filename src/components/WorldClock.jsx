@@ -9,7 +9,7 @@ const WorldClock = () => {
       id: 'berkeley', 
       name: 'Berkeley, California', 
       timezone: 'America/Los_Angeles', 
-      color: 'bg-yellow-400', 
+      color: 'bg-blue-500', // UC Berkeley blue
       unit: '°F',
       lat: 37.8715,
       lon: -122.2730
@@ -18,28 +18,28 @@ const WorldClock = () => {
       id: 'wellington', 
       name: 'Wellington, New Zealand', 
       timezone: 'Pacific/Auckland', 
-      color: 'bg-green-400', 
+      color: 'bg-black', // New Zealand All Blacks
       unit: '°C',
       lat: -41.2924,
       lon: 174.7787
     },
     { 
-      id: 'nyc', 
-      name: 'New York, New York', 
-      timezone: 'America/New_York', 
-      color: 'bg-red-400', 
-      unit: '°F',
-      lat: 40.7589,
-      lon: -73.9851
-    },
-    { 
       id: 'rochester', 
       name: 'Rochester, New York', 
       timezone: 'America/New_York', 
-      color: 'bg-purple-400', 
+      color: 'bg-yellow-500', // University of Rochester yellow
       unit: '°F',
       lat: 43.1566,
       lon: -77.6088
+    },
+    { 
+      id: 'sydney', 
+      name: 'Sydney, Australia', 
+      timezone: 'Australia/Sydney', 
+      color: 'bg-orange-500', // Sydney Harbour Bridge orange/rust
+      unit: '°C',
+      lat: -33.8688,
+      lon: 151.2093
     }
   ];
 
@@ -75,7 +75,7 @@ const WorldClock = () => {
       const mockTemps = {
         berkeley: 68,
         wellington: 16,
-        nyc: 42,
+        sydney: 22,
         rochester: 38
       };
       
