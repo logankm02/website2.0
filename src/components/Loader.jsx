@@ -1,8 +1,9 @@
 import React, { useEffect } from 'react';
 import { Html, useProgress } from "@react-three/drei";
-import { metronome } from 'ldrs';
+import { ring } from 'ldrs'
+ring.register()
 
-metronome.register()
+
 
 export const Loader = ({ setIsLoaded }) => {
   const { progress } = useProgress();
@@ -15,13 +16,13 @@ export const Loader = ({ setIsLoaded }) => {
 
   return (
     <Html center>
-      <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center z-50">
-        <l-metronome
-          size="50"
-          speed="1.6" 
-          color="black" 
-        ></l-metronome>
-      </div>
+      <l-ring
+        size="40"
+        stroke="4"
+        bg-opacity="0"
+        speed="2" 
+        color="black" 
+      ></l-ring>
     </Html>
   );
 };

@@ -10,7 +10,7 @@ export default function App() {
     <main className={`w-full h-screen relative ${isLoaded ? 'bg-gradient-to-b from-sunset to-transparent bg-cover' : 'bg-transparent'}`}>
       <Router>
         <Routes>
-          <Route path="/" element={<Home setIsLoaded={setIsLoaded}/>} />
+          <Route path="/" element={<Home setIsLoaded={setIsLoaded} isLoaded={isLoaded}/>} />
           <Route path="/about" element={<About />} />
         </Routes>
       </Router>

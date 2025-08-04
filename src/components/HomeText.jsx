@@ -23,10 +23,10 @@ export const HomeText = () => {
     }
   }, [])
   return (
-      <div className="text-center w-full text-white p-8 drop-shadow-lg">
-            <h1 className="text-6xl font-bold mb-4">Hi, I'm Logan Kinajil-Moran</h1>
-            <p className="text-lg mb-3">An electrical engineering and computer science student from New Zealand 🇳🇿</p>
-            <p className="text-lg mb-4">Incoming MEng EECS student at UC Berkeley</p>
+      <div className="text-center w-full text-white p-4 md:p-8 drop-shadow-lg">
+            <h1 className="text-3xl md:text-6xl font-bold mb-3 md:mb-4 leading-tight">Hi, I'm Logan Kinajil-Moran</h1>
+            <p className="text-sm md:text-lg mb-2 md:mb-3 px-2">An electrical engineering and computer science student from New Zealand 🇳🇿</p>
+            <p className="text-sm md:text-lg mb-3 md:mb-4 px-2">Incoming MEng EECS student at UC Berkeley</p>
             {isMobile && <p className="text-base">Tap anywhere to learn more!</p>}
             {isDesktop && createPortal(
               <motion.div 

@@ -14,7 +14,6 @@ import { useGLTF, Html, useAnimations } from '@react-three/drei'
 import { useFrame, useThree } from '@react-three/fiber'
 import { LoopRepeat, Euler, Quaternion } from 'three'
 import { useNavigate } from 'react-router-dom'
-import { HomeText } from '../components/HomeText'
 
 export function Soccer(props) {
     const { nodes, materials } = useGLTF(scene)
@@ -26,6 +25,7 @@ export function Soccer(props) {
 
   const [zoomIn, setZoomIn] = useState(false)
   const [zoomComplete, setZoomComplete] = useState(false)
+  const ballStartTime = useRef(Date.now())
   const { gl, viewport } = useThree();
   
   const handleClick = (e) => {
@@ -49,8 +49,15 @@ export function Soccer(props) {
 
   useEffect(() => {
     if (actions && Object.keys(actions).length > 0) {
-      Object.values(actions).forEach(action => {
-        if (action) {
+      // Disable specific animations to prevent clipping
+      const disabledAnimations = [
+        'Armature|mixamo.com|Layer0',
+        'Armature|mixamo.com|Layer0.001', 
+        'Armature|mixamo.com|Layer0.002'
+      ]
+      
+      Object.entries(actions).forEach(([name, action]) => {
+        if (action && !disabledAnimations.includes(name)) {
           action.reset()
           action.setLoop(LoopRepeat, Infinity)
           action.play()
@@ -82,36 +89,52 @@ export function Soccer(props) {
 const targetPositions = {
     x: 0.5,
     y: -0.5,
-    z: 6.7,
+    z: 8.5,
     rotationX: -1.5
 };
 
-// Calculate distances to be covered in each dimension
+// Calculate distances to be covered in each dimension (from new starting position [0, -0.9, 5])
 const distances = {
-    x: Math.abs(targetPositions.x - 1.2),
+    x: Math.abs(targetPositions.x - 0),
     y: Math.abs(targetPositions.y - (-0.9)),
-    z: Math.abs(targetPositions.z - 2),
-    rotationX: Math.abs(targetPositions.rotationX - 0.2)
+    z: Math.abs(targetPositions.z - 5),
+    rotationX: Math.abs(targetPositions.rotationX - 0)
 };
 
 // Find the maximum distance
 const maxDistance = Math.max(distances.x, distances.y, distances.z, distances.rotationX);
 
-// Calculate rates of change in each dimension
+// Calculate rates of change in each dimension (smoother rates)
 const rates = {
-    x: distances.x / maxDistance * 0.035,
-    y: distances.y / maxDistance * 0.0,
-    z: distances.z / maxDistance * 0.035,
-    rotationX: distances.rotationX / maxDistance * 0.03,
+    x: distances.x / maxDistance * 0.025,
+    y: distances.y / maxDistance * 0.02,
+    z: distances.z / maxDistance * 0.025,
+    rotationX: distances.rotationX / maxDistance * 0.02,
 };
 
   useFrame(() => {
+    // Animate ball rolling in the character model
+    if (juggleRef.current) {
+      juggleRef.current.traverse((child) => {
+        if (child.name === 'Object_651') {
+          const elapsed = Date.now() - ballStartTime.current
+          const cycleTime = elapsed % 3500 // 3.5 second cycle (3s animate + 0.5s pause)
+          
+          // Only animate if not in pause period (first 3 seconds of cycle)
+          if (cycleTime < 3000) {
+            child.rotation.x += 0.00
+            child.rotation.z += 0.00
+          }
+        }
+      })
+    }
+    
     if (zoomIn) {
-        if (soccerRef.current.position.z < 6.7) {
+        if (soccerRef.current.position.z < 8.5) {
             soccerRef.current.position.z += rates.z
         }
-        if (soccerRef.current.position.x > 0.5) {
-            soccerRef.current.position.x -= rates.x
+        if (soccerRef.current.position.x < 0.5) {
+            soccerRef.current.position.x += rates.x
         }
         if (soccerRef.current.position.y < -0.5) {
             soccerRef.current.position.y += rates.y
@@ -122,9 +145,9 @@ const rates = {
 
         // Check if all conditions are satisfied
         const allConditionsMet =
-            soccerRef.current.position.z >= 6.7 &&
-            soccerRef.current.position.x <= 0.5 &&
-            soccerRef.current.rotation.x >= -2;
+            soccerRef.current.position.z >= 8.5 &&
+            soccerRef.current.position.x >= 0.5 &&
+            soccerRef.current.rotation.x <= -1.5;
 
         if (allConditionsMet) {
           setTimeout(() => {
@@ -136,13 +159,6 @@ const rates = {
     
   return (
     <>
-    {!zoomIn && (
-      <Html>
-      <div className="absolute transform -translate-x-1/2 -translate-y-80 z-10 w-[1000px]">
-        <HomeText />
-      </div>
-    </Html>
-    ) }
     <group ref={soccerRef}  {...props} dispose={null}>
       <group
         position={[-2.416, 0.362, -1.809]}
@@ -374,7 +390,8 @@ const rates = {
           material={materials['Material.002']}
         />
       </group>
-      <group position={[0.479, 0.574, -2.148]} rotation={[-1.4, 0, 0]} scale={0.005}>
+      {/* THIS IS THE GOAL (REMOVED FOR NOW) */}
+      {/* <group position={[0.479, 0.574, -2.148]} rotation={[-1.4, 0, 0]} scale={0.005}>
         <mesh
           castShadow
           receiveShadow
@@ -387,7 +404,7 @@ const rates = {
           geometry={nodes.Object_646.geometry}
           material={materials['Material.004']}
         />
-      </group>
+      </group> */}
       <group position={[-0.452, 0.574, 2.854]} rotation={[-1.742, 0, -Math.PI]} scale={0.005}>
         <mesh
           castShadow
@@ -1389,9 +1406,9 @@ const rates = {
       <primitive
         ref={juggleRef}
         object={passingScene}
-        position={[0, 0.3, 0.9]}
-        scale={[0.01, 0.01, 0.01]}
-        rotation={[-0.5, 9, 1.2]}
+        position={[0, 0.032, -1.52]}
+        scale={[0.011, 0.011, 0.011]}
+        rotation={[0, Math.PI*0.9, 0]}
         castShadow
         receiveShadow
       />

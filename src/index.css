@@ -4,15 +4,15 @@
 
 @layer components {
     .skill {
-        @apply flex flex-col justify-end mr-5 items-center my-5 h-20 hover:scale-110 transition-transform
+        @apply flex flex-col justify-center items-center my-3 md:my-5 h-20 md:h-24 w-16 md:w-20 hover:scale-110 transition-transform text-center
     }
 
     .skill img {
-        @apply w-20 h-auto mb-2
+        @apply w-14 md:w-20 h-auto mb-1 md:mb-2
     }
 
     .skill p {
-        @apply text-center
+        @apply text-center text-xs md:text-sm font-medium
     }
 
     .project {
