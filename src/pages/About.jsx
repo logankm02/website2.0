@@ -172,6 +172,14 @@ export default function About() {
 
   return (
     <main className="h-auto top-0 left-0">
+      {/* Logo in top left */}
+      <div className="hidden md:block fixed top-2 left-2 z-30">
+        <img 
+          src="/lkmlogo-white.png" 
+          alt="LKM Logo" 
+          className="w-10 h-10 object-contain opacity-90 hover:opacity-100 transition-opacity duration-300"
+        />
+      </div>
       <TableOfContents />
       <div
         className={`flex flex-col items-center mx-4 md:mx-10 transition-opacity duration-1000 ${
@@ -183,8 +191,8 @@ export default function About() {
           className="w-screen min-h-screen md:h-screen flex flex-col bg-banner bg-cover bg-center relative overflow-hidden"
         >
           {/* Location Badge */}
-          <div className="absolute top-2 md:top-4 right-2 md:right-4 flex items-center bg-black/20 backdrop-blur-sm rounded-full px-2 md:px-3 py-1 z-10">
-            <svg className="w-3 h-3 mr-1 text-white" fill="currentColor" viewBox="0 0 20 20">
+          <div className="hidden md:flex absolute top-4 right-4 items-center bg-black/20 backdrop-blur-sm rounded-full px-2 py-0.5 z-10">
+            <svg className="w-2.5 h-2.5 mr-0.5 text-white" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
             </svg>
             <p className="text-white text-xs font-medium">Wellington, NZ</p>
