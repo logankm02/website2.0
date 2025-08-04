@@ -15,7 +15,7 @@ import { useFrame, useThree } from '@react-three/fiber'
 import { LoopRepeat, Euler, Quaternion } from 'three'
 import { useNavigate } from 'react-router-dom'
 
-export function Soccer(props) {
+export function Soccer({ onZoomStart, ...props }) {
     const { nodes, materials } = useGLTF(scene)
     const { nodes: juggleNodes, materials: juggleMaterials, animations, scene: passingScene } = useGLTF(juggleScene)
     const soccerRef = useRef()
@@ -25,11 +25,15 @@ export function Soccer(props) {
 
   const [zoomIn, setZoomIn] = useState(false)
   const [zoomComplete, setZoomComplete] = useState(false)
+  const [delayStarted, setDelayStarted] = useState(false)
   const ballStartTime = useRef(Date.now())
   const { gl, viewport } = useThree();
   
   const handleClick = (e) => {
     setZoomIn(true)
+    if (onZoomStart) {
+      onZoomStart()
+    }
   }
 
   useEffect(() => {
@@ -149,7 +153,8 @@ const rates = {
             soccerRef.current.position.x >= 0.5 &&
             soccerRef.current.rotation.x <= -1.5;
 
-        if (allConditionsMet) {
+        if (allConditionsMet && !delayStarted) {
+          setDelayStarted(true);
           setTimeout(() => {
             setZoomComplete(true);
           }, 500); // 0.5 second delay

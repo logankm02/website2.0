@@ -4,17 +4,25 @@ import { Environment, Html, OrbitControls } from '@react-three/drei';
 import { Soccer } from '../models/Soccer';
 import { Loader } from '../components/Loader';
 import { HomeText } from '../components/HomeText';
+import { useBackground } from '../contexts/BackgroundContext';
 
-export default function Home({setIsLoaded, isLoaded}) {
+export default function Home() {
+    const [isZooming, setIsZooming] = useState(false);
+    const { homeLoaded, setHomeLoaded } = useBackground();
+
+    const handleZoomStart = () => {
+        setIsZooming(true);
+    };
+
     return (
          <section className='w-full h-screen relative'>
-            {isLoaded && (
-                <div className="absolute top-1/4 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 w-[95%] max-w-[1000px] px-4">
+            {homeLoaded && !isZooming && (
+                <div className="absolute top-1/4 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 w-[95%] max-w-[1000px] px-4 transition-opacity duration-500">
                     <HomeText />
                 </div>
             )}
             <Canvas className="w-full h-screen bg-transparent z-0" camera={{ near: 0.1, far: 1000 }}>
-                <Suspense fallback={<Loader setIsLoaded={setIsLoaded} />}>
+                <Suspense fallback={<Loader setIsLoaded={setHomeLoaded} />}>
                     {/* <OrbitControls 
                         enablePan={true}
                         enableZoom={true}
@@ -27,6 +35,7 @@ export default function Home({setIsLoaded, isLoaded}) {
                     <Soccer 
                         position={[0, -0.9, 5]}
                         rotation={[0, 0, 0]}
+                        onZoomStart={handleZoomStart}
                     />
                     <Environment preset="night" />
                 </Suspense>

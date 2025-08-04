@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useMediaQuery } from "react-responsive";
 import emailjs from "@emailjs/browser";
+import { useBackground } from "../contexts/BackgroundContext";
 import TableOfContents from "../components/TableOfContents";
 import WorldClock from "../components/WorldClock";
 import SpotifyPlaylistsAPI from "../components/SpotifyPlaylistsAPI";
@@ -56,6 +57,7 @@ const berkeley = "/images/berkeley.png";
 export default function About() {
   const isDesktop = useMediaQuery({ query: "(min-width: 768px)" });
   const isMobile = useMediaQuery({ query: "(max-width: 768px)" });
+  const { setAboutContentLoaded } = useBackground();
   
   const VITE_PUBLIC_KEY = "dMEvhwxawdetQkE0U";
   const VITE_TEMPLATE_ID = "template_9rosqi6";
@@ -96,8 +98,12 @@ export default function About() {
   useEffect(() => {
     if (profileLoaded) {
       setFadeIn(true);
+      // Delay background change until after hero fade-in completes
+      setTimeout(() => {
+        setAboutContentLoaded(true);
+      }, 1100); // 1100ms to ensure fade-in is fully complete
     }
-  }, [profileLoaded]);
+  }, [profileLoaded, setAboutContentLoaded]);
 
   const handleProfileLoad = () => {
     setProfileLoaded(true);
@@ -786,7 +792,7 @@ export default function About() {
         </div>
       </div>
       </div>
-      <div id="getInTouch" className="flex flex-col justify-center w-full mx-auto mb-6 md:mb-10">
+      <div id="getInTouch" className="flex flex-col justify-center w-full mx-auto mb-2 md:mb-4">
         <h1 className="text-center mb-4 md:mb-8 text-2xl md:text-3xl font-bold px-4 md:px-0">Get in Touch</h1>
         <div className="mx-2 md:mx-auto md:max-w-2xl md:bg-slate-50 md:border md:rounded-xl p-4 md:p-8">
           <p className="mb-6 text-center text-gray-700">
