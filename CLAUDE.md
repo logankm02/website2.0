@@ -7,7 +7,8 @@ React + Vite + Tailwind CSS personal portfolio site, deployed to Cloudflare Page
 - `npm run dev` — dev server
 - `npm run build` — production build to `dist/`
 - `npm run lint` — ESLint (zero-warning policy)
-- `npm run deploy` — build + `wrangler pages deploy dist`
+- `npm run deploy` — build + deploy to the `logan-website` Cloudflare Pages
+  project (production domain: logankm.com)
 
 Deploying requires Wrangler auth (run in an interactive terminal — Claude cannot auth):
 
