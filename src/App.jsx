@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { Route, BrowserRouter as Router, Routes, useLocation } from "react-router-dom";
 import Home from "./pages/Home";
 import About from "./pages/About";
+import HomeV3 from "./pages/HomeV3";
 import { BackgroundProvider, useBackground } from "./contexts/BackgroundContext";
 
 function AppContent() {
@@ -15,8 +16,9 @@ function AppContent() {
   return (
     <main className={`w-full min-h-screen relative transition-colors duration-1000 ${getBackgroundClass()}`}>
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<HomeV3 />} />
         <Route path="/about" element={<About />} />
+        <Route path="/classic" element={<Home />} />
       </Routes>
     </main>
   );

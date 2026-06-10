@@ -37,7 +37,7 @@ const RecentReads = () => {
   }, []);
 
   return (
-    <div className="relative bg-white/10 backdrop-blur-md rounded-2xl p-3 shadow-2xl border border-white/20 hover:scale-105 transition-all h-full overflow-hidden">
+    <div className="relative bg-black/10 backdrop-blur-md rounded-2xl p-3 shadow-2xl border border-white/20 transition-all h-full overflow-hidden">
       <div className="widget-gradient"></div>
       <div className="relative z-10 h-full flex flex-col">
       <div className="flex items-center justify-between mb-3">
@@ -47,9 +47,8 @@ const RecentReads = () => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
             </svg>
           </div>
-          <p className="text-white font-semibold text-xs uppercase tracking-wide">Current Reads</p>
+          <p className="text-white font-semibold text-xs uppercase tracking-wide">Current & Recent Reads</p>
         </div>
-        <span className="text-white/60 text-[11px] uppercase tracking-wide">4 most recent</span>
       </div>
 
       <div className="grid grid-cols-2 gap-2 flex-1 min-h-0">
@@ -58,7 +57,7 @@ const RecentReads = () => {
             key={book.id}
             className="group border border-white/10 rounded-xl overflow-hidden bg-white/5 flex flex-col"
           >
-            <div className="relative h-32 overflow-hidden bg-black">
+            <div className="relative h-full overflow-hidden bg-black">
               {book.cover ? (
                 <>
                   <img
@@ -88,25 +87,19 @@ const RecentReads = () => {
                 </div>
               )}
               <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent px-2 py-1.5">
-                <p className="text-white text-xs font-semibold leading-tight line-clamp-1">
-                  {book.title}
-                </p>
+                <div className="flex items-center gap-1.5">
+                  {index < 2 && (
+                    <span className="w-1.5 h-1.5 flex-shrink-0 rounded-full bg-emerald-400 shadow-sm shadow-emerald-400/50" />
+                  )}
+                  <p className="text-white text-xs font-semibold leading-tight line-clamp-1">
+                    {book.title}
+                  </p>
+                </div>
                 <p className="text-white/70 text-[11px] leading-tight">
                   {book.author}
                 </p>
               </div>
             </div>
-
-            {index < 2 ? (
-              <div className="px-3 py-2 text-[11px] uppercase tracking-wide text-emerald-300 flex items-center gap-1">
-                <span className="w-1 h-1 rounded-full bg-emerald-300 animate-pulse"></span>
-                Now reading
-              </div>
-            ) : (
-              <div className="px-3 py-2 text-[11px] text-white/50">
-                #{book.id}
-              </div>
-            )}
           </div>
         ))}
       </div>

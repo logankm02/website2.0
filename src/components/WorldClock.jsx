@@ -109,7 +109,7 @@ const WorldClock = () => {
   }, []);
 
   return (
-    <div className="relative bg-white/10 backdrop-blur-md rounded-2xl p-3 shadow-2xl border border-white/20 hover:scale-105 transition-all h-full overflow-hidden">
+    <div className="relative bg-black/10 backdrop-blur-md rounded-2xl p-3 shadow-2xl border border-white/20 transition-all h-full overflow-hidden">
       <div className="widget-gradient"></div>
       <div className="relative z-10 h-full flex flex-col">
       <div className="flex items-center justify-between mb-3">
@@ -120,10 +120,6 @@ const WorldClock = () => {
             </svg>
           </div>
           <p className="text-white font-semibold text-xs uppercase tracking-wide">World Clock</p>
-        </div>
-        <div className="flex items-center gap-1 text-green-300 text-[11px]">
-          <span className="w-1.5 h-1.5 rounded-full bg-green-300 animate-pulse"></span>
-          Live
         </div>
       </div>
       <div className="text-white/90 flex-1 flex flex-col gap-2 justify-between">

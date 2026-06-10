@@ -68,7 +68,7 @@ const TableOfContents = ({ isWidget = false }) => {
   // Widget version
   if (isWidget) {
     return (
-      <div className="relative bg-white/10 backdrop-blur-md rounded-2xl p-3 shadow-2xl border border-white/20 hover:scale-105 transition-all h-full overflow-hidden">
+      <div className="relative bg-black/10 backdrop-blur-md rounded-2xl p-3 shadow-2xl border border-white/20 transition-all h-full overflow-hidden">
         <div className="widget-gradient"></div>
         <div className="relative z-10 h-full flex flex-col">
           <div className="flex items-center justify-between mb-3">
@@ -80,9 +80,6 @@ const TableOfContents = ({ isWidget = false }) => {
               </div>
               <p className="text-white font-semibold text-xs uppercase tracking-wide">Navigation</p>
             </div>
-            <span className="text-white/60 text-[11px] uppercase tracking-wide">
-              {sections.find((section) => section.id === activeSection)?.label || "Home"}
-            </span>
           </div>
           <nav className="space-y-1.5 flex-1 flex flex-col justify-between">
             {sections.map((section) => (
@@ -104,55 +101,7 @@ const TableOfContents = ({ isWidget = false }) => {
     );
   }
 
-  // Don't render floating version on mobile
-  if (!isDesktop) return null;
-
-  return (
-    <>
-      <motion.div
-        initial={{ opacity: 0, x: 50 }}
-        animate={{ opacity: isHovered ? 1 : 0, x: isHovered ? 0 : 50 }}
-        transition={{ duration: 0.12 }}
-        style={{ pointerEvents: isHovered ? 'auto' : 'none' }}
-        className="fixed right-8 top-1/3 transform -translate-y-1/3 z-40"
-        onMouseEnter={() => { if (hideTimer.current) clearTimeout(hideTimer.current); }}
-        onMouseLeave={() => { hideTimer.current = setTimeout(() => setIsHovered(false), 50); }}
-      >
-        <motion.div
-          animate={{
-            backgroundColor: isDarkBackground ? 'rgba(255, 255, 255, 0.15)' : 'rgba(255, 255, 255, 0.7)',
-            borderColor: isDarkBackground ? 'rgba(255, 255, 255, 0.3)' : 'rgb(243, 244, 246)'
-          }}
-          transition={{ duration: 0.3 }}
-          className="backdrop-blur-md rounded-2xl p-4 shadow-lg border"
-        >
-          <nav className="space-y-2">
-            {sections.map((section) => (
-              <motion.button
-                key={section.id}
-                onClick={() => scrollToSection(section.id)}
-                animate={{
-                  backgroundColor: activeSection === section.id
-                    ? (isDarkBackground ? 'rgba(255, 255, 255, 0.25)' : 'rgba(51, 65, 85, 0.15)')
-                    : 'rgba(0, 0, 0, 0)',
-                  color: isDarkBackground ? '#ffffff' : '#334155'
-                }}
-                whileHover={{
-                  backgroundColor: isDarkBackground ? 'rgba(255, 255, 255, 0.15)' : 'rgba(51, 65, 85, 0.1)'
-                }}
-                transition={{ duration: 0.2 }}
-                className={`block w-full text-left px-3 py-2 rounded-md text-sm font-medium ${
-                  activeSection === section.id ? 'font-semibold' : ''
-                }`}
-              >
-                {section.label}
-              </motion.button>
-            ))}
-          </nav>
-        </motion.div>
-      </motion.div>
-    </>
-  );
+  return null;
 };
 
 export default TableOfContents;

@@ -71,7 +71,7 @@ export default function CurrentProjects() {
 
   return (
     <div
-      className="relative bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl border border-white/20 hover:scale-105 transition-all w-full h-full overflow-hidden flex flex-col"
+      className="relative bg-black/10 backdrop-blur-md rounded-2xl shadow-2xl border border-white/20 transition-all w-full h-full overflow-hidden flex flex-col"
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >

@@ -10,6 +10,7 @@ const projects = [
     image: "/images/roarcar.png",
     href: "https://roar.berkeley.edu/",
     cta: "View ROAR Website",
+    githubHref: "https://github.com/augcog/DLIO_plusplus/tree/ucb-roar#",
   },
   {
     id: "calsol",
@@ -106,7 +107,14 @@ const projects = [
 export default function ProjectSpotlight() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [visible, setVisible] = useState(true);
+  const [dragX, setDragX] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const [isFlying, setIsFlying] = useState(false);
+  const [flyDir, setFlyDir] = useState(0);
+  const [noTransition, setNoTransition] = useState(false);
   const touchStartX = useRef(null);
+  const touchStartY = useRef(null);
+  const THRESHOLD = 80;
 
   const goTo = (idx) => {
     setVisible(false);
@@ -121,27 +129,68 @@ export default function ProjectSpotlight() {
 
   const handleTouchStart = (e) => {
     touchStartX.current = e.targetTouches[0].clientX;
+    touchStartY.current = e.targetTouches[0].clientY;
+    setIsDragging(true);
   };
-  const handleTouchEnd = (e) => {
-    if (touchStartX.current === null) return;
-    const diff = touchStartX.current - e.changedTouches[0].clientX;
-    if (Math.abs(diff) > 40) diff > 0 ? handleNext() : handlePrev();
+
+  const handleTouchMove = (e) => {
+    if (!touchStartX.current) return;
+    const dx = e.targetTouches[0].clientX - touchStartX.current;
+    const dy = e.targetTouches[0].clientY - touchStartY.current;
+    if (Math.abs(dx) > Math.abs(dy)) setDragX(dx);
+  };
+
+  const handleTouchEnd = () => {
+    setIsDragging(false);
+    if (Math.abs(dragX) > THRESHOLD) {
+      const dir = dragX > 0 ? 1 : -1;
+      const nextIdx = dir < 0
+        ? (activeIndex + 1) % projects.length
+        : (activeIndex - 1 + projects.length) % projects.length;
+      setFlyDir(dir);
+      setIsFlying(true);
+      setTimeout(() => {
+        setNoTransition(true);
+        setActiveIndex(nextIdx);
+        setDragX(0);
+        setIsFlying(false);
+        setFlyDir(0);
+        setTimeout(() => setNoTransition(false), 50);
+      }, 280);
+    } else {
+      setDragX(0);
+    }
     touchStartX.current = null;
+    touchStartY.current = null;
   };
 
   const active = projects[activeIndex];
+  const cardX = isFlying ? flyDir * 500 : dragX;
+  const cardRotate = isFlying ? flyDir * 12 : dragX * 0.04;
+  const cardOpacity = isFlying ? 0 : Math.max(0.4, 1 - Math.abs(dragX) / 250);
 
   return (
+    <>
+      <div className="hidden" aria-hidden="true">
+        {projects.map((p) => <img key={p.id} src={p.image} alt="" />)}
+      </div>
     <div
       className="rounded-2xl bg-white/70 backdrop-blur-md border border-gray-100 shadow-lg overflow-hidden"
       onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
+      style={{
+        transform: `translateX(${cardX}px) rotate(${cardRotate}deg)`,
+        transition: (isDragging || noTransition) ? 'none' : 'transform 0.28s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.28s ease',
+        opacity: cardOpacity,
+        willChange: 'transform',
+      }}
     >
       {/* Main content — fixed height so image never dictates the card size */}
-      <div className="flex flex-col md:flex-row h-[420px] md:h-[380px]">
+      <div className="flex flex-col-reverse md:flex-row h-[480px] md:h-[380px]">
         {/* Info panel */}
         <div
-          className={`md:w-1/2 p-6 flex flex-col justify-between overflow-y-auto transition-opacity duration-180 ${
+          className={`md:w-1/2 p-5 md:p-6 flex flex-col justify-between overflow-y-auto transition-opacity duration-180 ${
             visible ? "opacity-100" : "opacity-0"
           }`}
         >
@@ -164,14 +213,27 @@ export default function ProjectSpotlight() {
           </div>
 
           <div className="flex items-center justify-between mt-6">
-            <a
-              href={active.href}
-              target="_blank"
-              rel="noreferrer"
-              className="text-sm font-medium text-gray-900 bg-white border border-gray-200 hover:bg-gray-50 px-5 py-2 rounded-full shadow-sm transition-all hover:shadow-md"
-            >
-              {active.cta}
-            </a>
+            <div className="flex items-center gap-2">
+              <a
+                href={active.href}
+                target="_blank"
+                rel="noreferrer"
+                className="text-sm font-medium text-gray-900 bg-white border border-gray-200 hover:bg-gray-50 px-5 py-2 rounded-full shadow-sm transition-all hover:shadow-md"
+              >
+                {active.cta}
+              </a>
+              {active.githubHref && (
+                <a
+                  href={active.githubHref}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center gap-1.5 text-sm font-medium text-gray-900 bg-white border border-gray-200 hover:bg-gray-50 px-4 py-2 rounded-full shadow-sm transition-all hover:shadow-md"
+                >
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+                  GitHub
+                </a>
+              )}
+            </div>
 
             {/* Arrow nav */}
             <div className="flex gap-2">
@@ -239,5 +301,6 @@ export default function ProjectSpotlight() {
         ))}
       </div>
     </div>
+    </>
   );
 }
