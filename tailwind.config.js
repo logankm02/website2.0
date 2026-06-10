@@ -1,32 +1,20 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: [
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
-  ],
+  content: ["./index.html", "./src/**/*.{js,jsx}"],
   theme: {
     extend: {
-      colors: {
-        cream: "#FFFDD0",
-        malibu: "#84A4FC",
-        sunsetSky: "#FFA07A",
-        sunsetSun: "#FFD700", 
-      },
       gradientColorStops: {
-        'sunset': '#551764, #FFA07A',
-      },
-      transitionDuration: {
-        '500': '0.5s',
+        // Sky gradient behind the /classic 3D scene
+        sunset: "#551764, #FFA07A",
       },
       backgroundImage: {
-        'banner': "url('../public/cover.jpeg')",
-        'sky' : "url('../public/nightsky.jpg')",
+        // Hero banner on /about (no-video variant)
+        banner: "url('/cover.jpeg')",
       },
       fontFamily: {
-        'sans': ['Lexend', 'sans-serif'],
+        sans: ["Lexend", "sans-serif"],
       },
     },
   },
   plugins: [],
-}
-
+};

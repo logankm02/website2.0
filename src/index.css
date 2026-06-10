@@ -3,36 +3,35 @@
 @tailwind utilities;
 
 @layer components {
+    /* Light glass card used across the content sections */
+    .card-light {
+        @apply rounded-2xl bg-white/70 backdrop-blur-md border border-gray-100 shadow-lg;
+    }
+
+    /* Dark glass card used by the hero dashboard widgets and profile card */
+    .card-glass {
+        @apply bg-black/10 backdrop-blur-md rounded-2xl shadow-2xl border border-white/20;
+    }
+
+    /* Page background once content has loaded */
+    .bg-page {
+        @apply bg-gradient-to-br from-slate-100 via-blue-50/30 to-slate-50;
+    }
+
     .skill {
-        @apply flex flex-col justify-center items-center h-16 w-16 hover:scale-110 transition-transform text-center
+        @apply flex flex-col justify-center items-center h-16 w-16 hover:scale-110 transition-transform text-center;
     }
 
     .skill img {
-        @apply w-12 h-12 object-contain mb-1
+        @apply w-12 h-12 object-contain mb-1;
     }
 
     .skill p {
-        @apply text-center text-[12px] font-medium leading-tight
-    }
-
-    .project {
-       @apply w-auto h-6 ml-2
-    }
-
-    .slow-bounce {
-        animation: slowBounce 2s ease-in-out infinite;
+        @apply text-center text-[12px] font-medium leading-tight;
     }
 }
 
-@keyframes slowBounce {
-    0%, 100% {
-        transform: translateY(0);
-    }
-    50% {
-        transform: translateY(-8px);
-    }
-}
-
+/* Drifting highlight inside the glass widgets */
 @keyframes widgetGradientFlow {
     0% {
         transform: translate3d(-20%, -20%, 0) scale(1);

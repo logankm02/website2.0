@@ -1,0 +1,57 @@
+export const skillCategories = [
+  {
+    title: "Programming Languages",
+    fullWidth: true,
+    skills: [
+      { name: "C", icon: "/images/clogo.png" },
+      { name: "C++", icon: "/images/c++.png" },
+      { name: "Rust", icon: "/images/rust.png" },
+      { name: "Go", icon: "/images/golang.png" },
+      { name: "Python", icon: "/images/python.png" },
+      { name: "Java", icon: "/images/java.png" },
+      { name: "Ruby", icon: "/images/ruby.png" },
+      { name: "Swift", icon: "/images/swift.png" },
+      { name: "PHP", icon: "/images/php.png" },
+      { name: "Bash", icon: "/images/bash.png" },
+      { name: "SQL", icon: "/images/sqllogo.png" },
+    ],
+  },
+  {
+    title: "Web Technologies",
+    fullWidth: false,
+    skills: [
+      { name: "JavaScript", icon: "/images/jslogo.png" },
+      { name: "HTML", icon: "/images/html.png" },
+      { name: "CSS", icon: "/images/css.png" },
+      { name: "React", icon: "/images/react.png" },
+      { name: "Node.js", icon: "/images/nodejs.svg" },
+      { name: "Flask", icon: "/images/flask.png" },
+    ],
+  },
+  {
+    title: "Databases",
+    fullWidth: false,
+    skills: [
+      { name: "MySQL", icon: "/images/mysql.png" },
+      { name: "MongoDB", icon: "/images/mongodb.svg" },
+      { name: "Neo4j", icon: "/images/neo4j.png" },
+      { name: "Firebase", icon: "/images/firebase.png" },
+    ],
+  },
+  {
+    title: "Tools & Platforms",
+    fullWidth: true,
+    skills: [
+      { name: "Git", icon: "/images/git.png" },
+      { name: "Docker", icon: "/images/docker.png" },
+      { name: "Linux", icon: "/images/linux.png" },
+      { name: "Azure", icon: "/images/azure.png" },
+      { name: "VS Code", icon: "/images/vscode.png" },
+      { name: "PlatformIO", icon: "/images/platformio.png" },
+      { name: "ROS 2", icon: "/images/ros2logo.png" },
+      { name: "Raspberry Pi", icon: "/images/rp.png" },
+      { name: "PyTorch", icon: "/images/pytorch.png" },
+      { name: "Unity", icon: "/images/unity.png" },
+    ],
+  },
+];

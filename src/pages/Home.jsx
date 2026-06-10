@@ -1,45 +1,23 @@
-import React, { Suspense, useState } from 'react';
-import { Canvas } from '@react-three/fiber';
-import { Environment, Html, OrbitControls } from '@react-three/drei';
-import { Soccer } from '../models/Soccer';
-import { Loader } from '../components/Loader';
-import { HomeText } from '../components/HomeText';
-import { useBackground } from '../contexts/BackgroundContext';
+import { useState } from "react";
+import Portfolio from "../components/Portfolio";
+import IntroDesktop from "../components/intro/IntroDesktop";
+import IntroMobile from "../components/intro/IntroMobile";
+import useMediaQuery from "../hooks/useMediaQuery";
 
+// Landing route: the portfolio with a full-screen video intro overlay on top.
 export default function Home() {
-    const [isZooming, setIsZooming] = useState(false);
-    const { homeLoaded, setHomeLoaded } = useBackground();
+  const isMobile = useMediaQuery("(max-width: 768px)");
+  const [introDone, setIntroDone] = useState(false);
+  const Intro = isMobile ? IntroMobile : IntroDesktop;
 
-    const handleZoomStart = () => {
-        setIsZooming(true);
-    };
-
-    return (
-         <section className='w-full h-screen relative'>
-            {homeLoaded && !isZooming && (
-                <div className="absolute top-1/4 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 w-[95%] max-w-[1000px] px-4 transition-opacity duration-500">
-                    <HomeText />
-                </div>
-            )}
-            <Canvas className="w-full h-screen bg-transparent z-0" camera={{ near: 0.1, far: 1000 }}>
-                <Suspense fallback={<Loader setIsLoaded={setHomeLoaded} />}>
-                    {/* <OrbitControls 
-                        enablePan={true}
-                        enableZoom={true}
-                        enableRotate={true}
-                        maxPolarAngle={Math.PI / 1.5}
-                        minDistance={1}
-                        maxDistance={10}
-                        target={[0, -1, 2]}
-                    /> */}
-                    <Soccer 
-                        position={[0, -0.9, 5]}
-                        rotation={[0, 0, 0]}
-                        onZoomStart={handleZoomStart}
-                    />
-                    <Environment preset="night" />
-                </Suspense>
-            </Canvas>
-        </section>
-    );
+  return (
+    <div
+      className={`w-full min-h-screen relative transition-colors duration-1000 ${
+        introDone ? "bg-page" : "bg-black"
+      }`}
+    >
+      <Portfolio videoBackground />
+      {!introDone && <Intro onDismissed={() => setIntroDone(true)} />}
+    </div>
+  );
 }
