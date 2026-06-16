@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { profile } from "../data/profile";
 
 // Glass profile card used in the hero dashboard and the mobile intro slide.
@@ -53,6 +54,12 @@ export default function ProfileCard({ className = "", onLearnMore, onGetInTouch,
         >
           Get in Touch
         </button>
+        <Link
+          to="/city"
+          className="text-white/80 bg-white/10 hover:bg-white/20 hover:text-white font-semibold rounded-lg px-3 md:px-4 py-1 md:py-2 transition-all hover:scale-105 backdrop-blur-sm border border-white/20 text-xs md:text-sm"
+        >
+          Try &ldquo;Logan City,&rdquo; the interactive resume
+        </Link>
       </div>
     </div>
   );
