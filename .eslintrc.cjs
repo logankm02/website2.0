@@ -16,4 +16,16 @@ module.exports = {
     "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
     "react/prop-types": "off",
   },
+  overrides: [
+    {
+      // Cloudflare Pages Functions + shared server helpers run in the Workers
+      // runtime, not React — different globals, and the react-refresh rule
+      // doesn't apply.
+      files: ["functions/**/*.js", "analytics/server.js"],
+      env: { browser: true, worker: true, node: true },
+      rules: {
+        "react-refresh/only-export-components": "off",
+      },
+    },
+  ],
 };

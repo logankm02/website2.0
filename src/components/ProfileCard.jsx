@@ -44,12 +44,14 @@ export default function ProfileCard({ className = "", onLearnMore, onGetInTouch,
       <div className="flex flex-col gap-1 md:gap-2 w-full">
         <button
           onClick={onLearnMore}
+          data-track-click="learn-more"
           className="text-black bg-white hover:bg-gray-100 font-semibold rounded-lg px-3 md:px-4 py-1 md:py-2 transition-all hover:scale-105 shadow-lg text-xs md:text-sm"
         >
           Learn More
         </button>
         <button
           onClick={onGetInTouch}
+          data-track-click="get-in-touch"
           className="text-white bg-white/20 hover:bg-white/30 font-semibold rounded-lg px-3 md:px-4 py-1 md:py-2 transition-all hover:scale-105 backdrop-blur-sm border border-white/30 text-xs md:text-sm"
         >
           Get in Touch

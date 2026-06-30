@@ -2,6 +2,7 @@ import { Suspense, lazy } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Home from "./pages/Home";
 import About from "./pages/About";
+import Analytics from "./components/Analytics";
 
 // The 3D scene pulls in three.js — load it only when /classic is visited.
 const Classic = lazy(() => import("./pages/Classic"));
@@ -11,6 +12,7 @@ const Village = lazy(() => import("./pages/Village"));
 export default function App() {
   return (
     <BrowserRouter>
+      <Analytics />
       <Suspense fallback={null}>
         <Routes>
           <Route path="/" element={<Home />} />

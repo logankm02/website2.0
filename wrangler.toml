@@ -1,0 +1,10 @@
+# Cloudflare Pages config. Keeps the D1 binding for the analytics functions in
+# version control. Deploy with `npm run deploy`.
+name = "logan-website"
+pages_build_output_dir = "dist"
+compatibility_date = "2025-06-30"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "website-analytics"
+database_id = "9540fcaa-03ad-4b6b-a3de-7f4700a5c798"
