@@ -8,6 +8,7 @@ import Analytics from "./components/Analytics";
 const Classic = lazy(() => import("./pages/Classic"));
 // The playable village game loads its own chunk too.
 const Village = lazy(() => import("./pages/Village"));
+const World = lazy(() => import("./pages/World"));
 
 export default function App() {
   return (
@@ -19,6 +20,7 @@ export default function App() {
           <Route path="/about" element={<About />} />
           <Route path="/classic" element={<Classic />} />
           <Route path="/city" element={<Village />} />
+          <Route path="/world" element={<World />} />
         </Routes>
       </Suspense>
     </BrowserRouter>

@@ -1,0 +1,5 @@
+# Large editable scenes and reproducible checkpoints stay local.
+blend/
+previews/
+data/
+**/__pycache__/
