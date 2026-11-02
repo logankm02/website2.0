@@ -6,20 +6,23 @@ import { Box3, Vector3, Ray } from 'three';
 import Vegetation from './Vegetation';
 import Traveler from './Traveler';
 import { createCollisionWorld, stepPlayer } from './physics';
-import { locations } from './locations';
+import { locationsForWorld } from './locations';
 
 export default function WorldScene({ assets, quality, running, onNearest, onInteract, onPause, onPerformance, debug }) {
   const { camera, gl } = useThree();
   const world = useMemo(() => createCollisionWorld(assets.manifest, assets.placements, assets.heights), [assets]);
-  const player = useRef({ x: 0, y: world.height(0, 24), z: 24, vx: 0, vz: 0, vy: 0, speed: 0, grounded: true });
-  const input = useRef(new Set()), orbit = useRef({ yaw: .08, pitch: .27, distance: 6.2, dragging: false });
+  const locations = locationsForWorld(assets.manifest);
+  const [spawnX, spawnY] = assets.manifest.spawn;
+  const player = useRef({ x: spawnX, y: world.height(spawnX, -spawnY), z: -spawnY, vx: 0, vz: 0, vy: 0, speed: 0, grounded: true });
+  const initialDistance = assets.manifest.campus ? 3.2 : 6.2;
+  const input = useRef(new Set()), orbit = useRef({ yaw: .08, pitch: .27, distance: initialDistance, dragging: false });
   const accumulator = useRef(0), updates = useRef(0), nearest = useRef(null), sun = useRef();
   const refs = useRef({ running, onNearest, onInteract, onPause, onPerformance }); refs.current = { running, onNearest, onInteract, onPause, onPerformance };
   const cameraState = useMemo(() => ({ target: new Vector3(), ideal: new Vector3(), direction: new Vector3(), ray: new Ray(), hit: new Vector3(), boxes: world.boxes.map(b => new Box3(new Vector3(b.x - b.hx, b.minY, b.z - b.hz), new Vector3(b.x + b.hx, b.maxY, b.z + b.hz))) }), [world]);
   useEffect(() => {
-    assets.world.scene.traverse(o => { if (o.isMesh) { o.castShadow = !o.name.startsWith('Terrain') && !o.name.startsWith('Pond'); o.receiveShadow = true; } });
-    camera.position.set(1, world.height(0, 24) + 3, 30); camera.lookAt(0, world.height(0, 24) + 1.1, 24);
-  }, [assets, camera, world]);
+    assets.world.scene.traverse(o => { if (o.isMesh) { o.castShadow = !/Terrain|water/.test(o.name); o.receiveShadow = true; } });
+    camera.position.set(spawnX + .2, world.height(spawnX, -spawnY) + 2, -spawnY + initialDistance); camera.lookAt(spawnX, world.height(spawnX, -spawnY) + 1.1, -spawnY);
+  }, [assets, camera, world, spawnX, spawnY, initialDistance]);
   useEffect(() => {
     const canvas = gl.domElement; canvas.tabIndex = 0; canvas.setAttribute('aria-label', 'Explorable village. WASD to move, Shift to run, drag to look, E to interact, Escape to pause.');
     const clear = () => { input.current.clear(); orbit.current.dragging = false; };
@@ -76,6 +79,6 @@ export default function WorldScene({ assets, quality, running, onNearest, onInte
     <primitive object={assets.world.scene} />
     <Vegetation assets={assets} quality={quality} player={player} />
     <Traveler asset={assets.traveler} player={player} />
-    <Traveler asset={assets.traveler} position={[3, world.height(3,16), 16]} />
+    {!assets.manifest.campus && <Traveler asset={assets.traveler} position={[-4.3, world.height(-4.3,9.6), 9.6]} />}
   </>;
 }

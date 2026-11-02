@@ -13,8 +13,8 @@ export function groundHeight(terrain, samples, x, z) {
 
 export function createCollisionWorld(manifest, placements, heights) {
   const boxes = manifest.landmarks.map(l => ({ x: l.center[0], z: -l.center[1], hx: l.half[0], hz: l.half[1], minY: l.center[2], maxY: l.center[2] + l.half[2] + 4 }));
-  boxes.push({ x: -1, z: -42, hx: 2.5, hz: 2.6, minY: 2.5, maxY: 20 });
-  const circles = [{ x: -2, z: -12, r: 3.2 }];
+  boxes.push(...manifest.collision);
+  const circles = [];
   for (const g of manifest.groups) {
     if (!g.kind.startsWith('tree') && !g.kind.startsWith('rock')) continue;
     for (let i = 0; i < g.count; i++) {
@@ -22,15 +22,10 @@ export function createCollisionWorld(manifest, placements, heights) {
       circles.push({ x: placements[k], z: -placements[k + 1], r: (g.kind.startsWith('tree') ? .52 : .9) * s });
     }
   }
-  // Decorative garden walls have a broad central walkway.
-  for (const x of [-13.3, 13.3]) {
-    const base = groundHeight(manifest.terrain, heights, x, -4);
-    boxes.push({ x, z: -4, hx: 6.4, hz: .45, minY: base, maxY: base + .9 });
-  }
   const height = (x, z) => groundHeight(manifest.terrain, heights, x, z);
+  const bounds = manifest.bounds;
   const blocked = (x, z, r = .32) => {
-    if (Math.abs(x) > 76 || z > 68 || z < -84) return true;
-    if (((x + 29) / 14.6) ** 2 + ((-z + 1) / 20.6) ** 2 < 1) return true;
+    if (x < bounds.minX || x > bounds.maxX || z < bounds.minZ || z > bounds.maxZ) return true;
     if (boxes.some(b => Math.abs(x - b.x) < b.hx + r && Math.abs(z - b.z) < b.hz + r)) return true;
     return circles.some(c => (x - c.x) ** 2 + (z - c.z) ** 2 < (r + c.r) ** 2);
   };

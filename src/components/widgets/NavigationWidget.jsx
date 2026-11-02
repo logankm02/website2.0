@@ -42,7 +42,7 @@ export default function NavigationWidget() {
           title="Navigation"
         />
         <nav className="space-y-1.5 flex-1 flex flex-col justify-between">
-          <a href="/world" className="block w-full text-center px-2 py-1 rounded-lg text-xs font-medium text-amber-100 bg-white/10 hover:bg-white/20">Explore the 3D valley ↗</a>
+          <a href="/world" className="block w-full text-center px-2 py-1 rounded-lg text-xs font-medium text-amber-100 bg-white/10 hover:bg-white/20">Explore LOGAN CITY in 3D ↗</a>
           {sections.map((section) => (
             <button
               key={section.id}

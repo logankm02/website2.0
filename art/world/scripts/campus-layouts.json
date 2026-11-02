@@ -1,0 +1,484 @@
+{
+  "uofr": {
+    "title": "EASTMAN QUAD",
+    "pathMatrix": [
+      "........................",
+      "........................",
+      "........................",
+      "........................",
+      "........................",
+      "..####################..",
+      "......##...##...##......",
+      "......##...##...##......",
+      "......##...##...##......",
+      "...#####...##...#####...",
+      "......##...##...##......",
+      "......##...##...##......",
+      "......##...##...##......",
+      "......##...##...##......",
+      "......##...##...##......",
+      "......############......",
+      "........................",
+      "........................",
+      "........................",
+      "........................"
+    ],
+    "furniture": [
+      {
+        "kind": "rushRhees",
+        "x": 8,
+        "y": 2,
+        "w": 8,
+        "h": 3
+      },
+      {
+        "kind": "brickHall",
+        "x": 0,
+        "y": 2,
+        "w": 5,
+        "h": 3
+      },
+      {
+        "kind": "brickHall",
+        "x": 18,
+        "y": 2,
+        "w": 6,
+        "h": 3
+      },
+      {
+        "kind": "brickHall",
+        "x": 0,
+        "y": 7,
+        "w": 4,
+        "h": 5
+      },
+      {
+        "kind": "brickHall",
+        "x": 20,
+        "y": 7,
+        "w": 4,
+        "h": 5
+      },
+      {
+        "kind": "brickHall",
+        "x": 8,
+        "y": 16,
+        "w": 8,
+        "h": 3
+      },
+      {
+        "kind": "pineTree",
+        "x": 5,
+        "y": 7
+      },
+      {
+        "kind": "campusTree",
+        "x": 18,
+        "y": 7,
+        "autumn": true
+      },
+      {
+        "kind": "campusTree",
+        "x": 5,
+        "y": 11,
+        "autumn": true
+      },
+      {
+        "kind": "pineTree",
+        "x": 18,
+        "y": 11
+      },
+      {
+        "kind": "campusTree",
+        "x": 4,
+        "y": 6
+      },
+      {
+        "kind": "campusTree",
+        "x": 19,
+        "y": 6,
+        "autumn": true
+      },
+      {
+        "kind": "campusTree",
+        "x": 5,
+        "y": 14
+      },
+      {
+        "kind": "campusTree",
+        "x": 18,
+        "y": 14,
+        "autumn": true
+      }
+    ],
+    "spawn": {
+      "x": 11,
+      "y": 12,
+      "dir": "up"
+    },
+    "hotspots": [
+      {
+        "x": 8,
+        "y": 4,
+        "w": 8,
+        "pages": [
+          "RUSH RHEES LIBRARY — the domed landmark of the University of Rochester.",
+          "Its tower presides over the EASTMAN QUAD. LOGAN logged many late nights beneath that dome."
+        ]
+      },
+      {
+        "x": 0,
+        "y": 4,
+        "w": 5,
+        "pages": [
+          "HUTCHISON HALL — chemistry and biology labs close the north edge of the quad."
+        ]
+      },
+      {
+        "x": 18,
+        "y": 4,
+        "w": 6,
+        "pages": [
+          "MELIORA HALL — MELIORA, 'ever better,' is the university's motto."
+        ]
+      },
+      {
+        "x": 3,
+        "y": 7,
+        "h": 5,
+        "pages": [
+          "BAUSCH & LOMB HALL — physics and astronomy, wrapped around a quiet brick courtyard."
+        ]
+      },
+      {
+        "x": 20,
+        "y": 7,
+        "h": 5,
+        "pages": [
+          "MOREY HALL — humanities and languages, mirroring Bausch & Lomb across the green."
+        ]
+      },
+      {
+        "x": 8,
+        "y": 16,
+        "w": 8,
+        "pages": [
+          "DEWEY HALL — psychology and the social sciences, closing the south end of the quad."
+        ]
+      }
+    ]
+  },
+  "ucb": {
+    "title": "MEMORIAL GLADE",
+    "pathMatrix": [
+      "........................",
+      "........................",
+      "...~~...................",
+      "...~~...................",
+      "..~~....................",
+      "..~~....................",
+      ".~~.............===.....",
+      ".~~.............===.....",
+      "..~~............===.....",
+      "..BB############===.....",
+      ".~~.............===.....",
+      ".~~.............===.....",
+      ".~~.............===.....",
+      ".~~~......######===.....",
+      "~~~~............===.....",
+      "~~~~~...........===.....",
+      "~~~~~...........===.....",
+      "~~~~~...........===.....",
+      "~~~~~...........===.....",
+      "~~~~~...........===....."
+    ],
+    "furniture": [
+      {
+        "kind": "forest",
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 2
+      },
+      {
+        "kind": "forest",
+        "x": 22,
+        "y": 2,
+        "w": 2,
+        "h": 12
+      },
+      {
+        "kind": "forest",
+        "x": 22,
+        "y": 14,
+        "w": 2,
+        "h": 6
+      },
+      {
+        "kind": "doeLibrary",
+        "x": 13,
+        "y": 2,
+        "w": 9,
+        "h": 4
+      },
+      {
+        "kind": "campanile",
+        "x": 7,
+        "y": 3,
+        "w": 3,
+        "h": 2
+      },
+      {
+        "kind": "satherGate",
+        "x": 14,
+        "y": 16,
+        "w": 6,
+        "h": 2
+      },
+      {
+        "kind": "ironFence",
+        "x": 5,
+        "y": 16,
+        "w": 9,
+        "h": 1
+      },
+      {
+        "kind": "ironFence",
+        "x": 20,
+        "y": 16,
+        "w": 2,
+        "h": 1
+      },
+      {
+        "kind": "ucSeal",
+        "x": 10,
+        "y": 8
+      },
+      {
+        "kind": "berryPatch",
+        "x": 19,
+        "y": 10,
+        "w": 2,
+        "h": 2
+      },
+      {
+        "kind": "stand",
+        "x": 19,
+        "y": 13,
+        "w": 2
+      },
+      {
+        "kind": "rock",
+        "x": 2,
+        "y": 14
+      },
+      {
+        "kind": "rock",
+        "x": 1,
+        "y": 16
+      },
+      {
+        "kind": "rock",
+        "x": 3,
+        "y": 18
+      },
+      {
+        "kind": "redwood",
+        "x": 5,
+        "y": 5
+      },
+      {
+        "kind": "redwood",
+        "x": 6,
+        "y": 6
+      },
+      {
+        "kind": "redwood",
+        "x": 4,
+        "y": 7
+      },
+      {
+        "kind": "redwood",
+        "x": 4,
+        "y": 11
+      },
+      {
+        "kind": "redwood",
+        "x": 6,
+        "y": 12
+      },
+      {
+        "kind": "redwood",
+        "x": 5,
+        "y": 14
+      },
+      {
+        "kind": "redwood",
+        "x": 13,
+        "y": 7
+      },
+      {
+        "kind": "campusTree",
+        "x": 11,
+        "y": 3
+      },
+      {
+        "kind": "campusTree",
+        "x": 10,
+        "y": 5
+      },
+      {
+        "kind": "campusTree",
+        "x": 14,
+        "y": 8
+      },
+      {
+        "kind": "campusTree",
+        "x": 20,
+        "y": 7
+      },
+      {
+        "kind": "campusTree",
+        "x": 21,
+        "y": 8
+      },
+      {
+        "kind": "campusTree",
+        "x": 6,
+        "y": 10
+      },
+      {
+        "kind": "campusTree",
+        "x": 13,
+        "y": 11
+      },
+      {
+        "kind": "campusTree",
+        "x": 21,
+        "y": 12
+      },
+      {
+        "kind": "campusTree",
+        "x": 7,
+        "y": 17
+      },
+      {
+        "kind": "campusTree",
+        "x": 12,
+        "y": 18
+      },
+      {
+        "kind": "bush",
+        "x": 12,
+        "y": 8
+      },
+      {
+        "kind": "bush",
+        "x": 9,
+        "y": 11
+      },
+      {
+        "kind": "bush",
+        "x": 14,
+        "y": 14
+      },
+      {
+        "kind": "bush",
+        "x": 19,
+        "y": 14
+      },
+      {
+        "kind": "lamppost",
+        "x": 15,
+        "y": 7
+      },
+      {
+        "kind": "lamppost",
+        "x": 19,
+        "y": 7
+      },
+      {
+        "kind": "lamppost",
+        "x": 15,
+        "y": 12
+      }
+    ],
+    "spawn": {
+      "x": 11,
+      "y": 14,
+      "dir": "up"
+    },
+    "hotspots": [
+      {
+        "x": 13,
+        "y": 5,
+        "w": 9,
+        "pages": [
+          "DOE LIBRARY — Berkeley's grand Beaux-Arts library under its red tile roof.",
+          "Inside its reading rooms, LOGAN ground through EECS problem sets late into the night."
+        ]
+      },
+      {
+        "x": 7,
+        "y": 4,
+        "w": 3,
+        "pages": [
+          "SATHER TOWER — 'the Campanile' — UC Berkeley's 307-foot clock tower.",
+          "On the hour its carillon rings out over GLADE. LOGAN's MEng in EECS happened in its shadow."
+        ]
+      },
+      {
+        "x": 14,
+        "y": 16,
+        "w": 6,
+        "pages": [
+          "SATHER GATE — the green bronze gateway to campus, standing since 1910.",
+          "Beyond it, Telegraph Avenue. Behind you, the glade. Choose wisely at lunchtime."
+        ]
+      },
+      {
+        "x": 10,
+        "y": 8,
+        "pages": [
+          "The UNIVERSITY OF CALIFORNIA seal, set in a planter on the glade.",
+          "FIAT LUX — 'let there be light.'"
+        ]
+      },
+      {
+        "x": 19,
+        "y": 10,
+        "w": 2,
+        "h": 2,
+        "pages": [
+          "A tidy berry garden. Planted by the botany club; raided by the CS majors."
+        ]
+      },
+      {
+        "x": 19,
+        "y": 13,
+        "w": 2,
+        "pages": [
+          "GLADE MART — snacks, sunscreen, and blue books. The awning has seen some winters."
+        ]
+      },
+      {
+        "x": 1,
+        "y": 6,
+        "w": 2,
+        "h": 2,
+        "pages": [
+          "STRAWBERRY CREEK — burbling down from the Berkeley hills, right through campus."
+        ]
+      },
+      {
+        "x": 0,
+        "y": 15,
+        "w": 5,
+        "h": 2,
+        "pages": [
+          "The creek pools here before slipping under the gate. Something ripples by the rocks."
+        ]
+      }
+    ]
+  }
+}

@@ -3,7 +3,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
 
 const BASE = '/world/';
-export async function loadWorld(onProgress) {
+export async function loadWorld(onProgress, campus) {
   const manager = new LoadingManager();
   manager.onProgress = (_url, loaded, total) => onProgress(Math.min(95, Math.round(loaded / total * 95)));
   const draco = new DRACOLoader(manager).setDecoderPath(`${BASE}draco/`).setWorkerLimit(2);
@@ -20,18 +20,24 @@ export async function loadWorld(onProgress) {
         // glTF carries neutral/empty attributes on joined unpainted parts.
         // Only the authored foliage, terrain, ivy and mountain shaders use them.
         m.vertexColors = /varied foliage|Meadow plant|Meadow with|Ivy variegation|Mountain rock/.test(m.name);
+        // Joined foliage keeps its authored paint in the second color layer.
+        // Three's standard material reads `color`; LODs already use that layer.
+        if (/varied foliage|Ivy variegation city/.test(m.name) && o.geometry.getAttribute('color_1')) {
+          o.geometry.setAttribute('color', o.geometry.getAttribute('color_1'));
+        }
       }
     });
     return result;
   }
   try {
-    const response = await fetch(`${BASE}manifest.json`);
+    const prefix = ['rochester', 'berkeley'].includes(campus) ? `campuses/${campus}/` : '';
+    const response = await fetch(`${BASE}${prefix}manifest.json`);
     if (!response.ok) throw new Error('The world manifest could not be loaded.');
     const manifest = await response.json();
     const [world, traveler, placements, heights, library] = await Promise.all([
-      gltf('village.glb'), gltf('traveler.glb'),
-      fetch(`${BASE}placements.bin`).then(r => { if (!r.ok) throw new Error('Vegetation data could not be loaded.'); return r.arrayBuffer(); }),
-      fetch(`${BASE}heightmap.bin`).then(r => { if (!r.ok) throw new Error('Terrain data could not be loaded.'); return r.arrayBuffer(); }),
+      gltf(manifest.world || 'village.glb'), gltf('traveler.glb'),
+      fetch(`${BASE}${manifest.placements || 'placements.bin'}`).then(r => { if (!r.ok) throw new Error('Vegetation data could not be loaded.'); return r.arrayBuffer(); }),
+      fetch(`${BASE}${manifest.heightmap || 'heightmap.bin'}`).then(r => { if (!r.ok) throw new Error('Terrain data could not be loaded.'); return r.arrayBuffer(); }),
       Promise.all(manifest.assets.map(async a => ({ ...a, high: await gltf(a.url), low: a.lodUrl ? await gltf(a.lodUrl) : null }))),
     ]);
     onProgress(100);
