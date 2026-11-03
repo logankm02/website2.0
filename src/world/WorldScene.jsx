@@ -12,9 +12,10 @@ export default function WorldScene({ assets, quality, running, onNearest, onInte
   const { camera, gl } = useThree();
   const world = useMemo(() => createCollisionWorld(assets.manifest, assets.placements, assets.heights), [assets]);
   const locations = locationsForWorld(assets.manifest);
+  const interior = Boolean(assets.manifest.interior);
   const [spawnX, spawnY] = assets.manifest.spawn;
   const player = useRef({ x: spawnX, y: world.height(spawnX, -spawnY), z: -spawnY, vx: 0, vz: 0, vy: 0, speed: 0, grounded: true });
-  const initialDistance = assets.manifest.campus ? 3.2 : 6.2;
+  const initialDistance = assets.manifest.campus || interior ? 3.2 : 6.2;
   const input = useRef(new Set()), orbit = useRef({ yaw: .08, pitch: .27, distance: initialDistance, dragging: false });
   const accumulator = useRef(0), updates = useRef(0), nearest = useRef(null), sun = useRef();
   const refs = useRef({ running, onNearest, onInteract, onPause, onPerformance }); refs.current = { running, onNearest, onInteract, onPause, onPerformance };
@@ -58,12 +59,13 @@ export default function WorldScene({ assets, quality, running, onNearest, onInte
     for (const box of c.boxes) if (c.ray.intersectBox(box, c.hit)) distance = Math.min(distance, Math.max(.8, c.hit.distanceTo(c.target) - .3));
     for (let d = .5; d < distance; d += .3) { c.ideal.copy(c.target).addScaledVector(c.direction, d); if (c.ideal.y < world.height(c.ideal.x, c.ideal.z) + .35) { distance = Math.max(.8, d - .3); break; } }
     c.ideal.copy(c.target).addScaledVector(c.direction, distance);
+    if (interior) c.ideal.y = Math.min(c.ideal.y, assets.manifest.ceilingHeight - .25);
     camera.position.lerp(c.ideal, 1 - Math.exp(-9 * Math.min(delta, .1))); camera.lookAt(c.target);
     if (sun.current) { sun.current.position.set(p.x - 30, p.y + 55, p.z + 25); sun.current.target.position.set(p.x, p.y, p.z); sun.current.target.updateMatrixWorld(); }
     updates.current += delta;
     if (updates.current > .2) {
       updates.current = 0;
-      const closest = locations.map(l => ({ l, d: Math.hypot(l.position[0] - p.x, l.position[2] - p.z) })).filter(v => v.d < 3.3).sort((a,b) => a.d - b.d)[0]?.l || null;
+      const closest = locations.filter(l => l.position).map(l => ({ l, d: Math.hypot(l.position[0] - p.x, l.position[2] - p.z) })).filter(v => v.d < (v.l.radius || 3.3)).sort((a,b) => a.d - b.d)[0]?.l || null;
       if (closest?.id !== nearest.current?.id) { nearest.current = closest; refs.current.onNearest(closest); }
       if (debug) debug.current = { x: p.x, y: p.y, z: p.z, ground: world.height(p.x,p.z), speed: p.speed, fps: Math.round(1 / Math.max(delta, .001)), calls: gl.info.render.calls, triangles: gl.info.render.triangles, nearest: closest?.id || '-' };
     }
@@ -71,14 +73,20 @@ export default function WorldScene({ assets, quality, running, onNearest, onInte
     if (perf.elapsed > 5) { if (perf.warmup > 8) refs.current.onPerformance(perf.frames / perf.elapsed); perf.elapsed = 0; perf.frames = 0; }
   });
   return <>
-    <color attach="background" args={['#bcd5e4']} />
+    <color attach="background" args={[interior ? '#343b3f' : '#bcd5e4']} />
+    {interior ? <>
+      <ambientLight intensity={1.2} color="#fff4e3" />
+      <pointLight position={[-2.5, 3.9, 0]} intensity={45} color="#fff4dd" distance={22} />
+      <pointLight position={[2.5, 3.9, -2]} intensity={45} color="#e5eeff" distance={22} />
+    </> : <>
     <fog attach="fog" args={['#bdd5df', 100, 480]} />
     <Sky distance={450000} sunPosition={[-30, 60, 25]} turbidity={3} rayleigh={.6} mieCoefficient={.003} mieDirectionalG={.8} />
     <hemisphereLight args={['#d8efff', '#687942', 1.8]} />
     <directionalLight ref={sun} castShadow={quality !== 'low'} intensity={3.2} color="#fff1d4" position={[-30,55,25]} shadow-mapSize={[quality === 'high' ? 2048 : 1024, quality === 'high' ? 2048 : 1024]} shadow-camera-left={-32} shadow-camera-right={32} shadow-camera-top={32} shadow-camera-bottom={-32} shadow-camera-near={1} shadow-camera-far={120} shadow-bias={-.00015} shadow-normalBias={.04} />
+    </>}
     <primitive object={assets.world.scene} />
-    <Vegetation assets={assets} quality={quality} player={player} />
+    {!interior && <Vegetation assets={assets} quality={quality} player={player} />}
     <Traveler asset={assets.traveler} player={player} />
-    {!assets.manifest.campus && <Traveler asset={assets.traveler} position={[-4.3, world.height(-4.3,9.6), 9.6]} />}
+    {!interior && !assets.manifest.campus && <Traveler asset={assets.traveler} position={[-4.3, world.height(-4.3,9.6), 9.6]} />}
   </>;
 }

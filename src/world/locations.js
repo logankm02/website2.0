@@ -24,4 +24,15 @@ locations.find(l => l.id === 'education').links.push(
   { label: 'Rochester campus in 3D', href: '/world?campus=rochester' },
   { label: 'Berkeley campus in 3D', href: '/world?campus=berkeley' },
 );
-export const locationsForWorld = manifest => manifest?.locations || locations;
+for (const id of ['education', 'experience', 'projects']) {
+  const building = locations.find(l => l.id === id);
+  building.kind = 'Enter';
+  building.travel = `/world?interior=${id}`;
+  building.links.unshift({ label: 'Enter the building', href: building.travel });
+}
+export function locationsForWorld(manifest) {
+  if (!manifest?.interior) return manifest?.locations || locations;
+  const building = locations.find(l => l.id === manifest.interior);
+  // Keep the original content in the room directory without furnishing the room.
+  return [...manifest.locations, { ...building, id: 'information', position: null, travel: undefined, links: building.links.slice(1) }];
+}

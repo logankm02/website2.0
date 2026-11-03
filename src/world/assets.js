@@ -1,9 +1,10 @@
 import { LoadingManager, SRGBColorSpace } from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
+import { arrivalManifest } from './worldRoute';
 
 const BASE = '/world/';
-export async function loadWorld(onProgress, campus) {
+export async function loadWorld(onProgress, route) {
   const manager = new LoadingManager();
   manager.onProgress = (_url, loaded, total) => onProgress(Math.min(95, Math.round(loaded / total * 95)));
   const draco = new DRACOLoader(manager).setDecoderPath(`${BASE}draco/`).setWorkerLimit(2);
@@ -30,10 +31,9 @@ export async function loadWorld(onProgress, campus) {
     return result;
   }
   try {
-    const prefix = ['rochester', 'berkeley'].includes(campus) ? `campuses/${campus}/` : '';
-    const response = await fetch(`${BASE}${prefix}manifest.json`);
+    const response = await fetch(`${BASE}${route.prefix}manifest.json`);
     if (!response.ok) throw new Error('The world manifest could not be loaded.');
-    const manifest = await response.json();
+    const manifest = arrivalManifest(await response.json(), route);
     const [world, traveler, placements, heights, library] = await Promise.all([
       gltf(manifest.world || 'village.glb'), gltf('traveler.glb'),
       fetch(`${BASE}${manifest.placements || 'placements.bin'}`).then(r => { if (!r.ok) throw new Error('Vegetation data could not be loaded.'); return r.arrayBuffer(); }),

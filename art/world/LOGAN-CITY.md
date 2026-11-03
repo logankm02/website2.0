@@ -7,7 +7,7 @@ Two campus gateways beside ΛΚΜ House open playable first-pass campus scenes:
 - `/world?campus=rochester`: Eastman Quad, Rush Rhees Library with copper dome, five brick halls, autumn trees, and a return portal.
 - `/world?campus=berkeley`: Memorial Glade, the Campanile, Doe Library, Sather Gate, Strawberry Creek and its bridge, the bronze seal, berry garden, Glade Mart, and a return portal.
 
-These translate the existing website’s stylized campus maps; they are not surveyed replicas of the entire real universities. Campus detail is intentionally lighter than the city, as requested. Building interactions open content and travel links. The original enterable pixel interiors and campus scenes remain intact at `/city`.
+These translate the existing website’s stylized campus maps; they are not surveyed replicas of the entire real universities. Campus detail is intentionally lighter than the city, as requested. The three city buildings now open basic empty 3D interiors; their directories retain the existing content links. Campus interactions open content and travel links. The original enterable pixel interiors and campus scenes remain intact at `/city`.
 
 ## Editable source
 
