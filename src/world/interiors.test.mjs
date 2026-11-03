@@ -9,7 +9,7 @@ const floats=path=>{const b=readFileSync(new URL(path,root));return new Float32A
 const city=read('manifest.json');
 const cityWorld=createCollisionWorld(city,floats('placements.bin'),floats('heightmap.bin'));
 
-for(const id of ['education','experience','projects'])test(`${id}: empty room is walkable, contained and exits at its own city door`,()=>{
+for(const id of ['education','experience','projects'])test(`${id}: furnished room is walkable, contained and exits at its own city door`,()=>{
   const route=resolveWorldRoute('?interior='+id),m=read(route.prefix+'manifest.json');
   assert.equal(route.startImmediately,true);assert.equal(m.interior,id);
   assert.deepEqual(m.assets,[]);assert.deepEqual(m.groups,[]);
@@ -27,6 +27,27 @@ for(const id of ['education','experience','projects'])test(`${id}: empty room is
   assert.deepEqual(returned.spawn,door.slice(0,2));assert.equal(returnRoute.startImmediately,true);
   assert.equal(cityWorld.blocked(returned.spawn[0],-returned.spawn[1]),false);
   assert.notDeepEqual(city.spawn,returned.spawn,'return does not reset to the town spawn');
+});
+test('every furnished exhibit can be approached from its room entrance', () => {
+  for (const room of ['education', 'experience', 'projects']) {
+    const m = read('interiors/' + room + '/manifest.json');
+    const world = createCollisionWorld(m, floats(m.placements), floats(m.heightmap));
+    const queue = [[Math.round(m.spawn[0]*2), Math.round(-m.spawn[1]*2)]];
+    const visited = new Set();
+    const reachable = new Set();
+    for (let i = 0; i < queue.length; i++) {
+      const [x,z] = queue[i], key = x + ',' + z;
+      if (visited.has(key)) continue;
+      visited.add(key);
+      if (world.blocked(x/2,z/2)) continue;
+      for (const spot of m.locations) {
+        if (Math.hypot(spot.position[0]-x/2, spot.position[2]-z/2) < .5) reachable.add(spot.id);
+      }
+      queue.push([x+1,z],[x-1,z],[x,z+1],[x,z-1]);
+    }
+    assert.ok(m.locations.length >= 3, room + ' has exhibits and an exit');
+    assert.deepEqual(reachable, new Set(m.locations.map(l => l.id)), room);
+  }
 });
 test('world route selection validates room names and retains campus routes',()=>{
   assert.equal(resolveWorldRoute('?interior=../../outside').prefix,'');

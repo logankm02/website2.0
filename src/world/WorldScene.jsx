@@ -15,14 +15,20 @@ export default function WorldScene({ assets, quality, running, onNearest, onInte
   const interior = Boolean(assets.manifest.interior);
   const [spawnX, spawnY] = assets.manifest.spawn;
   const player = useRef({ x: spawnX, y: world.height(spawnX, -spawnY), z: -spawnY, vx: 0, vz: 0, vy: 0, speed: 0, grounded: true });
-  const initialDistance = assets.manifest.campus || interior ? 3.2 : 6.2;
-  const input = useRef(new Set()), orbit = useRef({ yaw: .08, pitch: .27, distance: initialDistance, dragging: false });
+  const isCity = !assets.manifest.campus && !interior;
+  const initialDistance = isCity ? 11.5 : 3.2;
+  const initialPitch = isCity ? .43 : .27;
+  const input = useRef(new Set()), orbit = useRef({ yaw: assets.manifest.arrivalYaw ?? .08, pitch: initialPitch, distance: initialDistance, dragging: false });
   const accumulator = useRef(0), updates = useRef(0), nearest = useRef(null), sun = useRef();
   const refs = useRef({ running, onNearest, onInteract, onPause, onPerformance }); refs.current = { running, onNearest, onInteract, onPause, onPerformance };
   const cameraState = useMemo(() => ({ target: new Vector3(), ideal: new Vector3(), direction: new Vector3(), ray: new Ray(), hit: new Vector3(), boxes: world.boxes.map(b => new Box3(new Vector3(b.x - b.hx, b.minY, b.z - b.hz), new Vector3(b.x + b.hx, b.maxY, b.z + b.hz))) }), [world]);
   useEffect(() => {
     assets.world.scene.traverse(o => { if (o.isMesh) { o.castShadow = !/Terrain|water/.test(o.name); o.receiveShadow = true; } });
-    camera.position.set(spawnX + .2, world.height(spawnX, -spawnY) + 2, -spawnY + initialDistance); camera.lookAt(spawnX, world.height(spawnX, -spawnY) + 1.1, -spawnY);
+    const { yaw, pitch } = orbit.current;
+    const targetY = world.height(spawnX, -spawnY) + 1.3;
+    const horizontal = Math.cos(pitch) * initialDistance;
+    camera.position.set(spawnX + Math.sin(yaw) * horizontal, targetY + Math.sin(pitch) * initialDistance, -spawnY + Math.cos(yaw) * horizontal);
+    camera.lookAt(spawnX, targetY, -spawnY);
   }, [assets, camera, world, spawnX, spawnY, initialDistance]);
   useEffect(() => {
     const canvas = gl.domElement; canvas.tabIndex = 0; canvas.setAttribute('aria-label', 'Explorable village. WASD to move, Shift to run, drag to look, E to interact, Escape to pause.');
@@ -38,13 +44,13 @@ export default function WorldScene({ assets, quality, running, onNearest, onInte
     const down = e => { if (refs.current.running && e.button === 0) { orbit.current.dragging = true; canvas.setPointerCapture(e.pointerId); canvas.focus(); } };
     const move = e => { if (refs.current.running && (orbit.current.dragging || document.pointerLockElement === canvas)) { orbit.current.yaw -= e.movementX * .003; orbit.current.pitch = Math.max(.08, Math.min(.9, orbit.current.pitch + e.movementY * .0025)); } };
     const up = () => { orbit.current.dragging = false; };
-    const wheel = e => { e.preventDefault(); orbit.current.distance = Math.max(3, Math.min(9, orbit.current.distance + e.deltaY * .008)); };
+    const wheel = e => { e.preventDefault(); orbit.current.distance = Math.max(3, Math.min(isCity ? 20 : 9, orbit.current.distance + e.deltaY * .008)); };
     const blur = () => { clear(); refs.current.onPause(); };
     const visibility = () => { if (document.hidden) blur(); };
     window.addEventListener('keydown', keydown); window.addEventListener('keyup', keyup); window.addEventListener('blur', blur); document.addEventListener('visibilitychange', visibility);
     canvas.addEventListener('pointerdown', down); canvas.addEventListener('pointermove', move); canvas.addEventListener('pointerup', up); canvas.addEventListener('pointercancel', up); canvas.addEventListener('wheel', wheel, { passive: false });
     return () => { clear(); window.removeEventListener('keydown', keydown); window.removeEventListener('keyup', keyup); window.removeEventListener('blur', blur); document.removeEventListener('visibilitychange', visibility); canvas.removeEventListener('pointerdown', down); canvas.removeEventListener('pointermove', move); canvas.removeEventListener('pointerup', up); canvas.removeEventListener('pointercancel', up); canvas.removeEventListener('wheel', wheel); };
-  }, [gl]);
+  }, [gl, isCity]);
   useEffect(() => { if (!running) { input.current.clear(); player.current.vx = 0; player.current.vz = 0; player.current.speed = 0; } }, [running]);
   const performance = useRef({ elapsed: 0, frames: 0, warmup: 0 });
   useFrame((_, delta) => {

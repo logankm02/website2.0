@@ -1,16 +1,13 @@
-# Empty city interiors
+# Logan City interiors
 
-ΛΚΜ House, LOGAN & CO., and LOGAN LABS each have a separate walkable, unfurnished room. Rooms include only a floor, ceiling, walls, trim, windows, and an exit door. House flooring is wood, the office is blue-gray, and the lab is concrete.
+Press **E** at a building door to enter. Inside, approach an exhibit and press **E** to inspect it. The exit returns you to the same doorstep. The circular map opens the room directory.
 
-At a city building door, press **E** to enter. Near the interior exit, press **E** to return to that building’s doorstep. The city Directory also links to the rooms. Existing portfolio links remain in each room’s Directory. Campus routes and the pixel city are unchanged.
+| Building | Route | Exhibits |
+| --- | --- | --- |
+| ΛΚΜ House | `/world?interior=education` | Academic ledger, library shelves, and two gateways leading to the Rochester and Berkeley campus worlds |
+| LOGAN & CO. | `/world?interior=experience` | Mission control consoles, a tripod-mounted LiDAR scanner, and a solar test array |
+| LOGAN LABS | `/world?interior=projects` | Instrument bench, open-wheel autonomous racecar, and a Scrabble table with a playable project link |
 
-Local URLs:
-- `/world?interior=education`
-- `/world?interior=experience`
-- `/world?interior=projects`
+The Blender MCP entry point is `art/world/scripts/80_build_interiors.py`. It calls `room_furniture.py` to build the props and their collision and interaction data. Run it with Blender Python via `runpy.run_path`. Supply `init_globals={'ROOM_ID': 'education'}` to regenerate a single room.
 
-Generated through Blender MCP using `art/world/scripts/80_build_interiors.py`. This creates separate scenes, compressed GLBs, room manifests, flat collision heightfields, editable `.blend` files, and previews in `/private/tmp/logan-interiors/`. Browser files are installed at `public/world/interiors/{id}/`; editable sources are retained at `art/world/blend/interior-{id}.blend` and alongside this document in `interiors/`.
-
-Room assets are 16–19 KB each and reuse the existing animated traveler. They load no outdoor vegetation. Indoor lighting and ceiling-aware camera positioning are selected from room metadata. Room collision uses the same movement controller as the city.
-
-Validation: production build and lint pass; all 15 movement/navigation tests pass, including four-wall containment, walkable exits, validated room routes, and return to the correct exterior doorway. Existing unrelated user edits were preserved.
+Each room is written to `/private/tmp/logan-furnished-rooms/{id}/`. The editable Blender file retains individual objects. The browser export joins meshes and applies Draco compression. Runtime assets live in `public/world/interiors/{id}/`, editable scenes in `art/world/blend/interior-{id}.blend`, and reference renders in `art/world/previews/interior-{id}.png`.

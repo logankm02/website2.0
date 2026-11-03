@@ -1,15 +1,18 @@
-"""Basic unfurnished city rooms. Run through Blender MCP; keeps other scenes."""
+"""Furnished city rooms. Run through Blender MCP; keeps other scenes."""
 import bpy, sys, json, struct, math
 from pathlib import Path
 from mathutils import Vector
 sys.path.insert(0,str(Path(__file__).resolve().parent))
 from world_core import box, mat, join
+from room_furniture import furnish
 
 ROOMS=[('education','ΛΚΜ House',12,10,(.72,.66,.53),(.30,.16,.065)),
        ('experience','LOGAN & CO.',12,10,(.31,.37,.43),(.13,.17,.21)),
        ('projects','LOGAN LABS',17,12,(.64,.66,.62),(.36,.38,.36))]
-stage=Path('/private/tmp/logan-interiors');stage.mkdir(exist_ok=True)
+stage=Path('/private/tmp/logan-furnished-rooms');stage.mkdir(exist_ok=True)
 for room_id,label,w,d,wall_color,floor_color in ROOMS:
+    if globals().get('ROOM_ID',room_id) != room_id:
+        continue
     folder=stage/room_id;folder.mkdir(exist_ok=True)
     scene=bpy.data.scenes.new('City interior — '+room_id);bpy.context.window.scene=scene
     scene.render.engine='CYCLES';scene.cycles.samples=20;scene.cycles.use_denoising=True
@@ -32,7 +35,7 @@ for room_id,label,w,d,wall_color,floor_color in ROOMS:
         box('Room wall',(x,y,h/2),(hx*2,hy*2,h),wall)
         box('Room skirting',(x,y,.12),(hx*2+.08,hy*2+.08,.24),trim,.02)
         collision.append({'x':x,'z':-y,'hx':hx,'hz':hy,'minY':0,'maxY':h})
-    # Plain architectural shell only: no furniture, exhibits, NPCs or props.
+    # Floor finish varies by building.
     if room_id=='education':
         seam=mat('Oak floor seams',(.16,.08,.035),.9)
         for i in range(int(w/.42)):
@@ -56,18 +59,19 @@ for room_id,label,w,d,wall_color,floor_color in ROOMS:
       'locations':[{'id':'exit','label':'Outside '+label,'kind':'Exit','position':[0,0,d/2-.5],'radius':3.0,
         'travel':'/world?from='+room_id,'body':'Return to the city outside this building.',
         'links':[{'label':'Back outside','href':'/world?from='+room_id}]}]}
+    furnish(room_id, manifest)
     scene['interior_manifest']=json.dumps(manifest)
     (folder/'manifest.json').write_text(json.dumps(manifest,separators=(',',':')))
     (folder/'heightmap.bin').write_bytes(struct.pack('<4f',0,0,0,0));(folder/'placements.bin').write_bytes(b'')
-    # Merge only the generated room meshes for a small browser GLB.
-    join(list(scene.objects),'Interior shell '+room_id)
-    bpy.ops.export_scene.gltf(filepath=str(folder/'room.glb'),export_format='GLB',use_selection=True,use_active_scene=True,
-      export_animations=False,export_cameras=False,export_lights=False,export_draco_mesh_compression_enable=True,export_draco_mesh_compression_level=6)
     for x,y in [(-w*.22,0),(w*.22,d*.18)]:
         bpy.ops.object.light_add(type='AREA',location=(x,y,h-.3));light=bpy.context.object;light.data.energy=420;light.data.shape='DISK';light.data.size=5
-    bpy.ops.object.camera_add(location=(w*.26,-d*.31,2.4));cam=bpy.context.object
-    cam.rotation_euler=(Vector((0,d*.2,1.7))-cam.location).to_track_quat('-Z','Y').to_euler();cam.data.lens=23;scene.camera=cam
+    bpy.ops.object.camera_add(location=(.1,-d*.43,2.65));cam=bpy.context.object
+    cam.rotation_euler=(Vector((0,d*.2,1.7))-cam.location).to_track_quat('-Z','Y').to_euler();cam.data.lens=17;scene.camera=cam
     scene.render.filepath=str(folder/'preview.png')
     bpy.data.libraries.write(str(folder/'room.blend'),{scene},fake_user=True,compress=True)
+    # Merge only the generated room meshes for a small browser GLB.
+    join([obj for obj in scene.objects if obj.type == 'MESH'],'Furnished room '+room_id)
+    bpy.ops.export_scene.gltf(filepath=str(folder/'room.glb'),export_format='GLB',use_selection=True,use_active_scene=True,
+      export_animations=False,export_cameras=False,export_lights=False,export_draco_mesh_compression_enable=True,export_draco_mesh_compression_level=6)
     bpy.ops.render.render(write_still=True)
     print(room_id,'ready:',(folder/'room.glb').stat().st_size,'bytes')

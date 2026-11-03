@@ -16,5 +16,8 @@ export function resolveWorldRoute(search) {
 
 export function arrivalManifest(manifest, route) {
   const doorway = route.from && manifest.landmarks.find(l => l.id === route.from)?.door;
-  return doorway ? { ...manifest, spawn: doorway.slice(0, 2) } : manifest;
+  if (!doorway) return manifest;
+  // Look along the promenade on exit so the facade doesn't fill the frame.
+  const arrivalYaw = route.from === 'education' ? -.55 : .70;
+  return { ...manifest, spawn: doorway.slice(0, 2), arrivalYaw };
 }

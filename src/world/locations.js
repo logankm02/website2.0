@@ -33,6 +33,6 @@ for (const id of ['education', 'experience', 'projects']) {
 export function locationsForWorld(manifest) {
   if (!manifest?.interior) return manifest?.locations || locations;
   const building = locations.find(l => l.id === manifest.interior);
-  // Keep the original content in the room directory without furnishing the room.
+  // Keep the original content in the room directory alongside its exhibits.
   return [...manifest.locations, { ...building, id: 'information', position: null, travel: undefined, links: building.links.slice(1) }];
 }
