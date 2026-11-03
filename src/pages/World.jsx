@@ -1,6 +1,7 @@
 import { Component, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { ACESFilmicToneMapping } from 'three';
+import FieldMap from '../world/FieldMap';
 import WorldScene from '../world/WorldScene';
 import { loadWorld } from '../world/assets';
 import { locationsForWorld } from '../world/locations';
@@ -18,19 +19,20 @@ class WorldErrorBoundary extends Component {
 function DestinationDialog({ destination, onClose, locations, worldName }) {
   const ref = useRef();
   useEffect(() => { ref.current?.showModal(); }, []);
-  return <dialog className="world-dialog" ref={ref} onCancel={e => { e.preventDefault(); onClose(); }}>
+  return <dialog className={`world-dialog ${destination.id === 'map' ? 'is-directory' : 'is-conversation'}`} aria-labelledby="destination-name" ref={ref} onCancel={e => { e.preventDefault(); onClose(); }}>
     <button className="world-close" aria-label="Close dialog" onClick={onClose}>×</button>
-    <p className="world-eyebrow">{destination.id === 'map' ? 'Find your way' : worldName}</p>
-    <h2>{destination.label}</h2><p>{destination.body}</p>
+    <p className="world-eyebrow">{destination.id === 'map' ? worldName : worldName}</p>
+    <h2 id="destination-name">{destination.label}</h2><p>{destination.body}</p>
     {destination.id === 'map' ? <div className="world-map-list">{locations.filter(l => !l.secret && l.id !== 'welcome').map((l,i) => <a key={l.id} href={l.links[0].href}><span>0{i + 1}</span><div><strong>{l.label}</strong><small>{l.links[0].label}</small></div><span>↗</span></a>)}</div> : <div className="world-destination-links">{destination.links.map(link => <a key={link.href} href={link.href} target={link.href.startsWith('https') ? '_blank' : undefined} rel={link.href.startsWith('https') ? 'noopener noreferrer' : undefined}>{link.label}<span>{link.href.startsWith('https') ? '↗' : '→'}</span></a>)}</div>}
-    <button className="world-return" onClick={onClose}>Back to the trail</button>
+    <button className="world-return" onClick={onClose}>Back</button>
   </dialog>;
 }
 function WorldPage() {
   const route = useMemo(() => resolveWorldRoute(window.location.search), []);
   const { campus, interior, name: worldName } = route;
   const [assets, setAssets] = useState(null), [progress, setProgress] = useState(0), [error, setError] = useState(null);
-  const locations = locationsForWorld(assets?.manifest);
+  const locations = useMemo(() => locationsForWorld(assets?.manifest), [assets]);
+  const mapRef = useRef(null), arrowRef = useRef(null);
   const [started, setStarted] = useState(route.startImmediately), [paused, setPaused] = useState(false), [destination, setDestination] = useState(null), [nearest, setNearest] = useState(null);
   const [qualityMode, setQualityMode] = useState('auto');
   const [quality, setQuality] = useState(() => navigator.hardwareConcurrency <= 4 ? 'low' : 'balanced');
@@ -61,36 +63,38 @@ function WorldPage() {
   }, []);
   const running = Boolean(assets) && started && !paused && !destination;
   useEffect(() => { if (assets && route.startImmediately) requestAnimationFrame(() => document.querySelector('.world-page canvas')?.focus()); }, [assets, route]);
+  const chapter = campus === 'rochester' ? '02' : campus === 'berkeley' ? '03' : '01';
+  const region = interior ? 'Logan City · Interior' : campus === 'berkeley' ? 'UC Berkeley' : campus === 'rochester' ? 'University of Rochester' : 'Central avenue';
+  const openMap = () => setDestination({ id: 'map', label: 'Area directory', body: interior ? 'Places and links for this room.' : 'Choose a landmark to visit.' });
   return <main className="world-page">
     <div className="world-canvas" style={!assets ? { backgroundImage: 'url(/world/arrival.png)' } : undefined}>
       {assets && <Canvas shadows={quality !== 'low'} dpr={[1, quality === 'high' ? 1.75 : quality === 'low' ? 1 : 1.35]} camera={{ fov: 58, near: .1, far: 700 }} gl={{ antialias: quality !== 'low', powerPreference: 'high-performance', toneMapping: ACESFilmicToneMapping, toneMappingExposure: 1.1 }} onCreated={({ gl }) => { gl.domElement.addEventListener('webglcontextlost', e => { e.preventDefault(); setError('The graphics connection was interrupted. Reload the page to return to Logan City.'); }); }}>
-        <WorldScene assets={assets} quality={quality} running={running} onNearest={setNearest} onInteract={interact} onPause={pause} onPerformance={performance} debug={debugEnabled ? debug : null} />
+        <WorldScene assets={assets} quality={quality} running={running} onNearest={setNearest} onInteract={interact} onPause={pause} onPerformance={performance} mapRef={mapRef} arrowRef={arrowRef} showGreeting={running && nearest?.id === 'welcome'} debug={debugEnabled ? debug : null} />
       </Canvas>}
     </div>
-    <header className="world-topbar">
-      <a href="/world" className="world-brand" aria-label="Logan City"><span className="world-monogram">LK</span><span>{worldName.toUpperCase()}<small>{interior ? 'Inside Logan City' : campus ? 'A campus chapter' : 'Logan’s little world'}</small></span></a>
-      <nav aria-label="World navigation">
-        <button onClick={() => setDestination({ id: 'map', label: worldName, body: interior ? 'An empty room, ready for what comes next. Return to the door and press E to head outside.' : campus ? 'Explore the campus landmarks, or use the return portal to head back to LOGAN CITY.' : 'The school house is northwest, mission control northeast, and the maker lab east of the central avenue.' })}>Directory <span>↗</span></button>
-        <label className="world-quality"><span className="sr-only">Rendering quality</span><select aria-label="Rendering quality" value={qualityMode} onChange={e => { setQualityMode(e.target.value); setQuality(e.target.value === 'auto' ? 'balanced' : e.target.value); }}><option value="auto">Quality · Auto</option><option value="high">Quality · High</option><option value="balanced">Quality · Balanced</option><option value="low">Quality · Low</option></select></label>
-        <a href="/about" className="world-portfolio-link">Portfolio <span>↗</span></a>
-      </nav>
-    </header>
     {started && !assets && !error && <div className="world-runtime-error" role="status">Opening {worldName} · {progress}%</div>}
     {(!started || paused) && !destination && <section className="world-arrival" aria-label={started ? 'Paused' : `Welcome to ${worldName}`}>
       <div className="world-arrival-copy">
-        <p className="world-eyebrow">{started ? 'Take a breath' : 'A new way to get to know me'}</p>
-        <h1>{started ? <>The trail<br /><em>can wait.</em></> : <>Take the<br /><em>scenic route.</em></>}</h1>
-        <p>{started ? `Your place in ${worldName} is right where you left it.` : campus ? 'An open-air chapter of my university years. Walk the quad, visit the landmarks, and find your way back through the portal.' : 'A little world of projects, stories, and things to play. Pick a path. See where it leads.'}</p>
-        {error ? <div role="alert" className="world-load-error"><p>{error}</p><a href="/about">Open the portfolio →</a><button onClick={() => window.location.reload()}>Reload</button></div> : <button className="world-enter" disabled={!assets} onClick={start}>{assets ? (started ? 'Back to exploring' : `Enter ${worldName}`) : `Preparing your arrival · ${progress}%`}<span>→</span></button>}
-        {!assets && !error && <progress max="100" value={progress} aria-label="Loading the village" />}
-        <a className="world-text-link" href="/about">Prefer the usual website? It’s right here ↗</a>
+        <p className="world-eyebrow"><span className="world-index">{chapter}</span> {started ? 'Field menu' : 'Area guide'}</p>
+        <h1>{worldName}</h1>
+        <p className="world-subtitle">{region}</p>
+        <p className="world-intro">{started ? 'Exploration paused.' : campus ? 'Walk the quad and meet its landmarks.' : 'Meet Logan by the avenue, visit the lab, or take the path to campus.'}</p>
+        {error ? <div role="alert" className="world-load-error"><p>{error}</p><button onClick={() => window.location.reload()}>Reload</button></div> :
+          <button className="world-enter" disabled={!assets} onClick={start}>{assets ? (started ? 'Resume exploring' : 'Start exploring') : `Loading · ${progress}%`}<span aria-hidden="true">▶</span></button>}
+        {!assets && !error && <progress max="100" value={progress} aria-label="Loading area" />}
+        <div className="world-menu-list">
+          <button onClick={openMap} disabled={!assets}>Area directory <span>↗</span></button>
+          <label>Graphics <select aria-label="Rendering quality" value={qualityMode} onChange={e => { setQualityMode(e.target.value); setQuality(e.target.value === 'auto' ? 'balanced' : e.target.value); }}><option value="auto">Auto</option><option value="high">High</option><option value="balanced">Balanced</option><option value="low">Low</option></select></label>
+          <a href="/about">Portfolio <span>↗</span></a>
+        </div>
+        <p className="world-controls">WASD to move · Shift to run · Drag to look</p>
       </div>
-      <div className="world-arrival-note"><span>{campus === 'rochester' ? '02' : campus === 'berkeley' ? '03' : '01'} / {worldName.toUpperCase()}</span><p>Some things are better<br />discovered on foot.</p></div>
     </section>}
-    {started && !paused && !destination && <>
-      <div className="world-location"><span className="world-compass">N<br />↑</span><div>{worldName.toUpperCase()}<small>{nearest ? nearest.label : interior ? 'Interior' : campus ? 'Campus walk' : 'Central avenue'}</small></div></div>
-      {nearest && <button className="world-interact" onClick={() => interact(nearest)}><kbd>E</kbd><span>{nearest.kind}<strong>{nearest.label}</strong></span><span>↗</span></button>}
-      <div className="world-controls"><span><kbd>W A S D</kbd> Move</span><span><kbd>SHIFT</kbd> Run</span><span>Drag to look</span><span><kbd>E</kbd> Interact</span><button onClick={pause}>Pause <kbd>ESC</kbd></button></div>
+    {running && <>
+      <div className="world-location"><span className="world-index">{chapter}</span><div><small>{region}</small><strong>{worldName}</strong></div></div>
+      <FieldMap assets={assets} locations={locations} mapRef={mapRef} arrowRef={arrowRef} onOpen={openMap} />
+      {nearest && <button className="world-interact" onClick={() => interact(nearest)}><kbd>E</kbd> {nearest.kind} <span>{nearest.id === 'welcome' ? 'Logan' : nearest.label}</span></button>}
+      <button className="world-pause" onClick={pause}><kbd>Esc</kbd> Menu</button>
     </>}
     {destination && <DestinationDialog destination={destination} onClose={close} locations={locations} worldName={worldName} />}
     {error && started && <div role="alert" className="world-runtime-error">{error} <a href="/about">Open portfolio</a></div>}

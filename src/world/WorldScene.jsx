@@ -1,14 +1,14 @@
 /* eslint-disable react/no-unknown-property -- These elements use the React Three Fiber renderer. */
 import { useEffect, useMemo, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
-import { Sky } from '@react-three/drei';
+import { Html, Sky } from '@react-three/drei';
 import { Box3, Vector3, Ray } from 'three';
 import Vegetation from './Vegetation';
 import Traveler from './Traveler';
 import { createCollisionWorld, stepPlayer } from './physics';
 import { locationsForWorld } from './locations';
 
-export default function WorldScene({ assets, quality, running, onNearest, onInteract, onPause, onPerformance, debug }) {
+export default function WorldScene({ assets, quality, running, onNearest, onInteract, onPause, onPerformance, mapRef, arrowRef, showGreeting, debug }) {
   const { camera, gl } = useThree();
   const world = useMemo(() => createCollisionWorld(assets.manifest, assets.placements, assets.heights), [assets]);
   const locations = locationsForWorld(assets.manifest);
@@ -65,6 +65,11 @@ export default function WorldScene({ assets, quality, running, onNearest, onInte
     updates.current += delta;
     if (updates.current > .2) {
       updates.current = 0;
+      if (mapRef.current && arrowRef.current) {
+        const radius = interior ? 8 : 26;
+        mapRef.current.setAttribute('viewBox', `${p.x - radius} ${p.z - radius} ${2 * radius} ${2 * radius}`);
+        arrowRef.current.setAttribute('transform', `translate(${p.x} ${p.z}) rotate(${-o.yaw * 180 / Math.PI})`);
+      }
       const closest = locations.filter(l => l.position).map(l => ({ l, d: Math.hypot(l.position[0] - p.x, l.position[2] - p.z) })).filter(v => v.d < (v.l.radius || 3.3)).sort((a,b) => a.d - b.d)[0]?.l || null;
       if (closest?.id !== nearest.current?.id) { nearest.current = closest; refs.current.onNearest(closest); }
       if (debug) debug.current = { x: p.x, y: p.y, z: p.z, ground: world.height(p.x,p.z), speed: p.speed, fps: Math.round(1 / Math.max(delta, .001)), calls: gl.info.render.calls, triangles: gl.info.render.triangles, nearest: closest?.id || '-' };
@@ -84,6 +89,9 @@ export default function WorldScene({ assets, quality, running, onNearest, onInte
     <hemisphereLight args={['#d8efff', '#687942', 1.8]} />
     <directionalLight ref={sun} castShadow={quality !== 'low'} intensity={3.2} color="#fff1d4" position={[-30,55,25]} shadow-mapSize={[quality === 'high' ? 2048 : 1024, quality === 'high' ? 2048 : 1024]} shadow-camera-left={-32} shadow-camera-right={32} shadow-camera-top={32} shadow-camera-bottom={-32} shadow-camera-near={1} shadow-camera-far={120} shadow-bias={-.00015} shadow-normalBias={.04} />
     </>}
+    {showGreeting && <Html center position={[-4.3, world.height(-4.3,9.6) + 2.3, 9.6]} zIndexRange={[2,1]} style={{ pointerEvents: 'none' }}>
+      <span className="world-greeting">New in town?</span>
+    </Html>}
     <primitive object={assets.world.scene} />
     {!interior && <Vegetation assets={assets} quality={quality} player={player} />}
     <Traveler asset={assets.traveler} player={player} />
