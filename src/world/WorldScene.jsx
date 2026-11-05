@@ -74,7 +74,13 @@ export default function WorldScene({ assets, quality, running, onNearest, onInte
     canvas.addEventListener('pointerdown', down); canvas.addEventListener('pointermove', move); canvas.addEventListener('pointerup', up); canvas.addEventListener('pointercancel', up); canvas.addEventListener('wheel', wheel, { passive: false });
     return () => { clear(); document.exitPointerLock?.(); window.removeEventListener('keydown', keydown); window.removeEventListener('keyup', keyup); window.removeEventListener('blur', blur); document.removeEventListener('visibilitychange', visibility); document.removeEventListener('pointerlockerror', lockError); canvas.removeEventListener('pointerdown', down); canvas.removeEventListener('pointermove', move); canvas.removeEventListener('pointerup', up); canvas.removeEventListener('pointercancel', up); canvas.removeEventListener('wheel', wheel); };
   }, [gl, interior]);
-  useEffect(() => { if (!running) { input.current.clear(); player.current.vx = 0; player.current.vz = 0; player.current.speed = 0; if (sprinting.current) { sprinting.current = false; onSprintChange(false); } document.exitPointerLock?.(); } }, [running, onSprintChange]);
+  const wasRunning = useRef(false), everRan = useRef(false);
+  useEffect(() => {
+    if (!running) { input.current.clear(); player.current.vx = 0; player.current.vz = 0; player.current.speed = 0; if (sprinting.current) { sprinting.current = false; onSprintChange(false); } document.exitPointerLock?.(); wasRunning.current = false; return; }
+    // Re-entering after a dialog/panel closes still carries that click's user gesture, so the lock can resume without another click. The very first entry has no such gesture.
+    if (!wasRunning.current && everRan.current) gl.domElement.requestPointerLock?.();
+    wasRunning.current = true; everRan.current = true;
+  }, [running, onSprintChange, gl]);
   const performance = useRef({ elapsed: 0, frames: 0, warmup: 0 });
   useFrame((_, delta) => {
     const p = player.current, o = orbit.current, c = cameraState;
