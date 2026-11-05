@@ -71,7 +71,7 @@ def box(name,loc,scale,material,bevel=0):
         bpy.context.view_layer.objects.active=o; bpy.ops.object.modifier_apply(modifier=b.name)
     return o
 
-def tube(name,points,radii,material,sides=9):
+def tube(name,points,radii,material,sides=13):
     vs=[]; fs=[]
     for i,p in enumerate(points):
         p=Vector(p); tangent=Vector(points[min(i+1,len(points)-1)])-Vector(points[max(i-1,0)])
@@ -84,8 +84,8 @@ def tube(name,points,radii,material,sides=9):
     fs.extend([tuple(reversed(range(sides))),tuple(range((len(points)-1)*sides,len(points)*sides))])
     return shade(mesh(name,vs,fs,material))
 
-def curve(name,points,radius,material): return tube(name,points,[radius]*len(points),material,8)
-def uvball(name,loc,scale,material,segments=16,rings=10):
+def curve(name,points,radius,material): return tube(name,points,[radius]*len(points),material,11)
+def uvball(name,loc,scale,material,segments=22,rings=14):
     bpy.ops.mesh.primitive_uv_sphere_add(segments=segments,ring_count=rings,location=loc)
     o=bpy.context.object; o.name=name; o.scale=scale; o.data.materials.append(material); return shade(o)
 

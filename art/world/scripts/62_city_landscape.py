@@ -16,9 +16,7 @@ paths=[rect(*r) for r in layout['PATHS']]
 footprints=[rect(b['x'],b['y'],b['w'],b['h']) for b in layout['BUILDINGS']]
 pond=rect(**layout['POND'])
 def inside(x,y,r,margin=0): return abs(x-r[0])<r[2]+margin and abs(y-r[1])<r[3]+margin
-def height(x,y):
-    edge=max(abs(x)-30,abs(y-1)-26,0)
-    return mix(2.5,3+2.6*math.sin(x*.07)*math.cos(y*.055)+1.3*math.sin(y*.11),smooth(edge/18))
+from city_spacing import EAST_TILES, meadow_height as height
 def solid(x,y,hx,hy,height=1.5): meta['collision'].append({'x':x,'z':-y,'hx':hx,'hz':hy,'minY':2.5,'maxY':2.5+height})
 nature.PLACEMENTS=[]
 def inst(kind,x,y,scale=1,yaw=0,z=None): return nature.instance(kind,x,y,height(x,y) if z is None else z,scale,yaw)
@@ -28,7 +26,7 @@ for i,(tx,ty) in enumerate(layout['TREES']):
     x,y=xy(tx,ty); inst('tree-'+str(i%2),x,y,.48+.10*rr.random(),rr.random()*TAU)
 for i in range(65):
     x=rr.uniform(-76,76); y=rr.uniform(-60,82)
-    if abs(x)<35 and -29<y<30: continue
+    if -35<x<35+EAST_TILES*S and -29<y<30: continue
     inst('tree-'+str(i%2),x,y,rr.uniform(.65,1.05),rr.random()*TAU)
 
 # Pohutukawa keeps a green canopy with masses of crimson flowers at the tips.
@@ -67,24 +65,10 @@ for s in layout['MAILBOXES']:
     curve('Mailbox red flag',[(x+.4,y,3.8),(x+.4,y,4.15),(x+.6,y,4.15)],.045,M['red'])
     solid(x,y,.4,.45)
 
-# Sculpted compact crossover: shaped body, glazed roof, four alloy wheels.
+# Tesla Model 3, authored as a reusable Blender asset.
+from tesla_model import build_tesla
 car=layout['CARS'][0]; cx,cy=xy(car['x']+(car['w']-1)/2,car['y']); cz=2.5
-paint=mat('Pearlescent ice blue car paint',(.60,.73,.78),.23,0,0,.35)
-rubber=mat('Soft tire rubber',(.012,.016,.02),.85)
-box('Crossover lower body',(cx,cy,cz+.55),(4.7,1.9,.72),paint,.32)
-roof=uvball('Swept crossover glazed cabin',(cx-.1,cy,cz+1.05),(1.58,.85,.70),M['glass'],40,20)
-box('Crossover roof',(cx-.3,cy,cz+1.63),(1.8,1.45,.12),paint,.10)
-for side in [-1,1]:
-    yy=cy+side*.94
-    for off in [-1.5,1.5]:
-        wheel=lathe('Crossover tire',(0,0,0),[(.25,-.13),(.40,-.13),(.46,-.07),(.46,.07),(.40,.13),(.25,.13)],rubber,32)
-        wheel.rotation_euler.x=math.pi/2; wheel.location=(cx+off,yy,cz+.43)
-        hub=uvball('Alloy wheel hub',(cx+off,yy+side*.15,cz+.43),(.28,.035,.28),M['metal'],24,12)
-        for j in range(5):
-            a=j*TAU/5
-            curve('Wheel spoke',[(cx+off,yy+side*.19,cz+.43),(cx+off+.24*math.cos(a),yy+side*.19,cz+.43+.24*math.sin(a))],.024,M['steel'])
-    for off in [-.6,.7]: box('Flush door handle',(cx+off,yy,cz+.95),(.27,.04,.035),M['metal'],.01)
-for side in [-1,1]: box('Crossover light bar',(cx+side*2.31,cy,cz+.8),(.05,1.4,.09),M['white'] if side==1 else M['red'],.03)
+build_tesla(cx,cy,cz)
 solid(cx,cy,2.4,1,1.8)
 
 for tx,ty in layout['BALLS']:
@@ -130,7 +114,7 @@ for tx,ty in layout['FLOWERS']:
     x,y=xy(tx,ty)
     for i in range(65): plant('flowers-'+str((tx+ty)%3+1),x+rr.uniform(-.85,.85),y+rr.uniform(-.85,.85),rr.uniform(.8,1.2),rr.random()*TAU)
 for i in range(62000):
-    x=rr.uniform(-50,50); y=rr.uniform(-43,53)
+    x=rr.uniform(-50,50+EAST_TILES*S); y=rr.uniform(-43,53)
     if any(inside(x,y,r,.35) for r in paths+footprints+[pond]): continue
     if y<-22 and abs(x-2.4)<2.5: continue
     if any(abs(x-c['x'])<c['hx']+.3 and abs(y+c['z'])<c['hz']+.3 for c in meta['collision']): continue
@@ -149,7 +133,8 @@ for tx,ty in [(10,7),(14,7),(10,14),(14,18),(3,15)]:
     box('Lantern cap',(x,y,6.35),(.5,.5,.1),M['navy'],.04)
     solid(x,y,.24,.24,4)
 # The town border is walkable only through the same southern gap as /city.
-for args in [(-27.6,1.2,1.2,24),(27.6,1.2,1.2,24),(0,24,28.8,1.2),(-14.4,-21.6,14.4,1.2),(16.8,-21.6,12,1.2)]: solid(*args,height=6)
+east_extension=EAST_TILES*S
+for args in [(-27.6,1.2,1.2,24),(27.6+east_extension,1.2,1.2,24),(east_extension/2,24,28.8+east_extension/2,1.2),(-14.4,-21.6,14.4,1.2),(16.8+east_extension/2,-21.6,12+east_extension/2,1.2)]: solid(*args,height=6)
 meta['bounds']={'minX':-77,'maxX':77,'minZ':-84,'maxZ':68}
 scene['city_manifest']=json.dumps(meta)
 scene['placements']=json.dumps(nature.PLACEMENTS,separators=(',',':'))

@@ -10,7 +10,7 @@ export function resolveWorldRoute(search) {
     interior, campus, from,
     prefix: interior ? `interiors/${interior}/` : campus ? `campuses/${campus}/` : '',
     name: interior ? roomNames[interior] : campus === 'rochester' ? 'Eastman Quad' : campus === 'berkeley' ? 'Memorial Glade' : 'Logan City',
-    startImmediately: Boolean(interior || from),
+    startImmediately: true,
   };
 }
 

@@ -90,7 +90,7 @@
 .world-menu-list :is(a,button):hover, .world-dialog a:hover { background: #fff0b7; }
 .world-controls { color: #545966; font-size: 11px; margin: 15px 0 0; }
 .world-arrival progress { width: 100%; height: 5px; accent-color: var(--coral); }
-.world-location, .world-pause, .world-interact {
+.world-location, .world-interact {
   position: absolute;
   display: flex;
   align-items: center;
@@ -111,7 +111,22 @@
 .world-location strong, .world-location small { display: block; }
 .world-location small { color: #ffeaac; font-size: 8px; }
 .world-location strong { font-size: 16px; line-height: 1.15; }
-.world-pause { bottom: 18px; left: 20px; padding: 5px 11px 5px 5px; border-radius: 20px; font-size: 12px !important; }
+.world-sprint {
+  position: absolute;
+  top: 64px;
+  left: 20px;
+  padding: 3px 10px;
+  border-radius: 3px 10px 10px 3px;
+  background: var(--sun);
+  color: var(--ink);
+  font: 800 10px/1.4 system-ui,sans-serif;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  box-shadow: 0 2px 6px #18223a38;
+  pointer-events: none;
+  animation: world-sprint-in .15s ease-out;
+}
+@keyframes world-sprint-in { from { opacity: 0; transform: translateY(-4px) scale(.85); } to { opacity: 1; transform: none; } }
 .world-page kbd { background: #fffdf1; color: var(--ink); border-radius: 20px; padding: 3px 7px; font: 700 11px/1.2 system-ui,sans-serif; }
 .world-interact { left: 50%; bottom: 11%; transform: translateX(-50%); border-radius: 22px; padding: 6px 15px 6px 7px; font-size: 13px !important; }
 .world-interact kbd { background: var(--sun); }
@@ -148,6 +163,7 @@
 .world-dialog h2 { font-size: 32px; padding-right: 19px; }
 .world-dialog > p:not(.world-eyebrow) { margin: 12px 0; line-height: 1.55; }
 .world-dialog .world-eyebrow { color: #8e4834; padding-right: 20px; }
+.world-dialog-advance { cursor: pointer; }
 .world-close { position: absolute; top: 10px; right: 12px; width: 30px; height: 30px; background: #eeecdf; border-radius: 50%; }
 .world-map-list small { display: block; color: #606571; }
 .world-map-list a > div { flex: 1; }
@@ -160,7 +176,6 @@
 .world-failure { position: fixed; inset: 0; display: grid; place-content: center; gap: 14px; padding: 24px; background: #fffbea; color: #24283d; }
 @media (pointer: coarse) {
   .world-mobile-note { display: block; position: absolute; right: 0; bottom: 0; left: 0; padding: 3px 8px; text-align: center; background: var(--paper); font-size: 10px; }
-  .world-pause { bottom: 37px; }
   .field-map { bottom: 45px; }
 }
 @media (max-height: 510px) {
@@ -169,3 +184,13 @@
   .world-menu-list > * { padding-block: 4px; }
   .world-intro { margin-bottom: 8px; }
 }
+
+/* The world opens directly; compact HUD access replaces the arrival menu. */
+.world-guide-menu { position:absolute; z-index:2; top:18px; right:20px; display:flex; align-items:center; gap:3px; padding:4px; background:#24283bea; border-radius:5px 14px 5px 5px; box-shadow:0 2px 6px #18223a38; color:var(--paper); }
+.world-guide-menu a { padding:7px 12px; border-radius:3px 10px 3px 3px; font-size:12px; font-weight:700; }
+.world-guide-menu a:hover { background:var(--sun); color:var(--ink); }
+.world-loading { position:absolute; left:20px; bottom:24px; padding:8px 14px; border-radius:4px 12px 4px 4px; background:var(--paper); color:var(--ink); font-size:12px; border-left:3px solid var(--sun); }
+.world-map-list button { width:100%; display:flex; align-items:center; gap:12px; padding:12px 5px; border-bottom:1px solid #d9d8cc; text-align:left; }
+.world-map-list button > div { flex:1; }.world-map-list button > span:first-child { color:#8e4834; font-size:11px; }.world-map-list button:hover { background:#fff0b7; }
+.world-runtime-error button { text-decoration:underline; }
+@media(max-width:620px) { .world-guide-menu { top:75px; right:14px; }.world-guide-menu a { padding:6px 9px; }.world-location { left:14px; }.world-sprint { left:14px; } }

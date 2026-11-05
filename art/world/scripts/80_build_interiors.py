@@ -5,12 +5,14 @@ from mathutils import Vector
 sys.path.insert(0,str(Path(__file__).resolve().parent))
 from world_core import box, mat, join
 from room_furniture import furnish
+from room_dimensions import ROOM_SIZE
 
-ROOMS=[('education','ΛΚΜ House',12,10,(.72,.66,.53),(.30,.16,.065)),
-       ('experience','LOGAN & CO.',12,10,(.31,.37,.43),(.13,.17,.21)),
-       ('projects','LOGAN LABS',17,12,(.64,.66,.62),(.36,.38,.36))]
+ROOMS=[('education','ΛΚΜ House',(.72,.66,.53),(.30,.16,.065)),
+       ('experience','LOGAN & CO.',(.31,.37,.43),(.13,.17,.21)),
+       ('projects','LOGAN LABS',(.64,.66,.62),(.36,.38,.36))]
 stage=Path('/private/tmp/logan-furnished-rooms');stage.mkdir(exist_ok=True)
-for room_id,label,w,d,wall_color,floor_color in ROOMS:
+for room_id,label,wall_color,floor_color in ROOMS:
+    w,d=ROOM_SIZE[room_id]
     if globals().get('ROOM_ID',room_id) != room_id:
         continue
     folder=stage/room_id;folder.mkdir(exist_ok=True)
@@ -47,12 +49,12 @@ for room_id,label,w,d,wall_color,floor_color in ROOMS:
     box('Exit door frame',(0,-d/2+.14,1.55),(2.1,.12,3.1),trim,.035)
     box('Exit door',(0,-d/2+.22,1.48),(1.8,.06,2.95),door,.02)
     box('Exit door handle',(.65,-d/2+.3,1.3),(.08,.12,.25),trim,.025)
-    for x in [-w*.28,w*.28]:
+    for x in [-w*.40,w*.40]:
         box('Window frame',(x,d/2-.14,2.5),(2.3,.12,1.9),trim,.03)
         box('Daylight window',(x,d/2-.22,2.5),(2.08,.05,1.68),window)
         box('Window mullion',(x,d/2-.27,2.5),(.055,.06,1.75),trim)
     prefix='interiors/'+room_id+'/'
-    manifest={'version':2,'name':label,'interior':room_id,'ceilingHeight':h,'spawn':[0,-d/2+3.2],
+    manifest={'version':2,'name':label,'interior':room_id,'ceilingHeight':h,'spawn':[0,-d/2+4.6],
       'world':prefix+'room.glb','heightmap':prefix+'heightmap.bin','placements':prefix+'placements.bin',
       'terrain':{'size':40,'resolution':2,'minX':-20,'minY':-20},'assets':[],'groups':[],
       'landmarks':[],'collision':collision,'bounds':{'minX':-w/2+.15,'maxX':w/2-.15,'minZ':-d/2+.15,'maxZ':d/2-.15},
@@ -68,10 +70,22 @@ for room_id,label,w,d,wall_color,floor_color in ROOMS:
     bpy.ops.object.camera_add(location=(.1,-d*.43,2.65));cam=bpy.context.object
     cam.rotation_euler=(Vector((0,d*.2,1.7))-cam.location).to_track_quat('-Z','Y').to_euler();cam.data.lens=17;scene.camera=cam
     scene.render.filepath=str(folder/'preview.png')
+    # Soften bevel chamfers into rounded chunky edges, matching the city.
+    # The join below doesn't bake modifiers, so apply each one first.
+    room_meshes=[o for o in scene.objects if o.type=='MESH']
+    bpy.ops.object.select_all(action='DESELECT')
+    for o in room_meshes: o.select_set(True)
+    if room_meshes:
+        bpy.context.view_layer.objects.active=room_meshes[0]
+        bpy.ops.object.shade_auto_smooth(angle=math.radians(30))
+    for o in room_meshes:
+        bpy.ops.object.select_all(action='DESELECT'); o.select_set(True); bpy.context.view_layer.objects.active=o
+        mod=next((m for m in o.modifiers if m.type=='NODES'),None)
+        if mod: bpy.ops.object.modifier_apply(modifier=mod.name)
     bpy.data.libraries.write(str(folder/'room.blend'),{scene},fake_user=True,compress=True)
     # Merge only the generated room meshes for a small browser GLB.
     join([obj for obj in scene.objects if obj.type == 'MESH'],'Furnished room '+room_id)
     bpy.ops.export_scene.gltf(filepath=str(folder/'room.glb'),export_format='GLB',use_selection=True,use_active_scene=True,
       export_animations=False,export_cameras=False,export_lights=False,export_draco_mesh_compression_enable=True,export_draco_mesh_compression_level=6)
-    bpy.ops.render.render(write_still=True)
+    if globals().get('RENDER_PREVIEW', True): bpy.ops.render.render(write_still=True)
     print(room_id,'ready:',(folder/'room.glb').stat().st_size,'bytes')

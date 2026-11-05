@@ -12,6 +12,9 @@ const cityWorld=createCollisionWorld(city,floats('placements.bin'),floats('heigh
 for(const id of ['education','experience','projects'])test(`${id}: furnished room is walkable, contained and exits at its own city door`,()=>{
   const route=resolveWorldRoute('?interior='+id),m=read(route.prefix+'manifest.json');
   assert.equal(route.startImmediately,true);assert.equal(m.interior,id);
+  const [width, depth] = id === 'projects' ? [25, 19] : [18, 16];
+  assert.ok(m.bounds.maxX - m.bounds.minX >= width - .31, 'expanded room width');
+  assert.ok(m.bounds.maxZ - m.bounds.minZ >= depth - .31, 'expanded room depth');
   assert.deepEqual(m.assets,[]);assert.deepEqual(m.groups,[]);
   const world=createCollisionWorld(m,floats(m.placements),floats(m.heightmap));
   assert.equal(world.blocked(m.spawn[0],-m.spawn[1]),false);

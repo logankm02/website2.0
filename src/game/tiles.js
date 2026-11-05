@@ -21,10 +21,9 @@ const C = {
   treeDark: "#2e7038",
   trunk: "#7a4c2c",
   trunkDark: "#5a3820",
-  water: "#58a0e8",
-  waterLight: "#90c8f4",
-  waterDark: "#3070b8",
-  rim: "#7a5038",
+  water: "#4585dd",
+  waterLight: "#7fb1ef",
+  waterDark: "#2a5cb4",
   white: "#f0f2f4",
   whiteShade: "#c0c8d0",
   greyOutline: "#6a737e",
@@ -64,6 +63,50 @@ const C = {
   vent: "#c04038",
   ventShade: "#902c28",
 };
+
+// --- cast shadows -------------------------------------------------------------
+// Shadows are drawn SOLID onto one scratch layer, then composited onto the
+// ground at a single alpha — so overlapping shapes (the packed tree border)
+// flatten into one even tone instead of stacking darker.
+
+// A building's ground shadow: a strip off the south face that skews right as
+// it falls, plus a triangle widening down the east face. Sun from the NW.
+function castBlockShadow(ctx, x, y, w, h, drop = 6) {
+  for (let i = 0; i < drop; i++) rect(ctx, x + 2 + i, y + h + i, w - 2, 1, "#000");
+  for (let i = 0; i < h - 10; i++)
+    rect(ctx, x + w, y + 10 + i, 1 + Math.floor((i / (h - 10)) * (drop - 1)), 1, "#000");
+}
+
+// A tree's ground shadow: an ellipse skewed toward the lower-right.
+function castBlobShadow(ctx, cx, cy, rx, ry) {
+  for (let dy = -ry; dy <= ry; dy++) {
+    const half = Math.round(rx * Math.sqrt(Math.max(0, 1 - (dy * dy) / (ry * ry + 0.5))));
+    rect(ctx, cx - half + Math.round((dy + ry) * 0.7), cy + dy, half * 2, 1, "#000");
+  }
+}
+
+// NW-lit volume shading for extruded buildings: rim-light the west edge,
+// darken the east face so the block reads as a solid.
+function shadeBlock(ctx, x, y, w, h) {
+  rect(ctx, x, y, 1, h, "rgba(255,255,255,0.12)");
+  rect(ctx, x + w - 2, y, 2, h, "rgba(0,0,0,0.18)");
+}
+
+// HGSS ink pass: wrap a sprite in a crisp 1px silhouette outline (drawn by
+// stamping the sprite at the four neighbor offsets, recolored, then drawing
+// the sprite back on top). Grows the canvas by 1px on every side.
+const FOLIAGE_INK = "#17381f";
+const STRUCT_INK = "#2b2d36";
+function inked(img, color) {
+  const [c, ctx] = makeCanvas(img.width + 2, img.height + 2);
+  for (const [dx, dy] of [[1, 0], [1, 2], [0, 1], [2, 1]]) ctx.drawImage(img, dx, dy);
+  ctx.globalCompositeOperation = "source-in";
+  ctx.fillStyle = color;
+  ctx.fillRect(0, 0, c.width, c.height);
+  ctx.globalCompositeOperation = "source-over";
+  ctx.drawImage(img, 1, 1);
+  return c;
+}
 
 // --- props ------------------------------------------------------------------
 
@@ -241,18 +284,19 @@ function paintFern(ctx, ox, oy) {
 }
 
 // A pōhutukawa in bloom: a bushy canopy studded with crimson flowers over a
-// gnarled forked trunk — NZ's Christmas tree, flowering all year here.
+// gnarled forked trunk — NZ's Christmas tree, flowering all year here. The
+// canopy rides high so more trunk shows and the tree reads as tall.
 function paintPohutukawa(ctx, ox, oy) {
   const cx = ox + 8;
-  rect(ctx, ox + 6, oy + 11, 4, 4, "#503824"); // forked trunk
-  rect(ctx, ox + 5, oy + 9, 2, 3, "#503824");
-  rect(ctx, ox + 9, oy + 9, 1, 4, "#3a2818");
-  treeCanopy(ctx, cx, oy + 2, [
+  rect(ctx, ox + 6, oy + 9, 4, 6, "#503824"); // forked trunk
+  rect(ctx, ox + 5, oy + 7, 2, 3, "#503824");
+  rect(ctx, ox + 9, oy + 7, 1, 4, "#3a2818");
+  treeCanopy(ctx, cx, oy - 1, [
     [0, 0, 6], [-5, 2, 5], [5, 2, 5], [-2, 5, 5], [3, 5, 5],
   ], {});
   for (const [bx, by] of [[-4, -2], [3, -3], [6, 1], [-2, 3], [4, 4], [-6, 2], [1, -1]]) {
-    rect(ctx, cx + bx, oy + 2 + by, 2, 2, "#d83838"); // crimson blooms
-    px(ctx, cx + bx, oy + 2 + by, "#f86858");
+    rect(ctx, cx + bx, oy - 1 + by, 2, 2, "#d83838"); // crimson blooms
+    px(ctx, cx + bx, oy - 1 + by, "#f86858");
   }
 }
 
@@ -260,10 +304,10 @@ function paintPohutukawa(ctx, ox, oy) {
 
 // EDUCATION — a Greek-revival frat house: pediment with ΛΚΜ letters, white
 // columns, school flags in the upper windows, bunting, a sagging porch couch,
-// and one stray red cup. Same footprint and door tile; purely cosmetic.
-function paintFratHouse(ctx, b) {
-  const ox = b.x * TILE;
-  const oy = b.y * TILE;
+// and one stray red cup. The gable is extruded 12px above the footprint with
+// eaves proud of the walls, so the player can walk behind it. (ox, oy) is the
+// footprint's top-left within the structure's own canvas.
+function paintFratHouse(ctx, ox, oy) {
   const F = {
     trim: "#f0ede4", trimShade: "#c8c2b2", outline: "#5a554a",
     brick: "#a8503a", mortar: "#8e4030", brickOutline: "#543022",
@@ -272,23 +316,31 @@ function paintFratHouse(ctx, b) {
     couch: "#b07848", couchLight: "#c89058", couchDark: "#8a5a34", couchSeam: "#4a382c",
   };
 
-  // brick body
+  // brick body — mortar courses with staggered vertical joints
   rect(ctx, ox + 2, oy + 24, 92, 56, F.brickOutline);
   rect(ctx, ox + 4, oy + 26, 88, 52, F.brick);
   for (let my = 31; my < 78; my += 6) rect(ctx, ox + 4, oy + my, 88, 1, F.mortar);
+  for (let band = 0; band < 9; band++) {
+    const yy = oy + 26 + band * 6;
+    for (let jx = 8 + (band % 2) * 4; jx < 92; jx += 8) rect(ctx, ox + jx, yy, 1, 5, F.mortar);
+  }
 
-  // pediment (front gable) with a round attic window
-  for (let ry = 0; ry < 16; ry++) {
-    const half = Math.min(48, 5 + Math.round(ry * 2.9));
-    rect(ctx, ox + 48 - half, oy + ry, half * 2, 1, ry < 2 ? F.outline : F.trim);
-    px(ctx, ox + 48 - half, oy + ry, F.outline);
-    px(ctx, ox + 47 + half, oy + ry, F.outline);
+  // pediment (front gable) with a round attic window — extruded 12px above
+  // the footprint, eaves overhanging the walls by 2px each side, faced with
+  // clapboard siding lines
+  for (let ry = 0; ry < 28; ry++) {
+    const half = Math.min(50, 5 + Math.round(ry * 1.75));
+    const siding = ry > 4 && ry % 4 === 3;
+    rect(ctx, ox + 48 - half, oy - 12 + ry, half * 2, 1, ry < 2 ? F.outline : siding ? "#ddd8c9" : F.trim);
+    px(ctx, ox + 48 - half, oy - 12 + ry, F.outline);
+    px(ctx, ox + 47 + half, oy - 12 + ry, F.outline);
+    px(ctx, ox + 46 + half, oy - 12 + ry, F.trimShade); // raking shade, east slope
   }
   for (let dy = -3; dy <= 3; dy++)
     for (let dx = -3; dx <= 3; dx++)
-      if (dx * dx + dy * dy <= 9) px(ctx, ox + 48 + dx, oy + 8 + dy, F.navy);
+      if (dx * dx + dy * dy <= 9) px(ctx, ox + 48 + dx, oy + 2 + dy, F.navy);
   for (let dy = -1; dy <= 1; dy++)
-    for (let dx = -1; dx <= 1; dx++) px(ctx, ox + 48 + dx, oy + 8 + dy, "#a8c8f0");
+    for (let dx = -1; dx <= 1; dx++) px(ctx, ox + 48 + dx, oy + 2 + dy, "#a8c8f0");
 
   // entablature with the house letters: Λ K M
   rect(ctx, ox, oy + 16, 96, 1, F.outline);
@@ -302,6 +354,7 @@ function paintFratHouse(ctx, b) {
   rect(ctx, ox + 52, oy + 17, 1, 5, F.navy); // M
   rect(ctx, ox + 57, oy + 17, 1, 5, F.navy);
   for (const [lx, ly] of [[53, 18], [56, 18], [54, 19], [55, 19]]) px(ctx, ox + lx, oy + ly, F.navy);
+  rect(ctx, ox + 4, oy + 24, 88, 2, "rgba(0,0,0,0.16)"); // eave shadow on the brick
 
   // bunting strung across the porch, both schools' colors
   rect(ctx, ox + 8, oy + 27, 80, 1, "#ece8dc");
@@ -364,6 +417,8 @@ function paintFratHouse(ctx, b) {
   rect(ctx, ox + 42, oy + 74, 3, 4, "#d84040");
   rect(ctx, ox + 42, oy + 74, 3, 1, "#f07070");
 
+  shadeBlock(ctx, ox + 2, oy + 24, 92, 56);
+
   // white columns, drawn last so they stand proud of everything
   for (const cx of [4, 36, 66, 88]) {
     rect(ctx, ox + cx - 1, oy + 24, 6, 3, F.trim);
@@ -376,10 +431,10 @@ function paintFratHouse(ctx, b) {
 // EXPERIENCE — LOGAN & CO. MISSION CONTROL: a dark command-center block crowned
 // by a satellite dish and antenna array, a glowing wall of live screens (world
 // map + telemetry grids) behind the glass, tiered operator consoles, and a navy
-// awning over the entrance. Same footprint and door tile (col 17).
-function paintOffice(ctx, b) {
-  const ox = b.x * TILE;
-  const oy = b.y * TILE;
+// awning over the entrance. The flat roof is extruded 12px above the footprint
+// as a visible plated deck the comms gear stands on. (ox, oy) is the
+// footprint's top-left within the structure's own canvas.
+function paintOffice(ctx, ox, oy) {
   const dcx = ox + 56; // entrance centered on the door tile
   const O = {
     steel: "#aab0ba", steelLt: "#d8dce2", steelDk: "#5a626c",
@@ -389,27 +444,34 @@ function paintOffice(ctx, b) {
     awning: "#23407e", awningLt: "#5878c0", plaque: "#caa648",
   };
 
-  // rooftop: satellite dish (left) + antenna array (right) on the parapet
+  // extruded roof: rear parapet, then the visible plated deck (top face is a
+  // touch lighter than the walls — NW light), then the front fascia
+  rect(ctx, ox + 2, oy - 12, 92, 5, O.frame);
+  rect(ctx, ox + 4, oy - 11, 88, 3, O.steel);
+  rect(ctx, ox + 4, oy - 11, 88, 1, O.steelLt);
+  rect(ctx, ox + 2, oy - 7, 92, 19, O.frame);
+  rect(ctx, ox + 4, oy - 6, 88, 17, "#4a525f");
+  rect(ctx, ox + 4, oy - 6, 88, 1, "#5c6470");
+  for (let sx = ox + 26; sx < ox + 92; sx += 22) rect(ctx, sx, oy - 6, 1, 17, O.frame); // plate seams
+
+  // comms gear standing on the deck: satellite dish (west), antenna mast array
   for (let dy = -3; dy <= 2; dy++)
     for (let dx = -5; dx <= 5; dx++)
-      if (dx * dx / 26 + dy * dy / 9 <= 1) px(ctx, ox + 16 + dx, oy + 4 + dy, dx < 0 ? O.steelLt : O.steel);
-  rect(ctx, ox + 16, oy + 4, 1, 5, O.steelDk); // dish mast
-  rect(ctx, ox + 14, oy + 8, 5, 1, O.steelDk);
-  px(ctx, ox + 12, oy + 2, O.steelDk); // feed horn
-  for (const [axe, hgt] of [[70, 8], [74, 8], [78, 5]]) { // antenna array
-    rect(ctx, ox + axe, oy + 8 - hgt, 1, hgt, O.steelDk);
-    px(ctx, ox + axe, oy + 8 - hgt, O.steelLt);
+      if (dx * dx / 26 + dy * dy / 9 <= 1) px(ctx, ox + 16 + dx, oy - 2 + dy, dx < 0 ? O.steelLt : O.steel);
+  rect(ctx, ox + 16, oy - 2, 1, 6, O.steelDk); // dish mast
+  rect(ctx, ox + 14, oy + 3, 5, 1, O.steelDk);
+  px(ctx, ox + 12, oy - 4, O.steelDk); // feed horn
+  for (const [axe, hgt] of [[70, 9], [74, 12], [78, 6]]) { // antenna array
+    rect(ctx, ox + axe, oy + 4 - hgt, 1, hgt, O.steelDk);
+    px(ctx, ox + axe, oy + 4 - hgt, O.steelLt);
   }
-  px(ctx, ox + 74, oy, O.red); // beacon
-
-  // parapet
-  rect(ctx, ox + 2, oy + 8, 92, 6, O.frame);
-  rect(ctx, ox + 4, oy + 9, 88, 4, O.steel);
-  rect(ctx, ox + 4, oy + 9, 88, 1, O.steelLt);
+  px(ctx, ox + 74, oy - 9, O.red); // beacon atop the tall mast
+  rect(ctx, ox + 2, oy + 12, 92, 2, O.frame); // deck front fascia
 
   // dark command-center body
   rect(ctx, ox + 2, oy + 14, 92, 66, O.frame);
   rect(ctx, ox + 4, oy + 16, 88, 62, O.wall);
+  rect(ctx, ox + 4, oy + 16, 88, 2, "rgba(0,0,0,0.2)"); // eave shadow under the deck
 
   // the big VIDEO WALL behind the glass
   rect(ctx, ox + 8, oy + 20, 80, 26, O.frame);
@@ -456,15 +518,17 @@ function paintOffice(ctx, b) {
   px(ctx, dcx - 3, oy + 74, C.knob); px(ctx, dcx + 2, oy + 74, C.knob);
   rect(ctx, dcx + 12, oy + 66, 8, 10, O.plaque);
   for (const ly of [68, 70, 72]) rect(ctx, dcx + 13, oy + ly, 6, 1, "#7a5c20");
+
+  shadeBlock(ctx, ox + 2, oy - 12, 92, 92);
 }
 
 // PROJECTS — LOGAN LABS MAKER SPACE: an industrial workshop with a vented metal
 // roof + glowing skylight, a window of humming 3D printers, a pegboard of tools
 // over racked filament spools and a laser cutter, a LABS sign, and a half-raised
-// roll-up door showing the shop glow. Same footprint and door tile (col 16).
-function paintLab(ctx, b) {
-  const ox = b.x * TILE;
-  const oy = b.y * TILE;
+// roll-up door showing the shop glow. The roof is extruded 10px above the
+// footprint with eaves proud of the walls. (ox, oy) is the footprint's
+// top-left within the structure's own canvas.
+function paintLab(ctx, ox, oy, b) {
   const w = b.w * TILE; // 144
   const h = b.h * TILE; // 96
   const dcx = ox + 72; // roll-up door centered on the door tile
@@ -477,26 +541,30 @@ function paintLab(ctx, b) {
     sign: "#1b2630", signTxt: "#f4b73a", peg: "#7a5c38", tool: "#9aa3b0",
   };
 
-  // vented metal roof + a glowing skylight
-  rect(ctx, ox, oy, w, 40, M.roofOutline);
-  rect(ctx, ox + 2, oy + 2, w - 4, 36, M.roof);
-  rect(ctx, ox + 2, oy + 2, w - 4, 4, M.roofLt);
-  rect(ctx, ox + 8, oy + 7, w - 16, 6, M.duct); // duct run
-  rect(ctx, ox + 8, oy + 7, w - 16, 1, "#c2c8d0");
-  for (let dx = 14; dx < w - 12; dx += 9) rect(ctx, ox + dx, oy + 7, 1, 6, M.ductDk);
+  // vented metal roof + a glowing skylight — extruded 10px above the
+  // footprint, eaves proud of the walls by 2px each side
+  rect(ctx, ox - 2, oy - 10, w + 4, 50, M.roofOutline);
+  rect(ctx, ox, oy - 8, w, 46, M.roof);
+  rect(ctx, ox, oy - 8, w, 4, M.roofLt);
+  for (let rx = 4; rx < w - 2; rx += 4) rect(ctx, ox + rx, oy - 4, 1, 40, "#414956"); // corrugation
+  rect(ctx, ox + 8, oy - 2, w - 16, 6, M.duct); // duct run
+  rect(ctx, ox + 8, oy - 2, w - 16, 1, "#c2c8d0");
+  for (let dx = 14; dx < w - 12; dx += 9) rect(ctx, ox + dx, oy - 2, 1, 6, M.ductDk);
   for (let dy = -4; dy <= 4; dy++) // extraction fan
     for (let dx = -4; dx <= 4; dx++)
-      if (dx * dx + dy * dy <= 16) px(ctx, ox + 18 + dx, oy + 26 + dy, M.ductDk);
-  rect(ctx, ox + 14, oy + 26, 9, 1, M.steel); rect(ctx, ox + 18, oy + 22, 1, 9, M.steel); // blades
-  px(ctx, ox + 18, oy + 26, "#d8dce2");
-  rect(ctx, ox + w / 2 - 16, oy + 16, 32, 12, M.printFrame); // skylight
-  rect(ctx, ox + w / 2 - 14, oy + 18, 28, 8, M.warm);
-  for (let gx = ox + w / 2 - 14; gx < ox + w / 2 + 14; gx += 6) rect(ctx, gx, oy + 18, 1, 8, M.printFrame);
+      if (dx * dx + dy * dy <= 16) px(ctx, ox + 18 + dx, oy + 20 + dy, M.ductDk);
+  rect(ctx, ox + 14, oy + 20, 9, 1, M.steel); rect(ctx, ox + 18, oy + 16, 1, 9, M.steel); // blades
+  px(ctx, ox + 18, oy + 20, "#d8dce2");
+  rect(ctx, ox + w / 2 - 16, oy + 8, 32, 12, M.printFrame); // skylight
+  rect(ctx, ox + w / 2 - 14, oy + 10, 28, 8, M.warm);
+  for (let gx = ox + w / 2 - 14; gx < ox + w / 2 + 14; gx += 6) rect(ctx, gx, oy + 10, 1, 8, M.printFrame);
+  rect(ctx, ox - 2, oy + 36, w + 4, 4, M.roofOutline); // front fascia
 
   // workshop wall
   rect(ctx, ox + 2, oy + 40, w - 4, h - 40, M.wallOutline);
   rect(ctx, ox + 4, oy + 42, w - 8, h - 44, M.wall);
   rect(ctx, ox + 2, oy + 40, w - 4, 2, M.steel); // lintel
+  rect(ctx, ox + 4, oy + 42, w - 8, 2, "rgba(0,0,0,0.18)"); // eave shadow
   for (const sx of [6, 134]) rect(ctx, ox + sx, oy + 42, 4, h - 44, M.wallShade); // corner pilasters
 
   // LEFT window: a row of three 3D printers
@@ -551,63 +619,143 @@ function paintLab(ctx, b) {
   rect(ctx, dcx - 4, oy + h - 24, 8, 10, "#2a3038"); // a workbench silhouette
   for (let i = 0; i < 4; i++) rect(ctx, dcx - 11, oy + 62 + i * 2, 22, 1, M.duct); // rolled-up slats
   rect(ctx, dcx - 13, oy + 60, 26, 2, M.steel); // header
+
+  shadeBlock(ctx, ox - 2, oy - 10, w + 4, 50);
+  shadeBlock(ctx, ox + 2, oy + 40, w - 4, h - 40);
 }
 
 // --- pond -------------------------------------------------------------------
 
+// HGSS-style water: a grey stone kerb with block seams, a dark shore line,
+// and staggered wave glints that shimmer between the two frames.
 function makePondFrame(frame) {
   const w = POND.w * TILE;
   const h = POND.h * TILE;
   const [c, ctx] = makeCanvas(w, h);
-  rect(ctx, 0, 0, w, h, C.rim);
-  rect(ctx, 2, 2, w - 4, h - 4, C.waterDark);
-  rect(ctx, 3, 3, w - 6, h - 6, C.water);
-  // round the corners
+  const K = { outline: "#4e525c", stone: "#b4b9c1", stoneLt: "#d0d4da", seam: "#84888f" };
+  rect(ctx, 0, 0, w, h, K.outline);
+  rect(ctx, 1, 1, w - 2, h - 2, K.stone);
+  rect(ctx, 1, 1, w - 2, 1, K.stoneLt);
+  for (let x = 7; x < w - 4; x += 8) { // kerb block seams, top + bottom runs
+    rect(ctx, x, 1, 1, 2, K.seam);
+    rect(ctx, x, h - 3, 1, 2, K.seam);
+  }
+  for (let y = 7; y < h - 4; y += 8) { // side runs
+    rect(ctx, 1, y, 2, 1, K.seam);
+    rect(ctx, w - 3, y, 2, 1, K.seam);
+  }
+  // water inside a dark shore line; deeper band shaded under the north kerb
+  rect(ctx, 4, 4, w - 8, h - 8, "#1d3f74");
+  rect(ctx, 5, 5, w - 10, h - 10, C.water);
+  rect(ctx, 5, 5, w - 10, 3, C.waterDark);
+  // staggered wave glints, phase-shifted per frame
+  for (let gy = 10; gy < h - 7; gy += 8) {
+    const stagger = ((gy - 10) / 8) % 2 ? 8 : 0;
+    for (let gx = 8 + stagger + (frame ? 4 : 0); gx < w - 9; gx += 16) {
+      rect(ctx, gx, gy, 4, 1, C.waterLight);
+      px(ctx, gx - 1, gy + 1, C.waterLight);
+      px(ctx, gx + 4, gy + 1, C.waterLight);
+    }
+  }
+  // dark counter-ripples on the alternate grid rows
+  for (let gy = 14; gy < h - 7; gy += 8) {
+    const stagger = ((gy - 14) / 8) % 2 ? 0 : 8;
+    for (let gx = 10 + stagger + (frame ? -2 : 2); gx < w - 12; gx += 16)
+      rect(ctx, gx, gy, 3, 1, C.waterDark);
+  }
+  px(ctx, frame ? 14 : 38, 16, "#dbeafe"); // sparkles trade places between frames
+  px(ctx, frame ? 44 : 22, 30, "#dbeafe");
+  // round the kerb corners
   for (const [cx, cy] of [[0, 0], [w - 2, 0], [0, h - 2], [w - 2, h - 2]]) {
     ctx.clearRect(cx, cy, 2, 1);
     ctx.clearRect(cx === 0 ? 0 : w - 1, cy === 0 ? 0 : h - 2, 1, 2);
-  }
-  // shore highlight + ripples
-  rect(ctx, 4, 4, w - 8, 1, C.waterLight);
-  const ripples = frame === 0
-    ? [[8, 10], [22, 18], [40, 12], [14, 28], [46, 30], [30, 22]]
-    : [[10, 12], [24, 16], [38, 14], [16, 26], [44, 32], [28, 20]];
-  for (const [rx, ry] of ripples) {
-    rect(ctx, rx, ry, 4, 1, C.waterLight);
-    px(ctx, rx + 1, ry + 1, C.waterLight);
   }
   return c;
 }
 
 // --- world ------------------------------------------------------------------
+// The world is split for 2.5D depth-sorting: `ground` is one flat canvas
+// (grass, paths, baked cast shadows) drawn first each frame; every tall thing
+// is a structure sprite with `anchorY` — the bottom edge of its footprint in
+// world px — merged with the player/NPCs and painter's-sorted at draw time,
+// so sprites walk behind whatever stands south of them.
 
 export function buildWorld() {
-  const [bg, ctx] = makeCanvas(MAP_W * TILE, MAP_H * TILE);
-
+  const [ground, gctx] = makeCanvas(MAP_W * TILE, MAP_H * TILE);
   for (let ty = 0; ty < MAP_H; ty++)
     for (let tx = 0; tx < MAP_W; tx++)
-      isPath(tx, ty) ? paintDirt(ctx, tx, ty, isPath) : paintGrass(ctx, tx, ty);
+      isPath(tx, ty) ? paintDirt(gctx, tx, ty, isPath) : paintGrass(gctx, tx, ty);
 
-  FENCES.forEach(([x, y]) => paintFence(ctx, x * TILE, y * TILE));
-  SIGNS.forEach((s) => paintSign(ctx, s.x * TILE, s.y * TILE));
-  MAILBOXES.forEach((m) => paintMailbox(ctx, m.x * TILE, m.y * TILE));
-  POTS.forEach(([x, y]) => paintPot(ctx, x * TILE, y * TILE));
+  // cast shadows, flattened onto the ground at one alpha
+  const [shadows, sctx] = makeCanvas(MAP_W * TILE, MAP_H * TILE);
   TREES.forEach((key) => {
     const [x, y] = key.split(",").map(Number);
-    paintBorderTree(ctx, x * TILE, y * TILE);
+    castBlobShadow(sctx, x * TILE + 10, y * TILE + 13, 9, 4);
   });
+  POHUTUKAWA.forEach(([x, y]) => castBlobShadow(sctx, x * TILE + 10, y * TILE + 12, 10, 4));
+  BUILDINGS.forEach((b) => castBlockShadow(sctx, b.x * TILE, b.y * TILE, b.w * TILE, b.h * TILE));
+  gctx.globalAlpha = 0.3;
+  gctx.drawImage(shadows, 0, 0);
+  gctx.globalAlpha = 1;
+
+  const structures = [];
+  // One shared sprite per prop type, wrapped in the ink outline pass;
+  // instances differ only by position. `inked` grows sprites 1px per side,
+  // which addProp folds into the draw offset.
+  const propImg = (paint, ink, w = TILE, h = TILE, px0 = 0, py0 = 0) => {
+    const [c, pctx] = makeCanvas(w, h);
+    paint(pctx, px0, py0);
+    return inked(c, ink);
+  };
+  const addProp = (img, tx, ty, padX = 0, padTop = 0) =>
+    structures.push({ img, x: tx * TILE - padX - 1, y: ty * TILE - padTop - 1, anchorY: (ty + 1) * TILE });
+
+  // Border trees and pōhutukawa overhang their tile on all sides, so their
+  // sprites carry padding (8px sides, 14/12px top) baked into the draw offset.
+  const treeImg = propImg(paintBorderTree, FOLIAGE_INK, TILE + 16, TILE + 16, 8, 14);
+  TREES.forEach((key) => {
+    const [x, y] = key.split(",").map(Number);
+    addProp(treeImg, x, y, 8, 14);
+  });
+  const pohutukawaImg = propImg(paintPohutukawa, FOLIAGE_INK, TILE + 16, TILE + 12, 8, 12);
+  POHUTUKAWA.forEach(([x, y]) => addProp(pohutukawaImg, x, y, 8, 12));
+
+  const fenceImg = propImg(paintFence, STRUCT_INK);
+  FENCES.forEach(([x, y]) => addProp(fenceImg, x, y));
+  const signImg = propImg(paintSign, STRUCT_INK);
+  SIGNS.forEach((s) => addProp(signImg, s.x, s.y));
+  const mailboxImg = propImg(paintMailbox, STRUCT_INK);
+  MAILBOXES.forEach((m) => addProp(mailboxImg, m.x, m.y));
+  const potImg = propImg(paintPot, STRUCT_INK);
+  POTS.forEach(([x, y]) => addProp(potImg, x, y));
+  const ballImg = propImg(paintBall, STRUCT_INK);
+  BALLS.forEach(([x, y]) => addProp(ballImg, x, y));
+  const fernImg = propImg(paintFern, FOLIAGE_INK);
+  FERNS.forEach(([x, y]) => addProp(fernImg, x, y));
+
+  // Buildings: unique sprites, extruded above their footprint (20px headroom
+  // for gables and rooftop gear, 4px each side for eaves), then inked. The
+  // outline's bottom edge doubles as a contact line where wall meets ground.
   BUILDINGS.forEach((b) => {
-    if (b.id === "education") paintFratHouse(ctx, b);
-    else if (b.id === "experience") paintOffice(ctx, b);
-    else paintLab(ctx, b);
+    const [c, bctx] = makeCanvas(b.w * TILE + 8, b.h * TILE + 20);
+    if (b.id === "education") paintFratHouse(bctx, 4, 20);
+    else if (b.id === "experience") paintOffice(bctx, 4, 20);
+    else paintLab(bctx, 4, 20, b);
+    structures.push({ img: inked(c, STRUCT_INK), x: b.x * TILE - 5, y: b.y * TILE - 21, anchorY: (b.y + b.h) * TILE });
   });
-  CARS.forEach((c) => paintModelY(ctx, c.x * TILE, c.y * TILE));
-  BALLS.forEach(([x, y]) => paintBall(ctx, x * TILE, y * TILE));
-  FERNS.forEach(([x, y]) => paintFern(ctx, x * TILE, y * TILE));
-  POHUTUKAWA.forEach(([x, y]) => paintPohutukawa(ctx, x * TILE, y * TILE));
+
+  // The car's roofline rises 7px above its row.
+  CARS.forEach((cc) => {
+    const [c, cctx] = makeCanvas(cc.w * TILE, TILE + 8);
+    paintModelY(cctx, 0, 8);
+    structures.push({ img: inked(c, STRUCT_INK), x: cc.x * TILE - 1, y: cc.y * TILE - 9, anchorY: (cc.y + 1) * TILE });
+  });
+
+  structures.sort((a, b) => a.anchorY - b.anchorY);
 
   return {
-    bg,
+    ground,
+    structures,
     pondFrames: [makePondFrame(0), makePondFrame(1)],
     flowerFrames: [makeFlowerFrame(0), makeFlowerFrame(1)],
     flowerTiles: FLOWERS,

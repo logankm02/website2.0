@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import GitHubIcon from "../components/GitHubIcon";
+import SectionHeading from "../components/SectionHeading";
 import useCarousel from "../hooks/useCarousel";
 import { spotlightProjects as projects } from "../data/projects";
 
@@ -63,7 +64,7 @@ export default function Projects() {
 
   return (
     <div id="projects" className="flex flex-col justify-center w-full md:w-11/12 lg:w-4/5 px-6 md:px-0 pb-8">
-      <h1 className="text-center m-4 md:m-6 text-2xl md:text-3xl font-bold">Projects</h1>
+      <SectionHeading index="03" title="Projects" />
 
       {/* Preload all project images so swapping never flashes */}
       <div className="hidden" aria-hidden="true">

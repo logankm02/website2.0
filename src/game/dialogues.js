@@ -16,7 +16,7 @@ export const PANEL_INTROS = {
     "The notice board by the door holds the complete career record.",
   ],
   projects: [
-    "LOGAN LABS — the MAKER SPACE. 3D printers humming, tools on the pegboard, spools of filament, the laser cutter glowing. Mind the wet prints.",
+    "LOGAN LABS — the MAKER SPACE. 3D printers humming, tools on the pegboard, spools of filament, the solder iron glowing.",
     "The notice board by the door indexes the full project roster.",
   ],
   skills: [

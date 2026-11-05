@@ -30,3 +30,16 @@ for (const campus of ['rochester','berkeley']) {
     assert.equal(world.blocked(...point(17,16.5)),false);
   });
 }
+
+test('Rochester side halls and Dewey present reachable entrances toward the quad',()=>{
+  const m=JSON.parse(readFileSync(new URL('campuses/rochester/manifest.json',root)));
+  const world=createCollisionWorld(m,floats(m.placements),floats(m.heightmap));
+  for(const [name,inward] of [['BAUSCH & LOMB',[1,0]],['MOREY HALL',[-1,0]],['DEWEY HALL',[0,1]]]){
+    const hall=m.landmarks.find(l=>l.id===name);
+    const dx=hall.door[0]-hall.center[0],dy=hall.door[1]-hall.center[1];
+    assert.ok((dx*inward[0]+dy*inward[1])/Math.hypot(dx,dy)>.99,name+' faces the green');
+    assert.equal(world.blocked(hall.door[0],-hall.door[1]),false,name+' doorstep is clear');
+    const sign=m.locations.find(l=>l.id===name);
+    assert.ok(Math.hypot(sign.position[0]-hall.door[0],sign.position[2]+hall.door[1])<.01,name+' interaction follows its entrance');
+  }
+});

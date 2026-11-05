@@ -1,5 +1,11 @@
 """Render-driven refinement: softer slate, detailed side elevations and ivy."""
 import bpy, math, random
+from city_spacing import EAST_TILES, TILE
+lab_offset = EAST_TILES * TILE
+# The lab's footprint moved north (y=8 -> y=1 in city_spacing.py) to join the
+# other two buildings' street-facing row; these hand-placed side details
+# shift by the same world-space delta to stay attached to its walls.
+lab_shift_y = 16.8
 from mathutils import Vector
 from world_core import *
 import world_nature as nature
@@ -20,13 +26,13 @@ def sidewindow(x,y,z,w=1.8,h=1.7):
 for y in [12,16.5,20]:
     for z in [3.6,6.7]: sidewindow(-21.68,y,z,1.8,1.65)
 for y in [-4.5,1,5]:
-    sidewindow(-.1,y,4.3,3,1.6)
-    box('Lab wall pilaster',(-.08,y+2,4.9),(.24,.22,4.8),M['stoneLight'],.035)
-for x in [0,21.6]:
-    mesh('Workshop closed gable',[(x,-8.4,7.3),(x,6,7.3),(x,-1.2,8.7)],[(0,1,2)],M['plaster'])
+    sidewindow(lab_offset-.1,y+lab_shift_y,4.3,3,1.6)
+    box('Lab wall pilaster',(lab_offset-.08,y+lab_shift_y+2,4.9),(.24,.22,4.8),M['stoneLight'],.035)
+for x in [lab_offset,lab_offset+21.6]:
+    mesh('Workshop closed gable',[(x,-8.4+lab_shift_y,7.3),(x,6+lab_shift_y,7.3),(x,-1.2+lab_shift_y,8.7)],[(0,1,2)],M['plaster'])
 for y in [11.5,16,20]:
-    sidewindow(4.7,y,4.0,2.2,1.5)
-    box('Mission panel seam',(4.7,y+1.6,5.8),(.045,.055,6.2),M['metal'])
+    sidewindow(-.1,y,4.0,2.2,1.5)
+    box('Mission panel seam',(-.1,y+1.6,5.8),(.045,.055,6.2),M['metal'])
 # Pediment oculus and fine horizontal clapboard courses.
 cx,fy=-14.4,8.11
 for j in range(8):
@@ -42,7 +48,7 @@ box('Oculus upright',(cx,fy-.16,11.1),(.045,.04,1),M['cream'])
 
 # Ivy traces follow the masonry, using folded leaf geometry rather than blobs.
 rr=random.Random(305); vs=[];fs=[];cs=[]
-for xx,yy,h in [(-21.82,10,5.8),(-21.82,19,5.6),(-.23,-6.8,3.3),(-.23,5.4,3.7)]:
+for xx,yy,h in [(-21.82,10,5.8),(-21.82,19,5.6),(lab_offset-.23,-6.8,3.3),(lab_offset-.23,5.4,3.7)]:
     for branch in range(5):
         points=[]
         for j in range(24):
@@ -55,14 +61,30 @@ for xx,yy,h in [(-21.82,10,5.8),(-21.82,19,5.6),(-.23,-6.8,3.3),(-.23,5.4,3.7)]:
 mesh('Living ivy on city masonry',vs,fs,nature.vertex_material('Ivy variegation city'),colors=cs)
 
 # Rooftop HVAC and gutters add readable layers without extra runtime effects.
-for x in [9,15]:
+for x in [4.2,10.2]:
     box('Mission rooftop HVAC',(x,18,10),(2,2,1),M['metal'],.08)
     for i in range(10): box('HVAC louver',(x-.8+i*.18,16.97,10),(.07,.04,.65),M['steel'])
-for x,y,d in [(-21.8,14.4,12),(-7,14.4,12),(0,-1.2,14.4)]:
+for x,y,d in [(-21.8,14.4,12),(-7,14.4,12),(lab_offset,-1.2,14.4)]:
     curve('Rainwater downpipe',[(x,y-d/2,8),(x-.15,y-d/2,7.7),(x-.15,y-d/2,2.8)],.055,M['metal'])
-scene.camera.location=(-48,-67,65)
-scene.camera.rotation_euler=(Vector((0,1,2.5))-scene.camera.location).to_track_quat('-Z','Y').to_euler()
-scene.camera.data.lens=48
+
+# Soften the baked bevel chamfers into rounded chunky edges; terrain, water,
+# distant backdrop and vegetation prototypes keep their own shading.
+bpy.ops.object.select_all(action='DESELECT')
+smooth_count=0
+for o in scene.objects:
+    if o.type!='MESH': continue
+    if o.get('terrain') or o.get('prototype') or o.get('instance_kind') or o.get('vegetation_chunk'): continue
+    if o.name.startswith(('Logan Terrain','Pond turquoise water','Distant ridge','Far snow')): continue
+    o.select_set(True); smooth_count+=1
+smoothed=[o for o in scene.objects if o.select_get()]
+if smoothed:
+    bpy.context.view_layer.objects.active=smoothed[0]
+    bpy.ops.object.shade_auto_smooth(angle=math.radians(30))
+print('Auto-smoothed',smooth_count,'architecture/fence/prop objects at 30 degrees.')
+
+scene.camera.location=(0,-77,61)
+scene.camera.rotation_euler=(Vector((8,1,3))-scene.camera.location).to_track_quat('-Z','Y').to_euler()
+scene.camera.data.lens=37
 scene.render.resolution_percentage=100
 scene.cycles.samples=40
 print('Slate, side windows, pediment, ivy and rooftop details refined.')

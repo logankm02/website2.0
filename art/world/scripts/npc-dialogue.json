@@ -1,0 +1,159 @@
+{
+  "education": {
+    "w": 12,
+    "h": 8,
+    "npcs": [
+      {
+        "x": 4,
+        "y": 4,
+        "dir": "down",
+        "pages": [
+          "University of Rochester — BA in Computer Science & Economics in Rochester, NY.",
+          "Magna Cum Laude, Phi Beta Kappa, and varsity soccer all live under this blue-and-dandelion crest."
+        ]
+      },
+      {
+        "x": 7,
+        "y": 4,
+        "dir": "down",
+        "pages": [
+          "UC Berkeley — MEng in EECS in Berkeley, CA.",
+          "Fung Scholar, CalSol builder, MEng ambassador. The blue-and-gold corner says Go Bears."
+        ]
+      }
+    ]
+  },
+  "experience": {
+    "w": 12,
+    "h": 9,
+    "npcs": [
+      {
+        "x": 2,
+        "y": 3,
+        "dir": "down",
+        "pages": [
+          "TESLA, Palo Alto — Software QA Engineer, starting July 2026. The newest hire in the village!",
+          "QA is the last gate between fresh software and a moving car. Somebody has to try to break it first."
+        ]
+      },
+      {
+        "x": 4,
+        "y": 3,
+        "dir": "down",
+        "pages": [
+          "I race with AI RACING TECH — the Berkeley MEng capstone on Prof. Allen Yang's ROAR autonomous racing platform.",
+          "My piece is DLIO++: LiDAR-IMU odometry in C++ and ROS 2 that tells the racecar exactly where it is at speed.",
+          "On a racetrack, 'roughly there' is how you meet a wall."
+        ]
+      },
+      {
+        "x": 6,
+        "y": 3,
+        "dir": "down",
+        "pages": [
+          "Sun's out, volts out! I'm an electrical engineer on CalSol, Berkeley's solar vehicle team.",
+          "I design and manufacture electronics for the Gen XI car — it races the American Solar Challenge in summer 2026."
+        ]
+      },
+      {
+        "x": 8,
+        "y": 3,
+        "dir": "down",
+        "pages": [
+          "Founding engineer at KITE, the AI-powered Gmail extension. usekite.app — tell your friends!",
+          "JavaScript up front, Flask in back, LLMs with Turbopuffer vector search underneath. Your inbox, but smarter.",
+          "Paying customers, tier-1 VC meetings, top 10% of YC applicants. Not bad for a little kite!"
+        ]
+      },
+      {
+        "x": 3,
+        "y": 6,
+        "dir": "up",
+        "pages": [
+          "Hoot hoot! At OWL INTEGRATIONS I prototyped ESP32 T-Beam trackers — GPS, LoRa mesh, ultra-low power.",
+          "They monitor wildlife in places with no signal, running ML audio classification on birdsong. The birds never noticed a thing."
+        ]
+      },
+      {
+        "x": 5,
+        "y": 6,
+        "dir": "up",
+        "pages": [
+          "I took a full-stack demo to DEF CON 2024 — Go and Neo4j in the back, React up front, Docker all the way down.",
+          "API design, database tuning, release prep on the Skynet project, which became OpenDR. Relax — not THAT Skynet."
+        ]
+      },
+      {
+        "x": 7,
+        "y": 6,
+        "dir": "up",
+        "pages": [
+          "Research assistant with the Department of Neurosurgery at the University of Rochester Medical Center.",
+          "I wrangled clinical records for 114,892 patients into shape for machine learning.",
+          "Our models out-predicted standard logistic regression on neurosurgical outcomes. The surgeons were pleased."
+        ]
+      }
+    ]
+  },
+  "projects": {
+    "w": 14,
+    "h": 10,
+    "npcs": [
+      {
+        "x": 3,
+        "y": 3,
+        "dir": "down",
+        "pages": [
+          "Welcome to the fast corner! This is ROAR localization — DLIO++ keeping an autonomous racecar locked onto its pose.",
+          "C++, Python, and ROS 2. A car can't brake late if it doesn't know where it is.",
+          "Open the ROAR website?"
+        ],
+        "href": "https://roar.berkeley.edu/"
+      },
+      {
+        "x": 10,
+        "y": 3,
+        "dir": "down",
+        "pages": [
+          "Careful, that's the Gen XI solar car! CalSol races it in the 2026 American Solar Challenge.",
+          "KiCad boards, C++ firmware, and every drop of sunshine we can catch.",
+          "Visit the CalSol team site?"
+        ],
+        "href": "https://calsol.berkeley.edu/"
+      },
+      {
+        "x": 2,
+        "y": 6,
+        "dir": "right",
+        "pages": [
+          "This terminal runs KITE — an AI email assistant that turns your inbox into a queryable database.",
+          "Natural-language search, thread summaries, context-aware replies, automatic calendar wrangling...",
+          "Open usekite.app?"
+        ],
+        "href": "https://usekite.app"
+      },
+      {
+        "x": 7,
+        "y": 6,
+        "dir": "up",
+        "pages": [
+          "Shh — it's listening! TūīNet identifies New Zealand's native birds by song, with AI audio recognition on a Raspberry Pi.",
+          "It reports home over OWL's ClusterDuck mesh from forests with no signal at all.",
+          "Read the TūīNet story?"
+        ],
+        "href": "https://medium.com/project-owl/project-t%C5%AB%C4%ABnet-tools-for-native-wildlife-conservation-5551211158fe"
+      },
+      {
+        "x": 11,
+        "y": 6,
+        "dir": "left",
+        "pages": [
+          "Fancy a word game? This SCRABBLE BOT finds optimal plays with a DAWG dictionary and board heuristics.",
+          "I have never beaten it. I am at peace with this.",
+          "Challenge the bot?"
+        ],
+        "href": "https://logankm02.github.io/scrabble-bot/"
+      }
+    ]
+  }
+}

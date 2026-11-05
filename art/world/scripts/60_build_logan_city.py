@@ -17,7 +17,8 @@ importlib.reload(architecture)
 import world_nature as nature
 importlib.reload(nature)
 
-LAYOUT = json.loads((OUT / 'scripts/city-layout.json').read_text())
+from city_spacing import city_layout, meadow_height
+LAYOUT = city_layout(json.loads((OUT / 'scripts/city-layout.json').read_text()))
 S = 2.4
 def xy(tx, ty): return ((tx - 11.5) * S, (10 - ty) * S)
 def rect(x, y, w, h):
@@ -31,8 +32,7 @@ def path_distance(x, y):
     return min(math.hypot(max(abs(x-cx)-hw,0), max(abs(y-cy)-hh,0)) for cx,cy,hw,hh in PATHS)
 def city_height(x, y):
     # A level, accessible town transitions to the existing soft rolling hills.
-    edge=max(abs(x)-30,abs(y-1)-26,0)
-    h=mix(2.5, 3+2.6*math.sin(x*.07)*math.cos(y*.055)+1.3*math.sin(y*.11),smooth(edge/18))
+    h=meadow_height(x,y)
     if inside(x,y,POND,-.28): h=.95
     return h
 
@@ -102,10 +102,7 @@ def framed_window(x,y,z,w,h,material=None):
     for dx in [-w/2,0,w/2]: box('Window vertical frame',(x+dx,y-.15,z+h/2),(.055,.065,h),M['cream'],.012)
     box('Window cross rail',(x,y-.15,z+h*.55),(w,.065,.055),M['cream'],.012)
 def door(x,y,z,wide=1.8):
-    framed_window(x,y,z,wide,2.8,M['navy'])
-    for dx in [-wide*.25,wide*.25]:
-        for zz in [.7,1.7]: box('Door inset panel',(x+dx,y-.16,z+zz),(wide*.35,.04,.68),M['steel'],.035)
-    uvball('Brass door latch',(x+wide*.3,y-.25,z+1.2),(.05,.08,.05),M['brass'])
+    box('Solid entrance backing',(x,y,z+1.4),(wide,.12,2.8),M['wood'],.035)
 def sign(label,x,y,z,w,material=None,size=.4):
     box(label+' plaque',(x,y,z),(w,.18,.9),material or M['navy'],.06)
     text(label+' lettering',label,(x,y-.11,z-.15),size,M['cream'])

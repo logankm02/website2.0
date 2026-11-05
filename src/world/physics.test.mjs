@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { groundHeight, createCollisionWorld, stepPlayer } from './physics.js';
-import { BUILDINGS, START, PATHS, POND } from '../game/map.js';
+import { START, POND } from '../game/map.js';
 const root = new URL('../../', import.meta.url);
 const manifest = JSON.parse(readFileSync(new URL('public/world/manifest.json', root)));
 function floats(name) { const b=readFileSync(new URL('public/world/'+name,root)); return new Float32Array(b.buffer.slice(b.byteOffset,b.byteOffset+b.byteLength)); }
@@ -44,13 +44,11 @@ test('steep uphill motion is rejected; a gentle slope remains walkable',()=>{
  const a=walk(state(0,0,0),['KeyD'],steep),b=walk(state(0,0,0),['KeyD'],gentle);
  assert.equal(a.x,0);assert.ok(b.x>5);assert.ok(Math.abs(b.y-gentle.height(b.x,b.z))<.1);
 });
-test('Blender manifest preserves LOGAN CITY layout and spawn',()=>{
- assert.deepEqual(manifest.layout.BUILDINGS,BUILDINGS);
- assert.deepEqual(manifest.layout.PATHS,PATHS);
+test('building geometry matches the 3D map and preserves the original pond and spawn',()=>{
  assert.deepEqual(manifest.layout.POND,POND);
  assert.deepEqual(manifest.spawn,[(START.x-11.5)*2.4,(10-START.y)*2.4]);
  assert.deepEqual(manifest.landmarks.map(l=>l.id),['education','experience','projects']);
- for(const b of BUILDINGS){
+ for(const b of manifest.layout.BUILDINGS){
   const l=manifest.landmarks.find(l=>l.id===b.id);
   assert.ok(Math.abs(l.center[0]-(b.x+(b.w-1)/2-11.5)*2.4)<1e-7);
   assert.ok(Math.abs(l.center[1]-(10-b.y-(b.h-1)/2)*2.4)<1e-7);
@@ -61,10 +59,24 @@ test('spawn connects to every building, both signs, pond walk and south gate',()
  const step=.6, queue=[[Math.round(manifest.spawn[0]/step),Math.round(-manifest.spawn[1]/step)]], seen=new Set();
  for(let i=0;i<queue.length;i++){
   const [ix,iz]=queue[i],key=ix+','+iz;
-  if(seen.has(key)||Math.abs(ix)>44||iz< -39||iz>39||world.blocked(ix*step,iz*step))continue;
+  if(seen.has(key)||ix < -44 || ix > Math.ceil((manifest.layout.MAP_W-12)*2.4/step)||iz< -39||iz>39||world.blocked(ix*step,iz*step))continue;
   seen.add(key);
   for(const [dx,dz] of [[1,0],[-1,0],[0,1],[0,-1]])queue.push([ix+dx,iz+dz]);
  }
  const targets=[...manifest.landmarks.map(l=>[l.id,l.door[0],-l.door[1]]),['skills',-6,1.56],['contact',6,13.56],['pond',-7.2,12],['gate',2.4,21.6],['rochester portal',-20,-5.2],['berkeley portal',-8.5,-5.2]];
  for(const [label,x,z] of targets)assert.ok([...seen].some(key=>{const [ix,iz]=key.split(',').map(Number);return Math.hypot(ix*step-x,iz*step-z)<1;}),label+' reachable');
+});
+
+test('the three buildings share one street-facing row, each with a clear doorstep', () => {
+  const [education, experience, projects] = ['education', 'experience', 'projects'].map(id => manifest.landmarks.find(l => l.id === id));
+  assert.ok(Math.abs(education.door[1] - experience.door[1]) < 1e-9);
+  assert.ok(Math.abs(education.door[1] - projects.door[1]) < 1e-9);
+  const gap = (left, right) => right.center[0] - right.half[0] - left.center[0] - left.half[0];
+  assert.ok(Math.abs(gap(education, experience) - gap(experience, projects)) < 1e-6, 'equal clear space between exterior walls');
+  assert.ok(education.center[0] < experience.center[0]);
+  assert.ok(experience.center[0] + experience.half[0] < projects.center[0] - projects.half[0]);
+  for (const landmark of [education, experience, projects]) {
+    const [x, y] = landmark.door;
+    for (let dx = -1; dx <= 1; dx += .5) assert.equal(world.blocked(x + dx, -y), false, landmark.id + ' doorstep clear at ' + dx);
+  }
 });

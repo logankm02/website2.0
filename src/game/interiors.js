@@ -230,8 +230,7 @@ const RUSH_RHEES_PAGES = [
   "Its tower presides over the EASTMAN QUAD. LOGAN logged many late nights beneath that dome.",
 ];
 const MELIORA_PAGES = [
-  "MELIORA HALL — MELIORA, 'ever better,' is the university's motto.",
-  "The varsity soccer team took it personally.",
+  "MELIORA HALL — MELIORA, 'ever better,' is the university's motto."
 ];
 const HUTCHISON_PAGES = ["HUTCHISON HALL — chemistry and biology labs close the north edge of the quad."];
 const BAUSCH_LOMB_PAGES = ["BAUSCH & LOMB HALL — physics and astronomy, wrapped around a quiet brick courtyard."];
@@ -250,10 +249,14 @@ const DOE_PAGES = [
   "DOE LIBRARY — Berkeley's grand Beaux-Arts library under its red tile roof.",
   "Inside its reading rooms, LOGAN ground through EECS problem sets late into the night.",
 ];
-const STARR_PAGES = ["C.V. STARR EAST ASIAN LIBRARY — one of the largest East Asian collections in the country."];
-const WHEELER_PAGES = ["WHEELER HALL — big lecture halls and the English department, closing the south of the glade."];
-const DURANT_PAGES = ["DURANT HALL — named for Berkeley's first president. Red tiles, like everything here."];
-const SOUTH_PAGES = ["SOUTH HALL — the oldest building on campus, brick and red-roofed since 1873."];
+const SATHER_GATE_PAGES = [
+  "SATHER GATE — the green bronze gateway to campus, standing since 1910.",
+  "Beyond it, Telegraph Avenue. Behind you, the glade. Choose wisely at lunchtime.",
+];
+const CREEK_PAGES = ["STRAWBERRY CREEK — burbling down from the Berkeley hills, right through campus."];
+const LAKE_PAGES = ["The creek pools here before slipping under the gate. Something ripples by the rocks."];
+const BERRY_PAGES = ["A tidy berry garden. Planted by the botany club; raided by the CS majors."];
+const STAND_PAGES = ["GLADE MART — snacks, sunscreen, and blue books. The awning has seen some winters."];
 const UC_SEAL_PAGES = [
   "The UNIVERSITY OF CALIFORNIA seal, set in a planter on the glade.",
   "FIAT LUX — 'let there be light.'",
@@ -488,81 +491,85 @@ const ROOMS = {
   },
 
   // The matching scene behind the SCHOOL HOUSE's right-hand portal: UC Berkeley's
-  // Memorial Glade, with Sather Tower (the Campanile) at its head and granite
-  // halls flanking. Same campus renderer, Berkeley landmarks.
+  // Memorial Glade — Sather Tower and Doe Library at the head of a forest-walled
+  // lawn, Strawberry Creek winding down the west side into a rocky pool, a stone
+  // plaza running south from Doe's portico through Sather Gate.
   ucb: {
     kind: "campus",
     title: "MEMORIAL GLADE",
     w: 24,
     h: 20,
     floor: "quad",
-    // Bird's-eye Memorial Glade. The dirt path is a hand-plotted tile matrix
-    // ("#" = path) so the lawn is a true smooth oval with diagonal spokes to the
-    // corners and arms to the seal and east hall — no formula.
+    // Hand-plotted ground matrix: "~" = creek/lake water (solid), "B" = wooden
+    // bridge over the creek, "=" = the pale stone plaza, "#" = brick walks.
     pathMatrix: [
       "........................",
-      ".##..................##.",
-      "..##................##..",
-      "...##...########...##...",
-      "....################....",
-      ".....####......####.....",
-      ".....###........###.....",
-      "....####........####....",
-      ".##.###..........######.",
-      "#######..........######.",
-      ".######..........###....",
-      "....###..........###....",
-      "....####........####....",
-      ".....###........###.....",
-      ".....####......####.....",
-      "....################....",
-      "...##...########...##...",
-      "..##................##..",
-      ".##..................##.",
       "........................",
+      "...~~...................",
+      "...~~...................",
+      "..~~....................",
+      "..~~....................",
+      ".~~.............===.....",
+      ".~~.............===.....",
+      "..~~............===.....",
+      "..BB############===.....",
+      ".~~.............===.....",
+      ".~~.............===.....",
+      ".~~.............===.....",
+      ".~~~......######===.....",
+      "~~~~............===.....",
+      "~~~~~...........===.....",
+      "~~~~~...........===.....",
+      "~~~~~...........===.....",
+      "~~~~~...........===.....",
+      "~~~~~...........===.....",
     ],
     paths: [],
-    // Each hall is composed of explicit roof blocks (tile rects) around optional
-    // interior courtyards, with a per-building architectural style.
     furniture: [
-      {
-        kind: "hall", x: 7, y: 0, w: 10, h: 4, portico: true, // Doe Library (N) — neoclassical centerpiece
-        blocks: [[0, 0, 2, 4], [4, 0, 2, 4], [8, 0, 2, 4], [2, 0, 6, 1], [2, 3, 6, 1]], // wings + spine + connecting bars
-        courts: [[2, 1, 2, 2], [6, 1, 2, 2]], // dual lightwells
-      },
-      {
-        kind: "hall", x: 0, y: 0, w: 5, h: 4, vwindows: true, // C.V. Starr (NW) — square roof, central garden
-        blocks: [[0, 0, 5, 1], [0, 3, 5, 1], [0, 1, 2, 2], [3, 1, 2, 2]],
-        courts: [[2, 1, 1, 2]],
-      },
-      { kind: "campanile", x: 18, y: 3, w: 3, h: 2 }, // Sather Tower (NE)
-      { kind: "hall", x: 20, y: 7, w: 4, h: 5 }, // South Hall (E) — cream + red roof
-      { kind: "hall", x: 0, y: 16, w: 6, h: 3 }, // South Hall (SW) — cream + red roof
-      { kind: "hall", x: 8, y: 16, w: 8, h: 3, stoneEntry: true }, // Wheeler Hall (S) — wide lecture hall
-      { kind: "hall", x: 17, y: 16, w: 5, h: 3 }, // Durant Hall (SE) — compact pavilion
-      { kind: "ucSeal", x: 1, y: 9 }, // the UC seal on the west
-      // single trees, evenly spaced through the clear side margins
-      { kind: "campusTree", x: 3, y: 4 }, { kind: "pineTree", x: 1, y: 5 },
-      { kind: "campusTree", x: 2, y: 6, autumn: true }, { kind: "campusTree", x: 3, y: 8 },
-      { kind: "pineTree", x: 3, y: 11 }, { kind: "campusTree", x: 1, y: 12 },
-      { kind: "campusTree", x: 2, y: 13, autumn: true }, { kind: "pineTree", x: 1, y: 14 },
-      { kind: "campusTree", x: 3, y: 15 }, { kind: "campusTree", x: 22, y: 4 },
-      { kind: "pineTree", x: 23, y: 5 }, { kind: "campusTree", x: 21, y: 6, autumn: true },
-      { kind: "campusTree", x: 23, y: 6 }, { kind: "pineTree", x: 22, y: 12 },
-      { kind: "campusTree", x: 23, y: 13, autumn: true }, { kind: "campusTree", x: 21, y: 14 },
-      { kind: "pineTree", x: 23, y: 15 },
+      // forest walls framing the glade
+      { kind: "forest", x: 0, y: 0, w: 24, h: 2 }, // north tree line
+      { kind: "forest", x: 22, y: 2, w: 2, h: 12 }, // east edge
+      { kind: "forest", x: 22, y: 14, w: 2, h: 6 }, // SE corner
+      // landmarks
+      { kind: "doeLibrary", x: 13, y: 2, w: 9, h: 4 }, // Doe Library (NE), portico onto the plaza
+      { kind: "campanile", x: 7, y: 3, w: 3, h: 2 }, // Sather Tower (NW)
+      { kind: "satherGate", x: 14, y: 16, w: 6, h: 2 }, // the gate astride the plaza
+      { kind: "ironFence", x: 5, y: 16, w: 9, h: 1 }, // fence runs flanking the gate
+      { kind: "ironFence", x: 20, y: 16, w: 2, h: 1 },
+      { kind: "ucSeal", x: 10, y: 8 }, // the bronze seal mid-glade
+      // the Glade Mart and its berry garden, east of the plaza
+      { kind: "berryPatch", x: 19, y: 10, w: 2, h: 2 },
+      { kind: "stand", x: 19, y: 13, w: 2 },
+      // rocks in the creek pool
+      { kind: "rock", x: 2, y: 14 }, { kind: "rock", x: 1, y: 16 }, { kind: "rock", x: 3, y: 18 },
+      // redwood grove west of the glade, singles drifting east
+      { kind: "redwood", x: 5, y: 5 }, { kind: "redwood", x: 6, y: 6 },
+      { kind: "redwood", x: 4, y: 7 }, { kind: "redwood", x: 4, y: 11 },
+      { kind: "redwood", x: 6, y: 12 }, { kind: "redwood", x: 5, y: 14 },
+      { kind: "redwood", x: 13, y: 7 },
+      // round campus trees + undergrowth
+      { kind: "campusTree", x: 11, y: 3 }, { kind: "campusTree", x: 10, y: 5 },
+      { kind: "campusTree", x: 14, y: 8 }, { kind: "campusTree", x: 20, y: 7 },
+      { kind: "campusTree", x: 21, y: 8 }, { kind: "campusTree", x: 6, y: 10 },
+      { kind: "campusTree", x: 13, y: 11 }, { kind: "campusTree", x: 21, y: 12 },
+      { kind: "campusTree", x: 7, y: 17 }, { kind: "campusTree", x: 12, y: 18 }, // beyond the gate
+      { kind: "bush", x: 12, y: 8 }, { kind: "bush", x: 9, y: 11 },
+      { kind: "bush", x: 14, y: 14 }, { kind: "bush", x: 19, y: 14 },
+      // lampposts along the plaza
+      { kind: "lamppost", x: 15, y: 7 }, { kind: "lamppost", x: 19, y: 7 },
+      { kind: "lamppost", x: 15, y: 12 },
     ],
     hotspots: [
-      { x: 7, y: 3, w: 10, pages: DOE_PAGES },
-      { x: 0, y: 3, w: 5, pages: STARR_PAGES },
-      { x: 18, y: 4, w: 3, pages: CAMPANILE_PAGES },
-      { x: 20, y: 7, h: 5, pages: SOUTH_PAGES },
-      { x: 0, y: 16, w: 6, pages: SOUTH_PAGES },
-      { x: 8, y: 16, w: 8, pages: WHEELER_PAGES },
-      { x: 17, y: 16, w: 5, pages: DURANT_PAGES },
-      { x: 1, y: 9, pages: UC_SEAL_PAGES },
+      { x: 13, y: 5, w: 9, pages: DOE_PAGES },
+      { x: 7, y: 4, w: 3, pages: CAMPANILE_PAGES },
+      { x: 14, y: 16, w: 6, pages: SATHER_GATE_PAGES },
+      { x: 10, y: 8, pages: UC_SEAL_PAGES },
+      { x: 19, y: 10, w: 2, h: 2, pages: BERRY_PAGES },
+      { x: 19, y: 13, w: 2, pages: STAND_PAGES },
+      { x: 1, y: 6, w: 2, h: 2, pages: CREEK_PAGES },
+      { x: 0, y: 15, w: 5, h: 2, pages: LAKE_PAGES },
     ],
-    spots: [{ x: 10, y: 9, dir: "down" }],
+    spots: [{ x: 13, y: 10, dir: "down" }],
     npcData: [{ pal: 8, pages: GLADE_STUDENT_PAGES }], // a Berkeley student
     palOffset: 8,
     mats: [[11, 15], [12, 15]],
@@ -601,6 +608,10 @@ function buildInteriorLogic(room) {
   room.furniture.forEach((f) => {
     for (let y = f.y; y < f.y + (f.h || 1); y++)
       for (let x = f.x; x < f.x + (f.w || 1); x++) solid.add(`${x},${y}`);
+  });
+  // Campus water ("~" in the path matrix) is solid; bridges ("B") stay walkable.
+  (room.pathMatrix || []).forEach((rowStr, y) => {
+    for (let x = 0; x < rowStr.length; x++) if (rowStr[x] === "~") solid.add(`${x},${y}`);
   });
 
   const hotspots = new Map();

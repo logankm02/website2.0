@@ -201,10 +201,10 @@ function paintRushRhees(ctx, ox, oy, w) {
 
 // --- Berkeley buildings -----------------------------------------------------
 
-// Every Berkeley hall shares one red clay-tile roof palette.
-const RED_PAL = {
-  front: "#e2823f", course: "#cf7038", back: "#9c4824", side: "#c46434",
-  hip: "#7a3014", ridge: "#f8c084", edge: "#5e2810",
+// Doe Library's terracotta clay-tile roof palette.
+const ORANGE_PAL = {
+  front: "#d2722e", course: "#c06428", back: "#8a4418", side: "#b45a24",
+  hip: "#6e3412", ridge: "#f0a860", edge: "#552808",
 };
 
 // One rectangular hipped roof drawn with EXPLICIT geometry: each pixel belongs
@@ -238,79 +238,221 @@ function geoRoof(ctx, x, y, w, h, pal) {
   }
 }
 
-// The cream south wall strip under the roof eave, with the halls' signature
-// rhythm of blue window accents. Returns the wall's top y for entrances.
-function southWall(ctx, ox, oy, W, H, item) {
-  const wallH = 9;
-  const wy = oy + H - wallH;
-  rect(ctx, ox, wy - 1, W, 1, "#5e2810"); // eave shadow
-  rect(ctx, ox, wy, W, wallH, "#8a7a52");
-  rect(ctx, ox + 1, wy, W - 2, wallH - 1, "#ece2c8");
-  rect(ctx, ox + 1, wy, W - 2, 1, "#f6efd9"); // sunlit top course
+// Doe Library — a grey granite Beaux-Arts block under a terracotta hipped
+// roof: colonnaded facade with arched windows, a central pediment portico
+// with the DOE LIBRARY frieze, steps spilling onto the plaza, and a red flag
+// flying over the ridge.
+function paintDoeLibrary(ctx, ox, oy, w, h) {
+  const W = w * TILE; // 144
+  const H = h * TILE; // 64
   const cx = ox + W / 2;
-  const step = item.vwindows ? 7 : 11; // Starr gets a tighter screen rhythm
-  for (let gx = ox + 5; gx < ox + W - 5; gx += step) {
-    if (Math.abs(gx + 1 - cx) < (item.portico || item.stoneEntry ? 16 : 5)) continue;
-    rect(ctx, gx, wy + 2, 3, wallH - 3, C.glass); // blue/grey window
-    rect(ctx, gx, wy + 2, 3, 1, "#bcd0d8"); // bright sill
+  const G = {
+    wall: "#d6d2c6", lt: "#eceae2", shade: "#b4b0a2", outline: "#6e6a5e",
+    glass: "#39445a", glassLt: "#8fa6c8", sign: "#2c3446", steps: "#d9d4c6",
+  };
+
+  geoRoof(ctx, ox, oy, W, 30, ORANGE_PAL);
+  rect(ctx, cx - 26, oy + 9, 14, 6, "#8e98a8"); // skylight, west of the portico
+  rect(ctx, cx - 26, oy + 9, 14, 1, "#c4d0e0");
+  rect(ctx, cx + 14, oy - 13, 1, 15, "#8a8878"); // flagpole rising off the ridge
+  rect(ctx, cx + 15, oy - 13, 8, 4, "#d23c2e"); // the red flag
+  rect(ctx, cx + 15, oy - 10, 6, 1, "#a32418");
+
+  // granite facade under the eave
+  rect(ctx, ox, oy + 30, W, H - 30, G.outline);
+  rect(ctx, ox + 1, oy + 31, W - 2, H - 38, G.wall);
+  rect(ctx, ox + 1, oy + 31, W - 2, 1, G.lt); // cornice catches the sun
+  // colonnade: paired columns with arched windows between, clear of the portico
+  for (let colx = ox + 4; colx <= ox + W - 8; colx += 10) {
+    if (Math.abs(colx + 2 - cx) >= 24) {
+      rect(ctx, colx - 1, oy + 33, 5, 1, G.shade); // capital
+      rect(ctx, colx, oy + 34, 3, 20, G.lt);
+      rect(ctx, colx + 2, oy + 34, 1, 20, G.shade);
+    }
+    const wx = colx + 5;
+    if (wx + 4 < ox + W - 4 && Math.abs(wx + 2 - cx) >= 24) {
+      rect(ctx, wx, oy + 36, 4, 12, G.glass);
+      rect(ctx, wx, oy + 36, 4, 3, G.glassLt);
+      px(ctx, wx, oy + 36, G.wall); // arch shoulders
+      px(ctx, wx + 3, oy + 36, G.wall);
+    }
   }
-  return wy;
+  // central portico: pediment over the DOE LIBRARY frieze, columns, doorway
+  for (let r = 0; r <= 9; r++) {
+    const hw = Math.round((r / 9) * 21);
+    rect(ctx, cx - hw, oy + 22 + r, hw * 2 + 1, 1, G.wall);
+    px(ctx, cx - hw, oy + 22 + r, G.outline);
+    px(ctx, cx + hw, oy + 22 + r, G.outline);
+  }
+  rect(ctx, cx - 21, oy + 32, 42, 8, G.outline); // frieze board
+  rect(ctx, cx - 20, oy + 33, 40, 6, G.sign);
+  for (const [dx, dw] of [[-17, 3], [-13, 3], [-9, 3], [-4, 2], [0, 3], [4, 3], [8, 3], [12, 3], [16, 2]])
+    rect(ctx, cx + dx, oy + 35, dw, 2, "#e8dfc0"); // "DOE LIBRARY" letter blocks
+  for (const pc of [-19, -12, 9, 16]) { // portico columns flanking the door
+    rect(ctx, cx + pc, oy + 40, 3, 14, G.lt);
+    rect(ctx, cx + pc + 2, oy + 40, 1, 14, G.shade);
+  }
+  rect(ctx, cx - 5, oy + 41, 10, 13, "#2e2a22"); // recessed doorway
+  rect(ctx, cx - 5, oy + 41, 10, 2, "#171410");
+  // terrace band + steps narrowing up from the plaza
+  rect(ctx, ox + 1, oy + H - 7, W - 2, 6, G.shade);
+  rect(ctx, ox + 1, oy + H - 7, W - 2, 1, G.outline);
+  rect(ctx, cx - 24, oy + H - 2, 48, 2, "#cfcaba");
+  rect(ctx, cx - 21, oy + H - 4, 42, 2, G.steps);
+  rect(ctx, cx - 18, oy + H - 6, 36, 2, "#e4e0d4");
 }
 
-// A campus hall composed of explicit roof blocks (`item.blocks`, tile rects)
-// around optional `item.courts` (interior gardens). Style + facade details vary
-// per building so each reads as its real-world landmark.
-function paintHall(ctx, ox, oy, w, h, item = {}) {
-  const W = w * TILE, H = h * TILE;
+// Sather Gate — granite piers with lantern caps and the green bronze arch
+// spanning the plaza; the walk runs beneath it.
+function paintSatherGate(ctx, ox, oy, w, h) {
+  const W = w * TILE; // 96
+  const H = h * TILE; // 32
+  const G = {
+    stone: "#c9c5b9", lt: "#e6e3da", shade: "#98948a", outline: "#5e5a50",
+    green: "#2e6448", greenLt: "#4d8a66", gold: "#e0c050",
+  };
+  // bronze arch first, so the piers overlap its ends
+  for (let x = 20; x <= 76; x++) {
+    const t = (x - 48) / 28; // parabolic crown
+    const yTop = oy + 3 + Math.round(t * t * 8);
+    px(ctx, ox + x, yTop, G.green);
+    px(ctx, ox + x, yTop + 1, G.greenLt);
+    px(ctx, ox + x, yTop + 2, G.green);
+  }
+  rect(ctx, ox + 24, oy + 14, 48, 1, G.green); // lower tie beam
+  for (let x = ox + 26; x < ox + 72; x += 5) rect(ctx, x, oy + 12, 1, 2, G.greenLt); // filigree drops
+  disc(ctx, ox + 48, oy + 8, 3, G.gold); // the medallion
+  px(ctx, ox + 48, oy + 8, G.green);
+  const pier = (pxx, big) => {
+    const pw = big ? 10 : 8;
+    const ph = big ? 28 : 20;
+    const py = oy + H - 2 - ph;
+    rect(ctx, pxx - 1, py - 1, pw + 2, ph + 3, G.outline);
+    rect(ctx, pxx, py, pw, ph + 1, G.stone);
+    rect(ctx, pxx, py, 2, ph, G.lt);
+    rect(ctx, pxx + pw - 2, py, 2, ph, G.shade);
+    rect(ctx, pxx - 2, py - 2, pw + 4, 2, G.lt); // cap
+    rect(ctx, pxx - 2, py - 3, pw + 4, 1, G.outline);
+    if (big) { // lantern
+      rect(ctx, pxx + pw / 2 - 2, py - 9, 4, 6, G.outline);
+      rect(ctx, pxx + pw / 2 - 1, py - 8, 2, 4, "#ffe9a8");
+      px(ctx, pxx + pw / 2 - 1, py - 10, G.outline);
+    }
+  };
+  pier(ox + 2, false);
+  pier(ox + W - 10, false);
+  pier(ox + 14, true);
+  pier(ox + W - 24, true);
+}
 
-  // interior garden courtyards, laid down first so the roof eaves frame them
-  (item.courts || []).forEach(([cx, cy, cw, ch]) => {
-    const x0 = ox + cx * TILE, y0 = oy + cy * TILE, pw = cw * TILE, ph = ch * TILE;
-    rect(ctx, x0, y0, pw, ph, "#4a5238"); // shaded well
-    rect(ctx, x0 + 1, y0 + 1, pw - 2, ph - 2, "#6f8452"); // lawn
-    rect(ctx, x0 + (pw >> 1) - 2, y0 + (ph >> 1) - 1, 4, 3, "#54703e"); // a shrub
+// A run of iron fence on a stone footing, with a granite post each tile.
+function paintIronFence(ctx, ox, oy, w) {
+  const W = w * TILE;
+  rect(ctx, ox, oy + 13, W, 3, "#8f8b80"); // footing
+  rect(ctx, ox, oy + 13, W, 1, "#b5b1a6");
+  rect(ctx, ox, oy + 4, W, 1, "#22282a"); // rails
+  rect(ctx, ox, oy + 9, W, 1, "#22282a");
+  for (let x = ox + 1; x < ox + W; x += 3) {
+    rect(ctx, x, oy + 3, 1, 10, "#2c3234"); // pickets
+    px(ctx, x, oy + 2, "#454b54"); // spear tips
+  }
+  for (let x = ox; x < ox + W; x += 16) { // granite posts
+    rect(ctx, x + 6, oy + 1, 4, 14, "#5e5a50");
+    rect(ctx, x + 7, oy + 2, 2, 12, "#c9c5b9");
+  }
+}
+
+// A dense forest wall: staggered rows of overlapping canopies fill the rect,
+// spilling a few px past its edges so the tree line reads organic.
+function paintForest(ctx, ox, oy, w, h) {
+  const W = w * TILE;
+  const H = h * TILE;
+  for (let gy = 4; gy < H + 4; gy += 9)
+    for (let gx = ((gy / 9) % 2 ? 6 : 0) + 4; gx < W + 6; gx += 12) {
+      const cx = ox + gx - 2;
+      const cy = oy + gy + Math.floor(hash2(gx + ox, gy + oy) * 3) - 1;
+      disc(ctx, cx, cy, 7, T.treeOutline);
+      disc(ctx, cx, cy, 6, T.treeDk);
+      disc(ctx, cx, cy - 1, 4, T.treeMid);
+      disc(ctx, cx - 2, cy - 2, 2, T.treeLt);
+    }
+}
+
+// A Berkeley redwood: stacked conifer tiers over a russet trunk, reaching
+// well above its tile.
+function paintRedwood(ctx, ox, oy) {
+  const cx = ox + 8;
+  rect(ctx, cx - 1, oy + 8, 3, 8, "#7c4630");
+  rect(ctx, cx + 1, oy + 8, 1, 8, "#552d1c");
+  const tiers = [[oy + 6, 8], [oy + 1, 7], [oy - 4, 5], [oy - 8, 4]]; // [baseY, halfW]
+  tiers.forEach(([ty, hw]) => {
+    for (let r = 0; r < 6; r++) {
+      const half = Math.round((r / 5) * hw);
+      const y = ty - 5 + r;
+      rect(ctx, cx - half, y, half * 2 + 1, 1, "#2e7038");
+      px(ctx, cx - half, y, "#1e4a2c");
+      px(ctx, cx + half, y, "#1e4a2c");
+      if (r > 1) px(ctx, cx - half + 1, y, "#4f9c50"); // lit west edge
+    }
   });
+  px(ctx, cx, oy - 14, "#1e4a2c"); // tip
+}
 
-  // the roof, block by block
-  (item.blocks || [[0, 0, w, h]]).forEach(([bx, by, bw, bh]) =>
-    geoRoof(ctx, ox + bx * TILE, oy + by * TILE, bw * TILE, bh * TILE, RED_PAL));
+// A low round shrub.
+function paintBush(ctx, ox, oy) {
+  disc(ctx, ox + 8, oy + 10, 6, T.treeOutline);
+  disc(ctx, ox + 8, oy + 10, 5, T.treeDk);
+  disc(ctx, ox + 7, oy + 9, 3, T.treeMid);
+  disc(ctx, ox + 6, oy + 8, 1, T.treeLt);
+}
 
-  const wy = southWall(ctx, ox, oy, W, H, item);
-  const cx = ox + W / 2;
-
-  if (!item.portico && !item.stoneEntry) // a subtle centered door
-    rect(ctx, cx - 2, wy + 1, 5, 8, "#6a4a2e");
-
-  if (item.portico) { // Doe's grand columned portico under a solid pediment
-    const py = oy + H;
-    const pedH = 11, pedW = 15;
-    for (let r = 0; r <= pedH; r++) { // solid cream triangle, dark raked edges
-      const hw = Math.round((r / pedH) * pedW);
-      rect(ctx, cx - hw, py - 13 - pedH + r, hw * 2 + 1, 1, "#ece2c8");
-      px(ctx, cx - hw, py - 13 - pedH + r, "#b6aa84");
-      px(ctx, cx + hw, py - 13 - pedH + r, "#b6aa84");
+// A tilled berry garden: dark furrows, sprouting bushes, ripening berries.
+function paintBerryPatch(ctx, ox, oy, w, h) {
+  const W = w * TILE;
+  const H = h * TILE;
+  rect(ctx, ox, oy, W, H, "#5f4530");
+  rect(ctx, ox, oy, W, 1, "#7a5c40");
+  rect(ctx, ox, oy + H - 1, W, 1, "#3f2d1e");
+  let berry = 0;
+  for (let ry = oy + 4; ry < oy + H - 4; ry += 7) {
+    rect(ctx, ox + 2, ry + 4, W - 4, 1, "#4a3423"); // furrow shadow
+    for (let sx = ox + 3; sx < ox + W - 4; sx += 5, berry++) {
+      rect(ctx, sx, ry, 2, 4, "#3f8c48"); // sprout
+      px(ctx, sx - 1, ry + 1, "#58ac50");
+      px(ctx, sx + 2, ry + 1, "#58ac50");
+      px(ctx, sx + 1, ry, berry % 2 ? "#d24040" : "#4058c8"); // the crop
     }
-    rect(ctx, cx - 16, py - 13, 33, 13, "#cabf9e"); // entablature
-    rect(ctx, cx - 15, py - 12, 31, 12, "#ece2c8");
-    rect(ctx, cx - 15, py - 12, 31, 1, "#f6efd9");
-    for (let c = cx - 13; c <= cx + 11; c += 4) { // fluted columns
-      rect(ctx, c, py - 10, 2, 10, "#d8cdab");
-      px(ctx, c, py - 10, "#b6aa84");
-    }
-    rect(ctx, cx - 4, py - 9, 8, 9, "#4a3220"); // central doorway
-    rect(ctx, cx - 17, py, 35, 2, "#b6aa84"); // steps
   }
+}
 
-  if (item.stoneEntry) { // Wheeler's heavy stone entry with double doors
-    const py = oy + H;
-    rect(ctx, cx - 13, py - 14, 26, 14, "#9c9684");
-    rect(ctx, cx - 12, py - 13, 24, 13, "#c4bdab");
-    rect(ctx, cx - 12, py - 13, 24, 1, "#ddd6c4");
-    rect(ctx, cx - 8, py - 10, 7, 10, "#4a3422"); // left door
-    rect(ctx, cx + 1, py - 10, 7, 10, "#4a3422"); // right door
-    rect(ctx, cx - 1, py - 11, 2, 11, "#9c9684"); // center mullion
-    rect(ctx, cx - 13, py, 26, 2, "#8f8876"); // steps
+// The Glade Mart: a timber kiosk with produce shelf under a striped awning.
+function paintStand(ctx, ox, oy, w) {
+  const W = (w || 2) * TILE;
+  rect(ctx, ox + 2, oy + 6, 2, 8, "#6a4426"); // legs
+  rect(ctx, ox + W - 4, oy + 6, 2, 8, "#6a4426");
+  rect(ctx, ox + 2, oy - 6, W - 4, 12, "#6a4426"); // stall body
+  rect(ctx, ox + 3, oy - 5, W - 6, 10, "#c08a50");
+  rect(ctx, ox + 3, oy - 5, W - 6, 5, "#2e2a24"); // shaded shelf
+  const produce = ["#d24040", "#e8a030", "#4058c8", "#d24040", "#3f8c48", "#e8a030"];
+  for (let i = 0; i < 6; i++) {
+    px(ctx, ox + 5 + i * 4, oy - 3, produce[i]);
+    px(ctx, ox + 5 + i * 4, oy - 2, produce[(i + 3) % 6]);
   }
+  rect(ctx, ox + 3, oy + 3, W - 6, 2, "#96683a"); // counter lip
+  for (let sx = 0; sx < W; sx += 6) // green-and-cream awning
+    rect(ctx, ox + sx, oy - 12, Math.min(6, W - sx), 5, (sx / 6) % 2 ? "#e8e4d8" : "#2e6448");
+  rect(ctx, ox, oy - 13, W, 1, "#1e4430");
+  rect(ctx, ox, oy - 7, W, 1, "rgba(0,0,0,0.25)"); // awning shadow on the stall
+}
+
+// A granite boulder sitting in the creek pool, ripples at its waterline.
+function paintRock(ctx, ox, oy) {
+  disc(ctx, ox + 8, oy + 9, 6, "#5e646e");
+  disc(ctx, ox + 8, oy + 8, 5, "#9aa1ab");
+  disc(ctx, ox + 6, oy + 7, 3, "#c3c9d1");
+  px(ctx, ox + 11, oy + 10, "#6a7078");
+  rect(ctx, ox + 1, oy + 12, 4, 1, "#7fb1ef");
+  rect(ctx, ox + 11, oy + 13, 4, 1, "#7fb1ef");
 }
 
 // The bronze University of California seal set in a round stone planter.
@@ -417,6 +559,75 @@ function paintPortalPad(ctx, mats) {
     }
 }
 
+// --- ground tiles beyond grass/brick (creek, plaza, bridge) -------------------
+
+const W_PAL = { base: "#4585dd", lt: "#7fb1ef", dk: "#2a5cb4", shore: "#1d3f74" };
+
+// Creek/lake water with dark shore lines against land and stable glints.
+function paintWaterTile(ctx, tx, ty, isWater) {
+  const ox = tx * TILE;
+  const oy = ty * TILE;
+  rect(ctx, ox, oy, TILE, TILE, W_PAL.base);
+  const g = hash2(tx * 5, ty * 13);
+  if (g < 0.55) {
+    const gx = ox + 2 + Math.floor(hash2(tx, ty) * 9);
+    const gy = oy + 3 + Math.floor(hash2(ty, tx) * 9);
+    rect(ctx, gx, gy, 4, 1, W_PAL.lt);
+    px(ctx, gx - 1, gy + 1, W_PAL.lt);
+    px(ctx, gx + 4, gy + 1, W_PAL.lt);
+  } else if (g > 0.78) {
+    rect(ctx, ox + 3 + ((tx * 7) % 6), oy + 8 + ((ty * 5) % 5), 3, 1, W_PAL.dk);
+  }
+  const up = !isWater(tx, ty - 1);
+  const down = !isWater(tx, ty + 1);
+  const left = !isWater(tx - 1, ty);
+  const right = !isWater(tx + 1, ty);
+  if (up) { rect(ctx, ox, oy, TILE, 1, W_PAL.shore); rect(ctx, ox, oy + 1, TILE, 2, W_PAL.dk); } // bank shade
+  if (down) rect(ctx, ox, oy + TILE - 1, TILE, 1, W_PAL.shore);
+  if (left) { rect(ctx, ox, oy, 1, TILE, W_PAL.shore); rect(ctx, ox + 1, oy, 1, TILE, W_PAL.dk); }
+  if (right) { rect(ctx, ox + TILE - 1, oy, 1, TILE, W_PAL.shore); rect(ctx, ox + TILE - 2, oy, 1, TILE, W_PAL.dk); }
+  if (up && left) px(ctx, ox, oy, T.grassDark); // grassy corner nips
+  if (up && right) px(ctx, ox + TILE - 1, oy, T.grassDark);
+  if (down && left) px(ctx, ox, oy + TILE - 1, T.grassDark);
+  if (down && right) px(ctx, ox + TILE - 1, oy + TILE - 1, T.grassDark);
+}
+
+// The pale stone plaza: 8px slabs with tone shifts, seams, and a kerb where
+// the pavement meets grass.
+function paintSlabTile(ctx, tx, ty, onPave) {
+  const ox = tx * TILE;
+  const oy = ty * TILE;
+  rect(ctx, ox, oy, TILE, TILE, "#d9d4c6");
+  for (let sy = 0; sy < 2; sy++)
+    for (let sx = 0; sx < 2; sx++) {
+      const v = hash2(tx * 2 + sx, ty * 2 + sy + 31);
+      if (v < 0.25) rect(ctx, ox + sx * 8 + 1, oy + sy * 8 + 1, 7, 7, "#cfcaba");
+      else if (v > 0.8) rect(ctx, ox + sx * 8 + 1, oy + sy * 8 + 1, 7, 7, "#e4e0d4");
+      if (v > 0.94) px(ctx, ox + sx * 8 + 3, oy + sy * 8 + 4, "#b5b0a0"); // a chipped corner
+    }
+  rect(ctx, ox, oy, TILE, 1, "#bcb7a7"); // seam grid
+  rect(ctx, ox, oy, 1, TILE, "#bcb7a7");
+  rect(ctx, ox, oy + 8, TILE, 1, "#bcb7a7");
+  rect(ctx, ox + 8, oy, 1, TILE, "#bcb7a7");
+  if (!onPave(tx, ty - 1)) rect(ctx, ox, oy, TILE, 1, "#98937f"); // kerb against grass
+  if (!onPave(tx, ty + 1)) rect(ctx, ox, oy + TILE - 1, TILE, 1, "#98937f");
+  if (!onPave(tx - 1, ty)) rect(ctx, ox, oy, 1, TILE, "#98937f");
+  if (!onPave(tx + 1, ty)) rect(ctx, ox + TILE - 1, oy, 1, TILE, "#98937f");
+}
+
+// A plank bridge over the creek: deck drawn over the water tile, rails along
+// the north and south edges (the crossing runs east–west).
+function paintBridgeTile(ctx, tx, ty) {
+  const ox = tx * TILE;
+  const oy = ty * TILE;
+  rect(ctx, ox, oy + 2, TILE, 12, "#c08a50");
+  for (let py = oy + 5; py < oy + 14; py += 3) rect(ctx, ox, py, TILE, 1, "#96683a"); // planks
+  rect(ctx, ox, oy, TILE, 2, "#7a5028"); // rails
+  rect(ctx, ox, oy, TILE, 1, "#8f6034");
+  rect(ctx, ox, oy + 14, TILE, 2, "#7a5028");
+  rect(ctx, ox, oy + 14, TILE, 1, "#96683a");
+}
+
 // --- shadows ------------------------------------------------------------------
 
 // Soft directional shadows under buildings and trees, grounding them on the lawn.
@@ -426,14 +637,16 @@ function paintShadows(ctx, room) {
     const y = f.y * TILE;
     const w = (f.w || 1) * TILE;
     const h = (f.h || 1) * TILE;
-    if (f.kind === "campusTree" || f.kind === "pineTree") {
+    if (f.kind === "campusTree" || f.kind === "pineTree" || f.kind === "redwood" || f.kind === "bush") {
       for (let dy = -2; dy <= 3; dy++)
         for (let dx = -7; dx <= 9; dx++)
           if (dx * dx / 72 + dy * dy / 9 <= 1) px(ctx, x + 9 + dx, y + 15 + dy, "rgba(0,0,0,0.16)");
-    } else if (f.kind === "hall" || f.kind === "campanile" || f.kind === "brickHall" || f.kind === "rushRhees") {
+    } else if (f.kind === "doeLibrary" || f.kind === "campanile" || f.kind === "brickHall" || f.kind === "rushRhees") {
       rect(ctx, x + 6, y + h, w, 6, "rgba(18,26,12,0.26)"); // solid cast to the south
       rect(ctx, x + w, y + 6, 6, h, "rgba(18,26,12,0.22)"); // and to the east
       rect(ctx, x + w, y + h, 6, 6, "rgba(18,26,12,0.26)"); // SE corner
+    } else if (f.kind === "forest") {
+      rect(ctx, x + 3, y + h, w - 3, 5, "rgba(18,26,12,0.20)"); // tree-line cast
     }
   });
 }
@@ -471,11 +684,19 @@ function paintSquirtle(ctx, ox, oy) {
 const CAMPUS_PAINTERS = {
   brickHall: paintBrickHall,
   rushRhees: paintRushRhees,
-  hall: paintHall,
+  doeLibrary: paintDoeLibrary,
+  satherGate: paintSatherGate,
+  ironFence: paintIronFence,
   campanile: paintCampanile,
   ucSeal: paintUCSeal,
   campusTree: paintBushyTree,
   pineTree: paintTallTree,
+  redwood: paintRedwood,
+  bush: paintBush,
+  forest: paintForest,
+  berryPatch: paintBerryPatch,
+  stand: paintStand,
+  rock: paintRock,
   lamppost: paintLamppost,
   pikachu: paintPikachu,
   psyduck: paintPsyduck,
@@ -487,13 +708,27 @@ const CAMPUS_PAINTERS = {
 export function buildCampusArt(room) {
   const [bg, ctx] = makeCanvas(VIEW_W, VIEW_H);
 
-  const m = room.pathMatrix; // a hand-plotted tile map ("#" = dirt path)
-  const onPath = m
-    ? (x, y) => y >= 0 && y < m.length && x >= 0 && x < m[y].length && m[y][x] === "#"
+  // Hand-plotted tile map: "#" brick walk, "=" stone plaza, "~" creek water,
+  // "B" bridge over water. Rooms without a matrix fall back to path rects.
+  const m = room.pathMatrix;
+  const glyph = (x, y) => (m && y >= 0 && y < m.length && x >= 0 && x < m[y].length ? m[y][x] : ".");
+  // Out-of-bounds counts as water so the lake bleeds off the map edge.
+  const isWater = (x, y) =>
+    m ? (y < 0 || y >= m.length || x < 0 || x >= m[y].length ? true : "~B".includes(m[y][x])) : false;
+  const onPave = m
+    ? (x, y) => "#=B".includes(glyph(x, y))
     : (x, y) => isCampusPath(room, x, y);
   for (let ty = 0; ty < room.h; ty++)
-    for (let tx = 0; tx < room.w; tx++)
-      onPath(tx, ty) ? paintDirt(ctx, tx, ty, onPath) : paintGrass(ctx, tx, ty);
+    for (let tx = 0; tx < room.w; tx++) {
+      const g = glyph(tx, ty);
+      if (g === "~") paintWaterTile(ctx, tx, ty, isWater);
+      else if (g === "B") {
+        paintWaterTile(ctx, tx, ty, isWater);
+        paintBridgeTile(ctx, tx, ty);
+      } else if (g === "=") paintSlabTile(ctx, tx, ty, onPave);
+      else if (g === "#" || (!m && onPave(tx, ty))) paintDirt(ctx, tx, ty, onPave);
+      else paintGrass(ctx, tx, ty);
+    }
   if (!m) paintSkyBand(ctx, room); // the bird's-eye campus has no horizon
 
   paintPortalPad(ctx, room.mats);

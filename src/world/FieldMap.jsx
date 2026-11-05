@@ -16,6 +16,7 @@ const Cartography = memo(function Cartography({ manifest, locations }) {
     {pond && tileRect(pond.x, pond.y, pond.w, pond.h, '#71baca')}
     {layout?.pathMatrix?.map((row,y) => [...row.matchAll(/(#+|~+|=+|B+)/g)].map(match =>
       tileRect(match.index,y,match[0].length,1,match[0][0] === '~' ? '#71baca' : '#f8daa1',y + ':' + match.index)))}
+    {manifest.fountain && <circle cx={manifest.fountain.x} cy={manifest.fountain.z} r={manifest.fountain.radius*.65} fill="#65aeb0" stroke="#f3dbae" strokeWidth=".65" />}
     {manifest.landmarks.map(({id, center, half}) => <rect key={id} x={center[0]-half[0]} y={-center[1]-half[1]} width={half[0]*2} height={half[1]*2} fill="#ca916e" stroke="#866b54" strokeWidth=".4" rx=".6" />)}
     {locations.filter(l => l.position && !l.secret).map(({id,position}) => <circle key={id} cx={position[0]} cy={position[2]} r={interior ? .42 : .85} fill="#315b63" stroke="#fff7cf" strokeWidth={interior ? .15 : .35} />)}
   </>;

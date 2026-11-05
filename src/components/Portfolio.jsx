@@ -5,6 +5,7 @@ import Experience from "../sections/Experience";
 import Projects from "../sections/Projects";
 import Skills from "../sections/Skills";
 import Contact from "../sections/Contact";
+import Footer from "./Footer";
 
 // The full portfolio page content. With `videoBackground` the hero plays the
 // looping video and content shows immediately (an intro overlay handles the
@@ -35,6 +36,7 @@ export default function Portfolio({ videoBackground = false, onReady }) {
         <Projects />
         <Skills />
         <Contact />
+        <Footer />
       </div>
     </main>
   );

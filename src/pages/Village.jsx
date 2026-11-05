@@ -269,6 +269,12 @@ export default function Village() {
     ctx.imageSmoothingEnabled = false;
 
     const world = buildWorld();
+    // Static scenery as ready-made drawables: anchorY is the bottom edge of
+    // each structure's footprint, so sprites sort behind/in front correctly.
+    const structureDrawables = world.structures.map((s) => ({
+      y: s.anchorY,
+      draw: () => ctx.drawImage(s.img, s.x, s.y),
+    }));
     const playerFrames = buildPlayerFrames();
     const interiors = getInteriors();
     interiorsRef.current = interiors;
@@ -425,15 +431,19 @@ export default function Village() {
       }
 
       // --- draw ---
+      // Everything tall — structures, NPCs, the player — goes into one list
+      // keyed by the bottom edge of its footprint (world px) and is painted
+      // south-most last, so sprites pass behind whatever stands below them.
       let ox = 0;
       let oy = 0;
       const drawables = [];
 
       if (sceneId === "village") {
-        ctx.drawImage(world.bg, 0, 0);
+        ctx.drawImage(world.ground, 0, 0);
         ctx.drawImage(world.pondFrames[Math.floor(now / 600) % 2], world.pond.x * TILE, world.pond.y * TILE);
         const flowerFrame = world.flowerFrames[Math.floor(now / 450) % 2];
         world.flowerTiles.forEach(([fx, fy]) => ctx.drawImage(flowerFrame, fx * TILE, fy * TILE));
+        drawables.push(...structureDrawables);
         kiwisRef.current.forEach((k) => {
           const tt = k.moving ? k.progress : 0;
           const wx = (k.x + (k.tx - k.x) * tt) * TILE;
@@ -441,7 +451,7 @@ export default function Village() {
           const frames = kiwiFrames[k.dir];
           const fi = k.moving ? [1, 0, 1, 0][Math.floor(k.animClock / 0.18) % 4] : 0;
           drawables.push({
-            y: wy,
+            y: wy + TILE,
             draw: () => ctx.drawImage(
               frames[fi],
               Math.round(wx + (TILE - frames[fi].width) / 2),
@@ -465,7 +475,7 @@ export default function Village() {
           const fi = npc.moving ? stepSeq[Math.floor(npc.animClock / 0.16) % 4] : 0;
           const npcBob = fi > 0 ? 1 : 0;
           drawables.push({
-            y: wy,
+            y: wy + TILE,
             draw: () => ctx.drawImage(frames[fi], Math.round(ox + wx + (TILE - SPRITE_W) / 2), Math.round(oy + wy + TILE - SPRITE_H - npcBob)),
           });
         });
@@ -479,7 +489,7 @@ export default function Village() {
       const frameIdx = p.moving ? seq[Math.floor(p.animClock / 0.13) % 4] : 0;
       const bob = frameIdx > 0 ? 1 : 0;
       drawables.push({
-        y: drawYBase,
+        y: drawYBase + TILE,
         draw: () => ctx.drawImage(dirFrames[frameIdx], Math.round(drawX), Math.round(oy + drawYBase + TILE - SPRITE_H - bob)),
       });
 
