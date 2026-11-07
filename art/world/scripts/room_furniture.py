@@ -287,6 +287,8 @@ def furnish(room, manifest):
 
     collection={'education':school_house,'experience':mission_control,'projects':makerspace}[room]
     collection(block,station,sign)
+    from crafted_interiors import refine_room
+    refine_room(room)
 
     # Every resume entry becomes a villager, same as the pixel city: talk to
     # them and they tell their own story, positioned from the original room's

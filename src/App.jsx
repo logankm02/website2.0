@@ -16,7 +16,8 @@ export default function App() {
       <Analytics />
       <Suspense fallback={null}>
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<World />} />
+          <Route path="/home" element={<Home />} />
           <Route path="/about" element={<About />} />
           <Route path="/classic" element={<Classic />} />
           <Route path="/city" element={<Village />} />

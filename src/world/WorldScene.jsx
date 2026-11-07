@@ -7,11 +7,13 @@ import { Box3, Vector3, Ray, DataTexture, FloatType, RGBAFormat, Equirectangular
 import GradientSky from './GradientSky';
 import Vegetation from './Vegetation';
 import Traveler from './Traveler';
+import CampusCrowd from './CampusCrowd';
 import { createCollisionWorld, stepPlayer } from './physics';
 import { locationsForWorld } from './locations';
+import { INTRO_SECONDS, introEase } from './intro';
 import { makeProbePixels } from './toonMaterial';
 
-export default function WorldScene({ assets, quality, running, onNearest, onInteract, onPerformance, onSprintChange, mapRef, arrowRef, showGreeting, debug }) {
+export default function WorldScene({ intro = 'done', onIntroDone, assets, quality, running, onNearest, onInteract, onPerformance, onSprintChange, mapRef, arrowRef, showGreeting, debug }) {
   const { camera, gl, scene } = useThree();
   const world = useMemo(() => createCollisionWorld(assets.manifest, assets.placements, assets.heights), [assets]);
   const locations = useMemo(() => locationsForWorld(assets.manifest), [assets]);
@@ -32,6 +34,8 @@ export default function WorldScene({ assets, quality, running, onNearest, onInte
   const focusHeight = interior ? 1.3 : glade ? 3.7 : campus ? 4.6 : 2.25;
   const initialDistance = interior ? 6.2 : glade ? 10.5 : campus ? 17 : 14;
   const initialPitch = assets.manifest.arrivalPitch ?? (interior ? .2 : .23);
+  const introFlight = useRef({ time: 0, hover: 0, started: false, complete: false, from: new Vector3(), look: new Vector3(), currentLook: new Vector3(8,12,-4),
+    reduced: window.matchMedia('(prefers-reduced-motion: reduce)').matches });
   const input = useRef(new Set()), orbit = useRef({ yaw: assets.manifest.arrivalYaw ?? (assets.manifest.campus ? -.46 : .08), pitch: initialPitch, distance: initialDistance, dragging: false });
   const accumulator = useRef(0), updates = useRef(0), nearest = useRef(null), sun = useRef(), sprinting = useRef(false);
   const refs = useRef({ running, onNearest, onInteract, onPerformance, onSprintChange }); refs.current = { running, onNearest, onInteract, onPerformance, onSprintChange };
@@ -67,7 +71,7 @@ export default function WorldScene({ assets, quality, running, onNearest, onInte
     const move = e => { if (refs.current.running && (orbit.current.dragging || document.pointerLockElement === canvas)) { orbit.current.yaw -= e.movementX * .003; orbit.current.pitch = Math.max(-.35, Math.min(.9, orbit.current.pitch + e.movementY * .0025)); } };
     const up = () => { orbit.current.dragging = false; };
     const lockError = () => { orbit.current.dragging = true; };
-    const wheel = e => { e.preventDefault(); orbit.current.distance = Math.max(3.5, Math.min(interior ? 11 : 24, orbit.current.distance + e.deltaY * .008)); };
+    const wheel = e => { e.preventDefault(); if (!refs.current.running) return; orbit.current.distance = Math.max(3.5, Math.min(interior ? 11 : 24, orbit.current.distance + e.deltaY * .008)); };
     const blur = () => { clear(); };
     const visibility = () => { if (document.hidden) blur(); };
     window.addEventListener('keydown', keydown); window.addEventListener('keyup', keyup); window.addEventListener('blur', blur); document.addEventListener('visibilitychange', visibility); document.addEventListener('pointerlockerror', lockError);
@@ -96,7 +100,23 @@ export default function WorldScene({ assets, quality, running, onNearest, onInte
     for (let d = .5; d < distance; d += .3) { c.ideal.copy(c.target).addScaledVector(c.direction, d); if (c.ideal.y < world.height(c.ideal.x, c.ideal.z) + .35) { distance = Math.max(.8, d - .3); break; } }
     c.ideal.copy(c.target).addScaledVector(c.direction, distance);
     if (interior) c.ideal.y = Math.min(c.ideal.y, assets.manifest.ceilingHeight - .25);
-    camera.position.lerp(c.ideal, 1 - Math.exp(-9 * Math.min(delta, .1))); camera.lookAt(c.target);
+    const flight = introFlight.current;
+    if (intro === 'waiting') {
+      if (!flight.reduced) flight.hover += Math.min(delta, .05);
+      camera.position.set(30 + Math.sin(flight.hover*.13)*1.8, 32 + Math.sin(flight.hover*.23)*.45, 70);
+      flight.currentLook.set(8,12,-4); camera.lookAt(flight.currentLook);
+    } else if (intro === 'flying' && !flight.complete) {
+      if (!flight.started) {
+        flight.started = true; flight.from.copy(camera.position); flight.look.copy(flight.currentLook);
+      }
+      flight.time += Math.min(delta,.05);
+      const t = flight.reduced ? 1 : Math.min(1,flight.time / INTRO_SECONDS), eased = introEase(t);
+      camera.position.lerpVectors(flight.from,c.ideal,eased);
+      flight.currentLook.lerpVectors(flight.look,c.target,eased);camera.lookAt(flight.currentLook);
+      if (t === 1) { flight.complete = true; onIntroDone?.(); }
+    } else {
+      camera.position.lerp(c.ideal, 1 - Math.exp(-9 * Math.min(delta, .1))); camera.lookAt(c.target);
+    }
     if (sun.current) { sun.current.position.set(p.x - 30, p.y + 55, p.z + 25); sun.current.target.position.set(p.x, p.y, p.z); sun.current.target.updateMatrixWorld(); }
     updates.current += delta;
     if (updates.current > .2) {
@@ -130,10 +150,11 @@ export default function WorldScene({ assets, quality, running, onNearest, onInte
     </Html>}
     <primitive object={assets.world.scene} />
     {!interior && <Vegetation assets={assets} quality={quality} player={player} />}
-    <Traveler asset={assets.traveler} player={player} contactShadow={interior} />
-    {!interior && !assets.manifest.campus && <Traveler asset={assets.resident} residentIndex={2} position={[-4.3, world.height(-4.3,9.6), 9.6]} />}
+    <Traveler asset={assets.traveler} arrivalYaw={campus ? assets.manifest.arrivalYaw : 0} player={player} contactShadow={interior} />
+    {campus && assets.resident && <CampusCrowd assets={assets} world={world} observer={player} running={running} quality={quality}/>}
+    {!interior && !assets.manifest.campus && <Traveler asset={assets.resident} observer={player} residentIndex={2} position={[-4.3, world.height(-4.3,9.6), 9.6]} />}
     {interior && assets.resident && locations.filter(l => l.kind === 'Talk' && l.position).map((l,i) =>
-      <Traveler key={l.id} asset={assets.resident} residentIndex={i} position={l.position} contactShadow />)}
+      <Traveler key={l.id} asset={assets.resident} observer={player} residentIndex={i} position={l.position} contactShadow />)}
     {quality !== 'low' && <EffectComposer multisampling={0}>
       <Bloom luminanceThreshold={1.15} intensity={.13} mipmapBlur />
       <SMAA />

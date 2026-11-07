@@ -14,6 +14,9 @@ const Cartography = memo(function Cartography({ manifest, locations }) {
     {layout?.TREES?.map(([x,y]) => <circle key={x + ',' + y} cx={(x - 11.5) * tile} cy={(y - 10) * tile} r="1.8" fill="#78aa72" />)}
     {layout?.PATHS?.map(([x,y,w,h], i) => tileRect(x,y,w,h,'#f8daa1',i))}
     {pond && tileRect(pond.x, pond.y, pond.w, pond.h, '#71baca')}
+    {layout?.walks?.map(({points,width}, i) =>
+      <polyline key={'walk'+i} points={points.map(([x,y]) => x+','+(-y)).join(' ')} fill="none" stroke="#f5dfb0" strokeWidth={width} strokeLinejoin="round" strokeLinecap="round" />)}
+    {layout?.water?.map(([x,y,w,h], i) => <rect key={'water'+i} x={x} y={-y-h} width={w} height={h} fill="#71baca" />)}
     {layout?.pathMatrix?.map((row,y) => [...row.matchAll(/(#+|~+|=+|B+)/g)].map(match =>
       tileRect(match.index,y,match[0].length,1,match[0][0] === '~' ? '#71baca' : '#f8daa1',y + ':' + match.index)))}
     {manifest.fountain && <circle cx={manifest.fountain.x} cy={manifest.fountain.z} r={manifest.fountain.radius*.65} fill="#65aeb0" stroke="#f3dbae" strokeWidth=".65" />}
@@ -25,6 +28,7 @@ const Cartography = memo(function Cartography({ manifest, locations }) {
 export default function FieldMap({ assets, locations, mapRef, arrowRef, onOpen }) {
   const { manifest } = assets;
   const [x,y] = manifest.spawn;
+  const north = (manifest.layout?.northDegrees ?? 0) * Math.PI / 180;
   const radius = manifest.interior ? 8 : 26;
   return <button className="field-map" onClick={onOpen} aria-label="Open area directory">
     <svg ref={mapRef} viewBox={`${x-radius} ${-y-radius} ${2*radius} ${2*radius}`} aria-hidden="true">
@@ -33,6 +37,6 @@ export default function FieldMap({ assets, locations, mapRef, arrowRef, onOpen }
         <path transform={`scale(${radius/26})`} d="M0 -3.1 2.35 2.15 0 1.25 -2.35 2.15Z" fill="#ffdc4e" stroke="#303d45" strokeWidth=".65" strokeLinejoin="round" />
       </g>
     </svg>
-    <b aria-hidden="true">N</b><span>Area map</span>
+    <b aria-hidden="true" style={north ? {left: (50 + 50*Math.sin(north))+'%', top: (50 - 50*Math.cos(north))+'%', transform: 'translate(-50%, -50%)'} : undefined}>N</b><span>Area map</span>
   </button>;
 }

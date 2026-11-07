@@ -5,7 +5,7 @@ import { guideForLink, guideFromHash } from './guideContent.js';
 import { resolveWorldRoute } from './worldRoute.js';
 import { spotlightProjects } from '../data/projects.js';
 
-test('every world route opens without an arrival gate', () => {
+test('every world route starts loading immediately', () => {
   for (const search of ['', '?campus=rochester', '?campus=berkeley', '?interior=education', '?interior=experience', '?interior=projects']) {
     assert.equal(resolveWorldRoute(search).startImmediately, true, search);
   }

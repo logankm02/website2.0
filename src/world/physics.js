@@ -37,11 +37,12 @@ export function stepPlayer(state, input, yaw, world, dt) {
   const side = Number(input.has('KeyD') || input.has('ArrowRight')) - Number(input.has('KeyA') || input.has('ArrowLeft'));
   const magnitude = Math.hypot(forward, side) || 1;
   const sprintHeld = input.has('ShiftLeft') || input.has('ShiftRight');
-  const speed = sprintHeld ? 6.0 : 3.0;
+  const speed = sprintHeld ? 4.8 : 1.7;
   state.sprinting = sprintHeld && (forward !== 0 || side !== 0);
   const targetX = (-Math.sin(yaw) * forward + Math.cos(yaw) * side) / magnitude * speed;
   const targetZ = (-Math.cos(yaw) * forward - Math.sin(yaw) * side) / magnitude * speed;
-  const blend = 1 - Math.exp(-14 * dt);
+  const accelerating = forward !== 0 || side !== 0;
+  const blend = 1 - Math.exp(-(accelerating ? 5.5 : 14) * dt);
   state.vx += (targetX - state.vx) * blend; state.vz += (targetZ - state.vz) * blend;
   const before = world.height(state.x, state.z);
   const canStep = (x, z) => {
@@ -50,10 +51,12 @@ export function stepPlayer(state, input, yaw, world, dt) {
     const slope = Math.hypot(world.height(x + .15, z) - world.height(x - .15, z), world.height(x, z + .15) - world.height(x, z - .15)) / .3;
     return h - before < .28 && (slope < 1.0 || h < before);
   };
+  const oldX = state.x, oldZ = state.z;
   const nx = state.x + state.vx * dt;
   if (canStep(nx, state.z)) state.x = nx; else state.vx = 0;
   const nz = state.z + state.vz * dt;
   if (canStep(state.x, nz)) state.z = nz; else state.vz = 0;
+  state.distance = (state.distance ?? 0) + Math.hypot(state.x - oldX, state.z - oldZ);
   const ground = world.height(state.x, state.z);
   if (state.grounded && Math.abs(ground - state.y) < .28) { state.y = ground; state.vy = 0; }
   else { state.vy -= 18 * dt; state.y += state.vy * dt; }

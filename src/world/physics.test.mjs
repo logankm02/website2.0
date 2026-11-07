@@ -42,7 +42,8 @@ test('pond and border are solid, with the source city’s south gate open',()=>{
 test('steep uphill motion is rejected; a gentle slope remains walkable',()=>{
  const steep={height:x=>x*1.5,blocked:()=>false}, gentle={height:x=>x*.4,blocked:()=>false};
  const a=walk(state(0,0,0),['KeyD'],steep),b=walk(state(0,0,0),['KeyD'],gentle);
- assert.equal(a.x,0);assert.ok(b.x>5);assert.ok(Math.abs(b.y-gentle.height(b.x,b.z))<.1);
+ const level=walk(state(0,0,0),['KeyD'],flat);
+ assert.equal(a.x,0);assert.equal(a.distance,0);assert.ok(level.x>0 && Math.abs(b.x-level.x)<.01);assert.ok(Math.abs(b.y-gentle.height(b.x,b.z))<.1);
 });
 test('building geometry matches the 3D map and preserves the original pond and spawn',()=>{
  assert.deepEqual(manifest.layout.POND,POND);
@@ -63,7 +64,7 @@ test('spawn connects to every building, both signs, pond walk and south gate',()
   seen.add(key);
   for(const [dx,dz] of [[1,0],[-1,0],[0,1],[0,-1]])queue.push([ix+dx,iz+dz]);
  }
- const targets=[...manifest.landmarks.map(l=>[l.id,l.door[0],-l.door[1]]),['skills',-6,1.56],['contact',6,13.56],['pond',-7.2,12],['gate',2.4,21.6],['rochester portal',-20,-5.2],['berkeley portal',-8.5,-5.2]];
+ const targets=[...manifest.landmarks.map(l=>[l.id,l.door[0],-l.door[1]]),['skills',-6,1.56],['contact',6,13.56],['pond',-7.2,12],['gate',2.4,21.6]];
  for(const [label,x,z] of targets)assert.ok([...seen].some(key=>{const [ix,iz]=key.split(',').map(Number);return Math.hypot(ix*step-x,iz*step-z)<1;}),label+' reachable');
 });
 

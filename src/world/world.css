@@ -194,3 +194,33 @@
 .world-map-list button > div { flex:1; }.world-map-list button > span:first-child { color:#8e4834; font-size:11px; }.world-map-list button:hover { background:#fff0b7; }
 .world-runtime-error button { text-decoration:underline; }
 @media(max-width:620px) { .world-guide-menu { top:75px; right:14px; }.world-guide-menu a { padding:6px 9px; }.world-location { left:14px; }.world-sprint { left:14px; } }
+
+/* A title floating over the live city, with the entire frame acting as Start. */
+.world-page .world-opening {
+  position:absolute; inset:0; z-index:5; width:100%; height:100%;
+  padding:0; border:0; border-radius:0; background:linear-gradient(180deg,#172c4912,transparent 60%,#14223242);
+  color:#fffdf1; text-align:center; cursor:pointer; opacity:1;
+  transition:opacity .24s ease, visibility .24s; text-shadow:0 2px 12px #1831464d;
+}
+.world-page .world-opening:disabled { opacity:0; cursor:default; pointer-events:none; visibility:hidden; }
+.world-opening-title { position:absolute; left:5%; right:5%; top:10%; display:flex; flex-direction:column; align-items:center; animation:opening-float 6s ease-in-out infinite; }
+.world-opening-kicker { font-size:11px; font-weight:700; letter-spacing:.32em; margin-bottom:18px; }
+.world-opening-heading { font-size:clamp(40px,6.1vw,88px); line-height:1.02; letter-spacing:-.055em; font-weight:800; text-shadow:0 3px 0 #354f6366,0 8px 30px #253b5152; }
+.world-opening-dot { color:#ffda53; }
+.world-opening-sub { margin-top:19px; font-size:clamp(12px,1.2vw,16px); font-weight:500; letter-spacing:.02em; }
+.world-opening-enter { position:absolute; bottom:12%; left:50%; transform:translateX(-50%); display:flex; align-items:center; gap:12px; white-space:nowrap; font-size:14px; font-weight:650; }
+.world-opening-play { width:31px; height:31px; display:grid; place-items:center; border-radius:50%; background:#ffda53; color:#24283d; font-size:19px; text-shadow:none; box-shadow:0 3px 0 #253b5152; }
+.world-opening-caption { position:absolute; bottom:4.5%; left:10px; right:10px; font-size:9px; font-weight:600; letter-spacing:.19em; opacity:.85; }
+.world-opening-caption span { padding-inline:9px; }
+.world-page .world-opening:focus-visible { outline:none; }
+.world-opening:focus-visible .world-opening-play { outline:2px solid #fffdf1; outline-offset:5px; }
+.world-page .world-opening:focus:not(:focus-visible) { outline:none; }
+@keyframes opening-float { 0%,100% {transform:translateY(0)} 50% {transform:translateY(-7px)} }
+@media (max-height:510px) {
+  .world-opening-title {top:6%}.world-opening-heading {font-size:clamp(34px,8vh,55px)}
+  .world-opening-kicker {margin-bottom:9px}.world-opening-sub {margin-top:10px}
+  .world-opening-enter {bottom:13%}
+}
+@media (prefers-reduced-motion:reduce) {
+  .world-opening-title {animation:none}.world-page .world-opening {transition:none}
+}

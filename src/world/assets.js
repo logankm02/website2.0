@@ -45,7 +45,7 @@ export async function loadWorld(onProgress, route) {
       fetch(`${BASE}${manifest.heightmap || 'heightmap.bin'}`).then(r => { if (!r.ok) throw new Error('Terrain data could not be loaded.'); return r.arrayBuffer(); }),
       Promise.all(manifest.assets.map(async a => ({ ...a, high: await gltf(a.url,a.kind), low: a.lodUrl ? await gltf(a.lodUrl,a.kind) : null }))),
       manifest.detailModel ? gltf(manifest.detailModel) : null,
-      !manifest.campus ? gltf('resident.glb') : null,
+      gltf(manifest.campus ? 'student.glb' : manifest.interior ? 'resident.glb' : 'logan.glb'),
     ]);
     if (resident && manifest.interior && manifest.locations.some(l => l.kind === 'Talk')) {
       world.scene.traverse(o => { if (o.isMesh && /^Villager /i.test(o.material.name)) o.visible = false; });

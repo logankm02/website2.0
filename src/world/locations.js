@@ -15,8 +15,6 @@ export const locations = [
   { id: 'contact', label: 'Town noticeboard', position: notice('contact'), kind: 'Read', body: 'Have a project, a question, or an idea to share? Leave a note at the town noticeboard.', links: [{ label: 'Get in touch', href: '/about#getInTouch' }, { label: 'GitHub', href: profile.socials.github.url }] },
   { id: 'pond', label: 'The soccer pond', position: cityPosition(POND.x + (POND.w - 1) / 2, POND.y - 1), kind: 'Play', body: 'A familiar shortcut beside the southwest pond. Step into the original soccer scene, or find the Scrabble bot in the lab.', links: [{ label: 'Open the soccer scene', href: '/classic' }, { label: 'Play Scrabble', href: spotlightProjects.find(p => p.id === 'scrabble').href }] },
   { id: 'exit', label: 'South gate', position: cityPosition(EXITS[0].x + .5, EXITS[0].y), kind: 'Read', body: 'Take a moment to read the field guide: my résumé, projects, skills, and a way to get in touch.', links: [{ label: 'Read my résumé', href: '#guide/resume' }, { label: 'Get in touch', href: '#guide/contact' }] },
-  { id: 'rochester', label: 'University of Rochester', position: [-20, 2.5, -5.2], kind: 'Travel', body: 'Visit Eastman Quad: Rush Rhees Library, the copper dome, brick academic halls, and autumn trees.', links: [{ label: 'Enter Eastman Quad in 3D', href: '/world?campus=rochester' }] },
-  { id: 'berkeley', label: 'UC Berkeley', position: [-8.5, 2.5, -5.2], kind: 'Travel', body: 'Visit Memorial Glade: the Campanile, Doe Library, Strawberry Creek, and Sather Gate.', links: [{ label: 'Enter Memorial Glade in 3D', href: '/world?campus=berkeley' }] },
 ];
 
 locations.find(l => l.id === 'education').links.push(
