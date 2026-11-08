@@ -17,7 +17,9 @@ test('collision height matches exported terrain vertices across the map',()=>{
 });
 test('diagonal movement is normalized and running is faster',()=>{
  const a=walk(state(0,0,0),['KeyW'],flat),b=walk(state(0,0,0),['KeyW','KeyD'],flat),c=walk(state(0,0,0),['KeyW','ShiftLeft'],flat);
- assert.ok(Math.abs(Math.hypot(a.x,a.z)-Math.hypot(b.x,b.z))<1e-7);assert.ok(Math.abs(c.z)>Math.abs(a.z)*1.9);
+ assert.ok(Math.abs(a.speed-2.8)<.001,'brisk default walk');
+ assert.ok(Math.abs(c.speed-4.8)<.001,'sprint stays distinct');
+ assert.ok(Math.abs(Math.hypot(a.x,a.z)-Math.hypot(b.x,b.z))<1e-7);assert.ok(Math.abs(c.z)>Math.abs(a.z)*1.5);
 });
 test('gravity lands a falling player on the terrain',()=>{
  const p=state();p.y+=5;p.grounded=false;walk(p,[],world,180);assert.ok(Math.abs(p.y-world.height(p.x,p.z))<1e-5);assert.equal(p.grounded,true);

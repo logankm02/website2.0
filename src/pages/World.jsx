@@ -5,9 +5,8 @@ import WorldIntro from '../world/WorldIntro';
 import { INTRO_SEEN, shouldShowIntro } from '../world/intro';
 import FieldMap from '../world/FieldMap';
 import WorldScene from '../world/WorldScene';
-import { loadWorld } from '../world/assets';
+import useWorldTravel from '../world/useWorldTravel';
 import { locationsForWorld } from '../world/locations';
-import { resolveWorldRoute } from '../world/worldRoute';
 import FieldGuide from '../world/FieldGuide';
 import DestinationDialog from '../world/DestinationDialog';
 import { guideFromHash, guideHref } from '../world/guideContent';
@@ -22,7 +21,8 @@ class WorldErrorBoundary extends Component {
   }
 }
 function WorldPage() {
-  const route = useMemo(() => resolveWorldRoute(window.location.search), []);
+  const { route, assets, key: sceneKey, phase, progress, error, setError, sceneReady, travel } = useWorldTravel();
+  const transitioning = phase !== 'idle';
   const { campus, interior, name: worldName } = route;
   const [intro, setIntro] = useState(() => {
     let seen = false;
@@ -40,7 +40,6 @@ function WorldPage() {
     setIntro(state => state === 'waiting' ? 'flying' : state);
   }, []);
   const finishIntro = useCallback(() => setIntro('done'), []);
-  const [assets, setAssets] = useState(null), [progress, setProgress] = useState(0), [error, setError] = useState(null);
   const locations = useMemo(() => locationsForWorld(assets?.manifest), [assets]);
   const mapRef = useRef(null), arrowRef = useRef(null);
   const [destination, setDestination] = useState(null), [nearest, setNearest] = useState(null);
@@ -50,11 +49,6 @@ function WorldPage() {
   const [quality, setQuality] = useState(() => navigator.hardwareConcurrency <= 4 ? 'low' : 'balanced');
   const slowWindows = useRef(0), debug = useRef(null), [stats, setStats] = useState(null);
   const debugEnabled = new URLSearchParams(window.location.search).has('debug');
-  useEffect(() => {
-    let cancelled = false, resource;
-    loadWorld(value => { if (!cancelled) setProgress(previous => Math.max(previous, value)); }, route).then(result => { resource = result; if (cancelled) result.dispose(); else setAssets(result); }).catch(e => { if (!cancelled) setError(e.message); });
-    return () => { cancelled = true; resource?.dispose(); };
-  }, [route]);
   useEffect(() => {
     const prior = document.title; document.title = `${worldName} · Logan Kinajil-Moran`;
     return () => { document.title = prior; };
@@ -79,33 +73,42 @@ function WorldPage() {
   const changeQuality = value => { setQualityMode(value); setQuality(value === 'auto' ? 'balanced' : value); };
   const close = () => { setDestination(null); focus(); };
   const interact = useCallback(location => {
-    if (location.travel) window.location.assign(location.travel);
+    if (location.travel) { setDestination(null); setGuide(null); travel(location.travel); }
     else setDestination(location);
-  }, []);
-  const running = intro === 'done' && Boolean(assets) && !error && !destination && !guide;
+  }, [travel]);
+  useEffect(() => { setNearest(null); setSprinting(false); setDestination(null); setGuide(guideFromHash(window.location.hash)); }, [sceneKey]);
+  const running = !transitioning && intro === 'done' && Boolean(assets) && !error && !destination && !guide;
   useEffect(() => { if (assets && intro === 'done' && !guide && !destination) requestAnimationFrame(() => document.querySelector('.world-page canvas')?.focus()); }, [assets, guide, destination, intro]);
   const chapter = campus === 'rochester' ? '02' : campus === 'berkeley' ? '03' : '01';
   const region = interior ? 'Logan City · Interior' : campus === 'berkeley' ? 'UC Berkeley' : campus === 'rochester' ? 'University of Rochester' : 'Central avenue';
   const openMap = () => setDestination({ id: 'map', label: 'Area directory', body: interior ? 'Meet the people and inspect the exhibits in this room.' : 'Choose a landmark to visit.' });
-  return <main className="world-page">
+  const followWorldLink = event => {
+    if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    const link = event.target.closest('a[href]');
+    if (!link || link.target || link.hasAttribute('download') || link.getAttribute('href').startsWith('#')) return;
+    if (travel(link.href)) { event.preventDefault(); setDestination(null); setGuide(null); }
+  };
+  return <main className="world-page" onClick={followWorldLink} aria-busy={transitioning}>
     <div className="world-canvas">
       {assets && <WorldErrorBoundary><Canvas shadows={quality === 'low' ? false : { type: PCFSoftShadowMap }} dpr={[1, quality === 'high' ? 1.75 : quality === 'low' ? 1 : 1.35]} camera={{ fov: interior ? 62 : 48, near: .1, far: 700 }} gl={{ antialias: quality === 'low', powerPreference: 'high-performance', outputColorSpace: SRGBColorSpace, toneMapping: ACESFilmicToneMapping, toneMappingExposure: 1.1 }} onCreated={({ gl }) => { gl.domElement.addEventListener('webglcontextlost', e => { e.preventDefault(); setError('The graphics connection was interrupted. Reload the page to return to Logan City.'); }); }}>
-        <WorldScene intro={intro} onIntroDone={finishIntro} assets={assets} quality={quality} running={running} onNearest={setNearest} onInteract={interact} onPerformance={performance} onSprintChange={setSprinting} mapRef={mapRef} arrowRef={arrowRef} showGreeting={running && nearest?.id === 'welcome'} debug={debugEnabled ? debug : null} />
+        <WorldScene key={sceneKey} sceneKey={sceneKey} onReady={sceneReady} intro={intro} onIntroDone={finishIntro} assets={assets} quality={quality} running={running} onNearest={setNearest} onInteract={interact} onPerformance={performance} onSprintChange={setSprinting} mapRef={mapRef} arrowRef={arrowRef} showGreeting={running && nearest?.id === 'welcome'} debug={debugEnabled ? debug : null} />
       </Canvas></WorldErrorBoundary>}
     </div>
     {!assets && !error && <div className="world-loading" role="status">Entering {worldName}<span aria-hidden="true"> · {progress}%</span></div>}
     {assets && !error && intro !== 'done' && <WorldIntro leaving={intro === 'flying'} onEnter={enterWorld} />}
-    {intro === 'done' && !guide && !destination && <nav className="world-guide-menu" aria-label="World menu"><a href={guideHref('resume')}>Résumé</a><a href={guideHref('projects')}>Projects</a><a href={guideHref('settings')} aria-label="Controls and graphics">☷</a></nav>}
+    {!transitioning && intro === 'done' && !guide && !destination && <nav className="world-guide-menu" aria-label="World menu"><a href={guideHref('resume')}>Résumé</a><a href={guideHref('projects')}>Projects</a><a href={guideHref('settings')} aria-label="Controls and graphics">☷</a></nav>}
     {running && <>
       <div className="world-location"><span className="world-index">{chapter}</span><div><small>{region}</small><strong>{worldName}</strong></div></div>
       {sprinting && <div className="world-sprint" aria-hidden="true">Running</div>}
       <FieldMap assets={assets} locations={locations} mapRef={mapRef} arrowRef={arrowRef} onOpen={openMap} />
-      {nearest && <button className="world-interact" onClick={() => interact(nearest)}><kbd>E</kbd> {nearest.kind} <span>{nearest.id === 'welcome' ? 'Logan' : nearest.label}</span></button>}
+      {nearest && <button className="world-interact" onClick={() => interact(nearest)}><kbd>E</kbd> {nearest.kind === 'Talk' ? 'Talk to' : nearest.kind} <span>{nearest.label}</span></button>}
     </>}
     {destination && !guide && <DestinationDialog key={destination.id} destination={destination} onClose={close} onSelect={interact} locations={locations} worldName={worldName} />}
     {error && <div role="alert" className="world-runtime-error">{error} <button onClick={() => window.location.reload()}>Try again</button><p>You can still read the résumé and projects in the field guide.</p></div>}
     {guide && <FieldGuide view={guide} onClose={closeGuide} qualityMode={qualityMode} onQualityChange={changeQuality} />}
     {stats && <output className="world-debug" aria-label="Development diagnostics">{JSON.stringify({ ...stats, quality })}</output>}
+    <div className={`world-travel-veil is-${phase}`} aria-hidden="true" />
+    {transitioning && <span className="world-travel-status" role="status">{phase === 'closing' ? 'Moving to the next area' : `Arrived in ${worldName}`}</span>}
     <p className="world-mobile-note">This first edition is made for a keyboard and mouse. <a href={guideHref('resume')}>Read the field guide →</a></p>
   </main>;
 }

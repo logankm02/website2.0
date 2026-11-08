@@ -1,8 +1,9 @@
 /* eslint-disable react/no-unknown-property -- These elements use the React Three Fiber renderer. */
 import { useEffect, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Group, InstancedMesh, Matrix4, Vector3 } from 'three';
+import { Box3, DynamicDrawUsage, Group, InstancedBufferAttribute, InstancedMesh, Matrix4, Vector3 } from 'three';
 import { updateWind } from './toonMaterial';
+import { treeVisibility, treeFadeMaterial } from './treeVisibility';
 
 function components(model) {
   model.scene.updateMatrixWorld(true);
@@ -12,9 +13,9 @@ function components(model) {
   });
   return result;
 }
-export default function Vegetation({ assets, quality, player }) {
+export default function Vegetation({ assets, quality, player, focus, clearView }) {
   const generated = useMemo(() => {
-    const root = new Group(), geometry = [], batches = [], trees = [];
+    const root = new Group(), geometry = [], materials = [], batches = [], trees = [];
     const temp = new Matrix4(), scale = new Matrix4();
     const set = (mesh, index, row) => {
       temp.makeRotationY(row[4]); temp.setPosition(row[0], row[2], -row[1]);
@@ -33,8 +34,27 @@ export default function Vegetation({ assets, quality, player }) {
       const high = components(asset.high), low = asset.low ? components(asset.low) : null;
       geometry.push(...high.map(x => x.geometry), ...(low || []).map(x => x.geometry));
       if (asset.kind.startsWith('tree')) {
-        const make = parts => parts.map(part => { const mesh = new InstancedMesh(part.geometry, part.material, rows.length); mesh.count = 0; mesh.frustumCulled = false; mesh.castShadow = quality !== 'low'; mesh.receiveShadow = true; root.add(mesh); return mesh; });
-        trees.push({ rows, high: make(high), low: make(low || high) });
+        const bounds = new Box3();
+        high.forEach(part => { part.geometry.computeBoundingBox(); bounds.union(part.geometry.boundingBox); });
+        const localCenter = bounds.getCenter(new Vector3()), size = bounds.getSize(new Vector3());
+        const centers = rows.map(row => new Vector3(
+          row[0] + (localCenter.x * Math.cos(row[4]) + localCenter.z * Math.sin(row[4])) * row[3],
+          row[2] + localCenter.y * row[3],
+          -row[1] + (-localCenter.x * Math.sin(row[4]) + localCenter.z * Math.cos(row[4])) * row[3]));
+        const radii = rows.map(row => new Vector3(Math.max(size.x,size.z) * row[3] * .5 + 1.1,
+          size.y * row[3] * .5 + .5, Math.max(size.x,size.z) * row[3] * .5 + 1.1));
+        const make = parts => parts.map(part => {
+          // LODs have independent instance ordering, so coverage attributes must
+          // belong to their own geometry even when both use the same source.
+          const geom = part.geometry.clone(); geometry.push(geom);
+          geom.setAttribute('treeCoverage', new InstancedBufferAttribute(new Float32Array(rows.length).fill(1), 1).setUsage(DynamicDrawUsage));
+          const material = treeFadeMaterial(part.material); materials.push(material);
+          const mesh = new InstancedMesh(geom, material, rows.length);
+          mesh.instanceMatrix.setUsage(DynamicDrawUsage);
+          mesh.count = 0; mesh.frustumCulled = false;
+          mesh.castShadow = quality !== 'low'; mesh.receiveShadow = true; root.add(mesh); return mesh;
+        });
+        trees.push({ rows, centers, radii, coverage: new Float32Array(rows.length).fill(1), highIndices: [], lowIndices: [], high: make(high), low: make(low || high) });
       } else {
         const fountain = assets.manifest.fountain;
         const plant = asset.kind === 'grass' || asset.kind.startsWith('flowers');
@@ -56,27 +76,51 @@ export default function Vegetation({ assets, quality, player }) {
         }
       }
     }
-    return { root, geometry, batches, trees, set, clock: 0 };
+    return { root, geometry, materials, batches, trees, set, clock: 0, head: new Vector3(), center: new Vector3() };
   }, [assets, quality]);
-  useEffect(() => () => { generated.root.traverse(o => { if (o.isInstancedMesh) o.dispose(); }); generated.geometry.forEach(g => g.dispose()); }, [generated]);
-  useFrame((_, delta) => {
+  useEffect(() => () => { generated.root.traverse(o => { if (o.isInstancedMesh) o.dispose(); }); generated.geometry.forEach(g => g.dispose()); generated.materials.forEach(m => m.dispose()); }, [generated]);
+  useFrame(({ camera }, delta) => {
     updateWind(delta);
-    generated.clock -= delta; if (generated.clock > 0) return; generated.clock = .35;
     const p = player.current;
+    generated.head.set(p.x, p.y + 1.25, p.z);
+    for (const tree of generated.trees) {
+      for (let i = 0; i < tree.rows.length; i++) {
+        const target = clearView ? Math.min(treeVisibility(camera.position, generated.head, tree.centers[i], tree.radii[i]),
+          treeVisibility(camera.position, focus, tree.centers[i], tree.radii[i])) : 1;
+        const rate = target < tree.coverage[i] ? 12 : 4;
+        tree.coverage[i] += (target - tree.coverage[i]) * (1 - Math.exp(-rate * Math.min(delta, .1)));
+      }
+    }
+    generated.clock -= delta;
+    const updateInstances = generated.clock <= 0;
+    if (updateInstances) generated.clock = .35;
     const distance = row => Math.hypot(row[0] - p.x, -row[1] - p.z);
     for (const tree of generated.trees) {
-      let highCount = 0, lowCount = 0;
-      for (const row of tree.rows) {
-        const d = distance(row);
-        if (d > 155) continue;
-        const useHigh = quality === 'high' ? d < 42 : quality === 'balanced' && d < 23;
-        const meshes = useHigh ? tree.high : tree.low, index = useHigh ? highCount++ : lowCount++;
-        meshes.forEach(m => generated.set(m, index, row));
+      if (updateInstances) {
+        tree.highIndices.length = 0; tree.lowIndices.length = 0;
+        let highCount = 0, lowCount = 0;
+        for (let rowIndex = 0; rowIndex < tree.rows.length; rowIndex++) {
+          const row = tree.rows[rowIndex];
+          const d = distance(row);
+          if (d > 155) continue;
+          const useHigh = quality === 'high' ? d < 42 : quality === 'balanced' && d < 23;
+          const meshes = useHigh ? tree.high : tree.low, index = useHigh ? highCount++ : lowCount++;
+          (useHigh ? tree.highIndices : tree.lowIndices).push(rowIndex);
+          meshes.forEach(m => generated.set(m, index, row));
+        }
+        tree.high.forEach(m => { m.count = highCount; m.instanceMatrix.needsUpdate = true; });
+        tree.low.forEach(m => { m.count = lowCount; m.instanceMatrix.needsUpdate = true; });
       }
-      tree.high.forEach(m => { m.count = highCount; m.instanceMatrix.needsUpdate = true; });
-      tree.low.forEach(m => { m.count = lowCount; m.instanceMatrix.needsUpdate = true; });
+      for (const [meshes, indices] of [[tree.high, tree.highIndices], [tree.low, tree.lowIndices]]) {
+        for (const mesh of meshes) {
+          const attribute = mesh.geometry.getAttribute('treeCoverage');
+          indices.forEach((rowIndex, index) => { const value = tree.coverage[rowIndex]; attribute.array[index] = value < .003 ? 0 : value > .997 ? 1 : value; });
+          attribute.needsUpdate = true;
+        }
+      }
     }
-    const center = new Vector3(p.x, p.y, p.z);
+    if (!updateInstances) return;
+    const center = generated.center.set(p.x, p.y, p.z);
     const range = quality === 'high' ? 62 : quality === 'balanced' ? 46 : 30;
     generated.batches.forEach(b => { b.mesh.visible = b.center.distanceTo(center) < range; });
   });

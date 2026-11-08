@@ -37,7 +37,7 @@ export function stepPlayer(state, input, yaw, world, dt) {
   const side = Number(input.has('KeyD') || input.has('ArrowRight')) - Number(input.has('KeyA') || input.has('ArrowLeft'));
   const magnitude = Math.hypot(forward, side) || 1;
   const sprintHeld = input.has('ShiftLeft') || input.has('ShiftRight');
-  const speed = sprintHeld ? 4.8 : 1.7;
+  const speed = sprintHeld ? 4.8 : 2.8;
   state.sprinting = sprintHeld && (forward !== 0 || side !== 0);
   const targetX = (-Math.sin(yaw) * forward + Math.cos(yaw) * side) / magnitude * speed;
   const targetZ = (-Math.cos(yaw) * forward - Math.sin(yaw) * side) / magnitude * speed;

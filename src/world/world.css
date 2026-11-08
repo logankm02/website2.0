@@ -224,3 +224,25 @@
 @media (prefers-reduced-motion:reduce) {
   .world-opening-title {animation:none}.world-page .world-opening {transition:none}
 }
+
+/* A continuous canvas remains underneath this door-to-door dissolve. */
+.world-travel-veil {
+  position: absolute; inset: 0; z-index: 60;
+  background: #182124; opacity: 0; pointer-events: none;
+  transition: opacity 560ms cubic-bezier(.22,.61,.36,1);
+}
+.world-travel-veil.is-closing { opacity: 1; pointer-events: auto; transition-duration: 320ms; }
+.world-travel-veil.is-opening { pointer-events: auto; }
+.world-travel-status {
+  position: absolute; width: 1px; height: 1px; padding: 0;
+  overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+}
+@media (prefers-reduced-motion: reduce) { .world-travel-veil { transition-duration: 0ms !important; } }
+
+.world-opening-sub { display: block; max-width: 560px; margin-inline: auto; line-height: 1.6; }
+.world-dialog-actions { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 18px; flex-wrap: wrap; }
+.world-dialog-actions .world-return { margin-top: 0; margin-left: auto; gap: 22px; }
+.world-dialog-pagination { display: flex; align-items: center; gap: 12px; font-size: 12px; }
+.world-dialog-pagination button { background: #ecebe0; border: 1px solid #d9d8cc; border-radius: 5px; padding: 7px 10px; }
+.world-dialog-pagination button:disabled { cursor: default; opacity: .4; }
+.world-dialog-pagination span { font-variant-numeric: tabular-nums; color: #545966; }

@@ -10,10 +10,10 @@ import Traveler from './Traveler';
 import CampusCrowd from './CampusCrowd';
 import { createCollisionWorld, stepPlayer } from './physics';
 import { locationsForWorld } from './locations';
-import { INTRO_SECONDS, introEase } from './intro';
+import { INTRO_SECONDS, introEase, introFlightPoint, introLens } from './intro';
 import { makeProbePixels } from './toonMaterial';
 
-export default function WorldScene({ intro = 'done', onIntroDone, assets, quality, running, onNearest, onInteract, onPerformance, onSprintChange, mapRef, arrowRef, showGreeting, debug }) {
+export default function WorldScene({ sceneKey, onReady, intro = 'done', onIntroDone, assets, quality, running, onNearest, onInteract, onPerformance, onSprintChange, mapRef, arrowRef, showGreeting, debug }) {
   const { camera, gl, scene } = useThree();
   const world = useMemo(() => createCollisionWorld(assets.manifest, assets.placements, assets.heights), [assets]);
   const locations = useMemo(() => locationsForWorld(assets.manifest), [assets]);
@@ -44,13 +44,13 @@ export default function WorldScene({ intro = 'done', onIntroDone, assets, qualit
     assets.world.scene.traverse(o => { if (o.isMesh) { o.castShadow = !/Terrain|water/.test(o.name); o.receiveShadow = true; } });
     const { yaw, pitch } = orbit.current;
     const previousFov = camera.fov;
-    if (glade) { camera.fov = 60; camera.updateProjectionMatrix(); }
+    camera.fov = interior ? 62 : glade ? 60 : 48; camera.updateProjectionMatrix();
     const targetY = world.height(spawnX, -spawnY) + focusHeight;
     const horizontal = Math.cos(pitch) * initialDistance;
     camera.position.set(spawnX + Math.sin(yaw) * horizontal, targetY + Math.sin(pitch) * initialDistance, -spawnY + Math.cos(yaw) * horizontal);
     camera.lookAt(spawnX, targetY, -spawnY);
     return () => { camera.fov = previousFov; camera.updateProjectionMatrix(); };
-  }, [assets, camera, world, spawnX, spawnY, initialDistance, focusHeight, glade]);
+  }, [assets, camera, world, spawnX, spawnY, initialDistance, focusHeight, glade, interior]);
   useEffect(() => {
     const canvas = gl.domElement; canvas.tabIndex = 0; canvas.setAttribute('aria-label', 'Explorable village. WASD to move, Shift to run, click then move the mouse to look, E to interact.');
     const clear = () => { input.current.clear(); orbit.current.dragging = false; };
@@ -86,7 +86,11 @@ export default function WorldScene({ intro = 'done', onIntroDone, assets, qualit
     wasRunning.current = true; everRan.current = true;
   }, [running, onSprintChange, gl]);
   const performance = useRef({ elapsed: 0, frames: 0, warmup: 0 });
+  const readyFrames = useRef(0);
   useFrame((_, delta) => {
+    // Allow a full rendered frame (including materials and postprocessing)
+    // behind the travel veil before uncovering a newly mounted area.
+    if (++readyFrames.current === 3) onReady?.(sceneKey);
     const p = player.current, o = orbit.current, c = cameraState;
     if (running) {
       accumulator.current = Math.min(accumulator.current + delta, .1);
@@ -107,12 +111,15 @@ export default function WorldScene({ intro = 'done', onIntroDone, assets, qualit
       flight.currentLook.set(8,12,-4); camera.lookAt(flight.currentLook);
     } else if (intro === 'flying' && !flight.complete) {
       if (!flight.started) {
-        flight.started = true; flight.from.copy(camera.position); flight.look.copy(flight.currentLook);
+        flight.started = true; flight.from.copy(camera.position); flight.look.copy(flight.currentLook); flight.fov = camera.fov;
       }
-      flight.time += Math.min(delta,.05);
-      const t = flight.reduced ? 1 : Math.min(1,flight.time / INTRO_SECONDS), eased = introEase(t);
-      camera.position.lerpVectors(flight.from,c.ideal,eased);
-      flight.currentLook.lerpVectors(flight.look,c.target,eased);camera.lookAt(flight.currentLook);
+      flight.time += Math.min(delta,.1);
+      const t = flight.reduced ? 1 : Math.min(1,flight.time / INTRO_SECONDS);
+      camera.position.fromArray(introFlightPoint(flight.from.toArray(),c.ideal.toArray(),t));
+      // Keep the town in view before gently handing focus to the player.
+      const focus = introEase(Math.max(0,(t-.12)/.88));
+      flight.currentLook.lerpVectors(flight.look,c.target,focus);camera.lookAt(flight.currentLook);
+      camera.fov = introLens(t,flight.fov);camera.updateProjectionMatrix();
       if (t === 1) { flight.complete = true; onIntroDone?.(); }
     } else {
       camera.position.lerp(c.ideal, 1 - Math.exp(-9 * Math.min(delta, .1))); camera.lookAt(c.target);
@@ -130,7 +137,11 @@ export default function WorldScene({ intro = 'done', onIntroDone, assets, qualit
       if (closest?.id !== nearest.current?.id) { nearest.current = closest; refs.current.onNearest(closest); }
       if (debug) debug.current = { x: p.x, y: p.y, z: p.z, ground: world.height(p.x,p.z), speed: p.speed, fps: Math.round(1 / Math.max(delta, .001)), calls: gl.info.render.calls, triangles: gl.info.render.triangles, nearest: closest?.id || '-' };
     }
-    const perf = performance.current; perf.elapsed += delta; perf.warmup += delta; perf.frames++;
+    const perf = performance.current;
+    // The aerial view sees far more scenery than gameplay; don't use its cost
+    // to permanently lower the walking view's automatic quality.
+    if (intro !== 'done') { perf.elapsed = 0; perf.warmup = 0; perf.frames = 0; return; }
+    perf.elapsed += delta; perf.warmup += delta; perf.frames++;
     if (perf.elapsed > 5) { if (perf.warmup > 8) refs.current.onPerformance(perf.frames / perf.elapsed); perf.elapsed = 0; perf.frames = 0; }
   });
   return <>
@@ -146,10 +157,10 @@ export default function WorldScene({ intro = 'done', onIntroDone, assets, qualit
     <directionalLight ref={sun} castShadow={quality !== 'low'} intensity={2.55} color="#ffedcf" position={[-30,55,25]} shadow-mapSize={[2048, 2048]} shadow-camera-left={-32} shadow-camera-right={32} shadow-camera-top={32} shadow-camera-bottom={-32} shadow-camera-near={1} shadow-camera-far={120} shadow-bias={-.00015} shadow-normalBias={.04} />
     </>}
     {showGreeting && <Html center position={[-4.3, world.height(-4.3,9.6) + 2.3, 9.6]} zIndexRange={[2,1]} style={{ pointerEvents: 'none' }}>
-      <span className="world-greeting">New in town?</span>
+      <span className="world-greeting">Welcome! Press E to chat.</span>
     </Html>}
     <primitive object={assets.world.scene} />
-    {!interior && <Vegetation assets={assets} quality={quality} player={player} />}
+    {!interior && <Vegetation assets={assets} quality={quality} player={player} focus={cameraState.target} clearView={intro === 'done'} />}
     <Traveler asset={assets.traveler} arrivalYaw={campus ? assets.manifest.arrivalYaw : 0} player={player} contactShadow={interior} />
     {campus && assets.resident && <CampusCrowd assets={assets} world={world} observer={player} running={running} quality={quality}/>}
     {!interior && !assets.manifest.campus && <Traveler asset={assets.resident} observer={player} residentIndex={2} position={[-4.3, world.height(-4.3,9.6), 9.6]} />}
